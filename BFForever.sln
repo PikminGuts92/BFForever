@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFForever", "BFForever\BFForever.csproj", "{835AB612-BE76-4FEA-8E10-8775FD7157D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongFuse", "SongFuse\SongFuse.csproj", "{AC588F51-3F29-4048-AA97-D5697AC19E51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{835AB612-BE76-4FEA-8E10-8775FD7157D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{835AB612-BE76-4FEA-8E10-8775FD7157D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{835AB612-BE76-4FEA-8E10-8775FD7157D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
