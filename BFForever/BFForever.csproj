@@ -44,10 +44,17 @@
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Riff\Chunk.cs" />
+    <Compile Include="Riff\Constant.cs" />
+    <Compile Include="Riff\FString.cs" />
+    <Compile Include="Riff\Global.cs" />
+    <Compile Include="Riff\ZObjects\Index2.cs" />
+    <Compile Include="Riff\RiffFile.cs" />
+    <Compile Include="Riff\StringKey.cs" />
+    <Compile Include="Riff\StringTable.cs" />
+    <Compile Include="Riff\ZObject.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Riff\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

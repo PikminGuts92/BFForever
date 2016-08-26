@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BFForever.Riff
+{
+    public class Index2 : ZObject
+    {
+        public class Index2Entry
+        {
+            public FString InternalPath { get; set; }    // songs.Halestorm.LoveBites.bss_adv.tab
+            public FString Type { get; set; }            // tab
+            public List<FString> Packages { get; set; }      // PackageDefs.core.PackageDef
+            public List<string> ExternalPaths { get; set; } // songs/halestorm/lovebites/fused.rif (max 240 bytes)
+        }
+
+        public Index2(FString idx) : base(idx)
+        {
+            Entries = new List<Index2Entry>();
+        }
+
+        public int Version { get; set; }
+        public List<Index2Entry> Entries { get; set; }
+
+        public override void ImportData(AwesomeReader ar)
+        {
+            Version = ar.ReadInt32();
+            int count = ar.ReadInt32();
+            ar.ReadInt32(); // Should be 4
+
+            for (int i = 0; i < count; i++)
+            {
+                Index2Entry entry = new Index2Entry();
+
+                // 24 bytes
+                entry.InternalPath = ar.ReadInt64();
+                entry.Type = ar.ReadInt64();
+                int stringCount = ar.ReadInt32(); // Usually 1 for most entries
+
+                entry.Packages = new List<FString>();
+                entry.ExternalPaths = new List<string>();
+
+                // Jumps to packages/external paths entries
+                long stringOffset = (ar.ReadInt32() - 4) + ar.BaseStream.Position;
+                long previousPosition = ar.BaseStream.Position;
+
+                for (int ii = 0; ii < stringCount; ii++)
+                {
+                    // 248 bytes
+                    ar.BaseStream.Position = stringOffset;
+
+                    // Reads string + null-terminated string
+                    entry.Packages.Add(ar.ReadInt64());
+                    entry.ExternalPaths.Add(ar.ReadNullString());
+
+                    stringOffset += 248;
+
+                }
+
+                // Returns to next entry
+                ar.BaseStream.Position = previousPosition;
+
+                // Adds to entries
+                Entries.Add(entry);
+            }
+        }
+        
+
+        //public override FString ObjectType { get; } = Global.ComputeHash("index2");
+
+    }
+}
