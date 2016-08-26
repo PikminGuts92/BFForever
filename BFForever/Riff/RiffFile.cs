@@ -18,6 +18,9 @@ namespace BFForever.Riff
             Objects = new List<ZObject>();
         }
 
+        public bool BigEndian { get; set; }
+        public List<ZObject> Objects { get; set; }
+        
         /// <summary>
         /// Imports objects from riff file.
         /// </summary>
@@ -29,13 +32,65 @@ namespace BFForever.Riff
             using (FileStream fs = File.OpenRead(input))
             {
                 // Imports objects from file
-                //ParseRiff(fs);
+                ParseRiff(fs);
             }
         }
 
-        public bool BigEndian { get; set; }
+        /// <summary>
+        /// Parse chunk data from riff file
+        /// </summary>
+        /// <param name="input">Riff stream</param>
+        private void ParseRiff(Stream input)
+        {
+            using (AwesomeReader ar = new AwesomeReader(input))
+            {
+                // Checks for "RIFF" magic.
+                switch (ar.ReadInt32())
+                {
+                    case 1380533830: // "FFIR"
+                        ar.BigEndian = true;
+                        break;
+                    case Constant.RIFF:
+                        // Reader is already little endian by default.
+                        break;
+                    default:
+                        throw new Exception("Invalid magic. Expected \"RIFF\"");
+                }
 
-        public List<ZObject> Objects { get; set; }
-        
+                BigEndian = ar.BigEndian; // Sets endianess
+
+                int size = ar.ReadInt32();
+                int id = ar.ReadInt32();
+                ar.ReadInt32(); // Reads chunk size (Not needed since we have index chunk)
+
+                // INDX Identifier
+                if (id != Constant.INDX)
+                    throw new Exception("Could not find index chunk.");
+
+                int[] offset = new int[ar.ReadInt32()];
+                ar.ReadInt32(); // Should be 4.
+
+                for (int i = 0; i < offset.Length; i++)
+                {
+                    ar.ReadInt64(); // Reads index key (Not worth keeping)
+                    offset[i] = ar.ReadInt32();
+                    ar.ReadInt32(); // Sould be 0.
+                }
+
+                foreach (int off in offset)
+                {
+                    ar.BaseStream.Position = off; // Goes to chunk offset
+
+                    // Reads chunk
+                    // - If it was a string table then all values will be added to global strings
+                    Chunk chunk = Chunk.FromStream(ar);
+
+                    // Adds object to riff collection
+                    if (chunk != null && chunk is ZObject)
+                        Objects.Add(chunk as ZObject);
+                }
+
+            }
+        }
     }
 }
