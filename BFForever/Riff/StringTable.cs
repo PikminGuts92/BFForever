@@ -8,12 +8,12 @@ namespace BFForever.Riff
 {
     public enum Language : long
     {
-        English = 5412069155413958780,
-        Japanese = -4916594395764136780,
-        German = 8434362063832740322,
-        Italian = 4181558474080832064,
-        Spanish = -1868168087102288302,
-        French = 6388165613802289312
+        English = 5412069155413958780L,
+        Japanese = -4916594395764136780L,
+        German = 8434362063832740322L,
+        Italian = 4181558474080832064L,
+        Spanish = -1868168087102288302L,
+        French = 6388165613802289312L
     }
 
     public class StringTable : Chunk
@@ -82,6 +82,7 @@ namespace BFForever.Riff
                 sk.SetValue(d.Value, TableLanguage);
 
                 // Adds string to string table collection (And adds globally)
+                StringKey.AddString(sk);
                 Strings.Add(sk.Key);
             }
         }

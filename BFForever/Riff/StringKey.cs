@@ -23,6 +23,12 @@ namespace BFForever.Riff
             _key = key; // Only set once!
         }
 
+        
+        public static StringKey Find(long key)
+        {
+            return _strings[key];
+        }
+
         public void SetValue(string s, Language lan = Language.English)
         {
             switch (lan)
@@ -69,14 +75,10 @@ namespace BFForever.Riff
 
         public static void AddString(StringKey sk)
         {
-            if (Contains(sk.Key))
+            if (Exists(sk.Key))
             {
                 // String key exists globally
-                StringKey newString = _strings[sk.Key] + sk; // Merges strings
-
-                // Adds new string to global collection
-                _strings.Remove(sk.Key);
-                _strings.Add(newString.Key, newString);
+                _strings[sk.Key].MergeWith(sk); // Merges strings
             }
             else
             {
@@ -88,7 +90,7 @@ namespace BFForever.Riff
 
         public static void RemoveString(StringKey sk)
         {
-            if (Contains(sk.Key))
+            if (Exists(sk.Key))
                 _strings.Remove(sk.Key);
         }
 
@@ -100,11 +102,11 @@ namespace BFForever.Riff
         public static StringKey FindCreate(long key)
         {
             // Found string key
-            if (Contains(key))
+            if (Exists(key))
                 return _strings[key];
 
             // Didn't find string key - Creates one
-            return new StringKey(UniqueKey());
+            return new StringKey(key);
         }
 
         /// <summary>
@@ -120,43 +122,30 @@ namespace BFForever.Riff
             return sk;
         }
 
-        public static bool Contains(long key)
+        public static bool Exists(long key)
         {
             return _strings.ContainsKey(key);
         }
 
         private static long UniqueKey()
         {
-            while (Contains(_lastNumber))
+            while (Exists(_lastNumber))
                 _lastNumber++;
 
             return _lastNumber;
         }
 
-        public static StringKey operator+(StringKey a, StringKey b)
+        private void MergeWith(StringKey b)
         {
-            StringKey c = new StringKey(a.Key);
+            if (this.Key != b.Key) return;
 
-            // Copies values from a to b
-            c._english = a._english;
-            c._japanese = a._japanese;
-            c._german = a._german;
-            c._italian = a._italian;
-            c._spanish = a._spanish;
-            c._french = a._french;
-
-            if (a.Key == b.Key)
-            {
-                // Overwrites old strings so long as the new one isn't null
-                if (b._english != null) c._english = b._english;
-                if (b._japanese != null) c._japanese = b._japanese;
-                if (b._german != null) c._german = b._german;
-                if (b._italian != null) c._italian = b._italian;
-                if (b._spanish != null) c._spanish = b._spanish;
-                if (b._french != null) c._french = b._french;
-            }
-
-            return c;
+            // Overwrites old strings so long as the new one isn't null
+            if (b._english != null) this._english = b._english;
+            if (b._japanese != null) this._japanese = b._japanese;
+            if (b._german != null) this._german = b._german;
+            if (b._italian != null) this._italian = b._italian;
+            if (b._spanish != null) this._spanish = b._spanish;
+            if (b._french != null) this._french = b._french;
         }
 
         /// <summary>

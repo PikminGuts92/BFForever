@@ -28,6 +28,8 @@ namespace BFForever.Riff
                     break;
                 case Constant.STbl:
                     chunk = new StringTable(idx);
+                    chunk.ImportData(ar);
+
                     break;
                 case Constant.ZOBJ:
                     FString directory = ar.ReadInt64();
@@ -43,6 +45,7 @@ namespace BFForever.Riff
                             chunk = null;
                             break;
                     }
+                    ((ZObject)chunk).Directory = directory;
                     chunk.ImportData(ar);
 
                     break;

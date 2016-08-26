@@ -11,6 +11,12 @@ namespace SongFuse
     {
         static void Main(string[] args)
         {
+            if (args == null) return;
+
+            // Opens single rif file
+            RiffFile rif = new RiffFile();
+            rif.Import(args[0]);
+
         }
     }
 }
