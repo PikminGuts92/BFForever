@@ -58,6 +58,7 @@
     <Compile Include="Riff\ZObjects\Instrument.cs" />
     <Compile Include="Riff\ZObjects\Measure.cs" />
     <Compile Include="Riff\ZObjects\PackageDef.cs" />
+    <Compile Include="Riff\ZObjects\Section.cs" />
     <Compile Include="Riff\ZObjects\Song.cs" />
     <Compile Include="Riff\ZObjects\Tempo.cs" />
     <Compile Include="Riff\ZObjects\TimeEntry.cs" />

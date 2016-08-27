@@ -71,6 +71,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_TimeSignature:
                             chunk = new TimeSignature(idx);
                             break;
+                        case Constant.RIFF_Section:
+                            chunk = new Section(idx);
+                            break;
                         default:
                             return null;
                     }
