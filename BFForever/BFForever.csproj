@@ -55,6 +55,7 @@
     <Compile Include="Riff\StringTable.cs" />
     <Compile Include="Riff\ZObject.cs" />
     <Compile Include="Riff\ZObjects\PackageDef.cs" />
+    <Compile Include="Riff\ZObjects\Song.cs" />
     <Compile Include="SongManager.cs" />
   </ItemGroup>
   <ItemGroup />

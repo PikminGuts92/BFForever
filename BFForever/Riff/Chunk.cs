@@ -47,6 +47,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Catalog2:
                             chunk = new Catalog2(idx);
                             break;
+                        case Constant.RIFF_Song:
+                            chunk = new Song(idx);
+                            break;
                         default:
                             return null;
                     }
