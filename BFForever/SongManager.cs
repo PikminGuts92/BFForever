@@ -40,5 +40,14 @@ namespace BFForever
                 }
             }
         }
+
+        public RiffFile LoadRiffFile(string relativePath)
+        {
+            // Opens single rif file
+            RiffFile rif = new RiffFile();
+            rif.Import(_workingDirectory + "\\" + relativePath);
+
+            return rif;
+        }
     }
 }

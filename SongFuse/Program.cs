@@ -12,10 +12,13 @@ namespace SongFuse
     {
         static void Main(string[] args)
         {
-            if (args == null || args.Length < 1) return;
+            if (args == null || args.Length < 2) return;
 
+            // Loads song resources
             SongManager sm = new SongManager(args[0]);
 
+            // Loads single rif file
+            RiffFile rif = sm.LoadRiffFile(args[1]);
         }
     }
 }
