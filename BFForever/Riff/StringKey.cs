@@ -26,7 +26,10 @@ namespace BFForever.Riff
         
         public static StringKey Find(long key)
         {
-            return _strings[key];
+            if (Exists(key))
+                return _strings[key];
+            else
+                return null;
         }
 
         public void SetValue(string s, Language lan = Language.English)

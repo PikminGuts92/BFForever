@@ -9,7 +9,7 @@ namespace BFForever.Riff
     // Object level keys
     public class FString
     {
-        private StringKey _sk;
+        private long _globalKey;
         
         /// <summary>
         /// Creates fused string
@@ -17,8 +17,9 @@ namespace BFForever.Riff
         /// <param name="key">Key</param>
         public FString(long key)
         {
-            _sk = StringKey.FindCreate(key);
+            StringKey _sk = StringKey.FindCreate(key);
             StringKey.AddString(_sk); // Adds globally
+            _globalKey = _sk.Key;
         }
 
         /// <summary>
@@ -27,8 +28,9 @@ namespace BFForever.Riff
         /// <param name="s">String</param>
         public FString(string s)
         {
-            _sk = StringKey.FindCreate(s);
+            StringKey _sk = StringKey.FindCreate(s);
             StringKey.AddString(_sk); // Adds globally
+            _globalKey = _sk.Key;
         }
 
         /// <summary>
@@ -61,31 +63,34 @@ namespace BFForever.Riff
 
         public override string ToString()
         {
-            if (_sk == null || _sk.GetValue() == null)
-                return "???";
-            else
-                return _sk.GetValue();
+            StringKey sk = StringKey.Find(_globalKey);
+            if (sk == null) return "???";
+
+            // Base directory in string tables do not contain English strings for whatever reason
+            string text = (sk.GetValue() == null) ? sk.GetValue(Language.Japanese) : sk.GetValue();
+            return (text == null) ? "???" : text;
         }
 
         /// <summary>
         /// Gets string key
         /// </summary>
-        public long Key { get { return _sk.Key; } }
+        public long Key { get { return _globalKey; } }
 
         /// <summary>
-        /// Gets or sets string value
+        /// Gets or sets string value (English)
         /// </summary>
         public string Value
         {
             get
             {
-                return _sk.GetValue();
+                return StringKey.Find(_globalKey)?.GetValue();
             }
             set
             {
                 if (value == null) return;
-                _sk = StringKey.FindCreate(value);
-                StringKey.AddString(_sk); // Adds globally
+                StringKey sk = StringKey.FindCreate(value);
+                StringKey.AddString(sk); // Adds globally
+                _globalKey = sk.Key;
             }
         }
     }
