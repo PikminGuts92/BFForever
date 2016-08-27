@@ -59,6 +59,14 @@ namespace BFForever.Riff
             return new FString(key);
         }
 
+        public override string ToString()
+        {
+            if (_sk == null)
+                return null;
+            else
+                return _sk.GetValue();
+        }
+
         /// <summary>
         /// Gets string key
         /// </summary>
