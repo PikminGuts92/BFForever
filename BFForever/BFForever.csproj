@@ -52,6 +52,7 @@
     <Compile Include="Riff\ZObjects\AudioEffect.cs" />
     <Compile Include="Riff\ZObjects\Catalog2.cs" />
     <Compile Include="Riff\ZObjects\Chord.cs" />
+    <Compile Include="Riff\ZObjects\Event.cs" />
     <Compile Include="Riff\ZObjects\Index2.cs" />
     <Compile Include="Riff\RiffFile.cs" />
     <Compile Include="Riff\StringKey.cs" />

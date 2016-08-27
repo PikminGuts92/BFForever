@@ -80,6 +80,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_AudioEffect:
                             chunk = new AudioEffect(idx);
                             break;
+                        case Constant.RIFF_Event:
+                            chunk = new Event(idx);
+                            break;
                         default:
                             return null;
                     }
