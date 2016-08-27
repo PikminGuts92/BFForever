@@ -53,6 +53,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Audio:
                             chunk = new Audio(idx);
                             break;
+                        case Constant.RIFF_Instrument:
+                            chunk = new Instrument(idx);
+                            break;
                         default:
                             return null;
                     }
