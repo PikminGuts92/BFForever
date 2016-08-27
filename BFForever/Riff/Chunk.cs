@@ -74,6 +74,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Section:
                             chunk = new Section(idx);
                             break;
+                        case Constant.RIFF_Chord:
+                            chunk = new Chord(idx);
+                            break;
                         default:
                             return null;
                     }

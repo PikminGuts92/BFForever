@@ -50,6 +50,7 @@
     <Compile Include="Riff\Global.cs" />
     <Compile Include="Riff\ZObjects\Audio.cs" />
     <Compile Include="Riff\ZObjects\Catalog2.cs" />
+    <Compile Include="Riff\ZObjects\Chord.cs" />
     <Compile Include="Riff\ZObjects\Index2.cs" />
     <Compile Include="Riff\RiffFile.cs" />
     <Compile Include="Riff\StringKey.cs" />
