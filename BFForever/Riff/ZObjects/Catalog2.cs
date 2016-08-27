@@ -39,6 +39,11 @@ namespace BFForever.Riff
             GenreTags = new List<FString>();
         }
 
+        public override string ToString()
+        {
+            return string.Format("{0}: \"{1}\" by {2}", this.SongType, this?.Title, this?.Artist);
+        }
+
         public void ImportData(AwesomeReader ar)
         {
             // 280 bytes
