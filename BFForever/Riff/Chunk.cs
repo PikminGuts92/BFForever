@@ -89,6 +89,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Texture:
                             chunk = new Texture(idx);
                             break;
+                        case Constant.RIFF_Tab:
+                            chunk = new Tab(idx);
+                            break;
                         default:
                             return null;
                     }

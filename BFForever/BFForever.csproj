@@ -63,6 +63,7 @@
     <Compile Include="Riff\ZObjects\PackageDef.cs" />
     <Compile Include="Riff\ZObjects\Section.cs" />
     <Compile Include="Riff\ZObjects\Song.cs" />
+    <Compile Include="Riff\ZObjects\Tab.cs" />
     <Compile Include="Riff\ZObjects\Tempo.cs" />
     <Compile Include="Riff\ZObjects\TextEventEntry.cs" />
     <Compile Include="Riff\ZObjects\Texture.cs" />
