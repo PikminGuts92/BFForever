@@ -44,6 +44,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_PackageDef:
                             chunk = new PackageDef(idx);
                             break;
+                        case Constant.RIFF_Catalog2:
+                            chunk = new Catalog2(idx);
+                            break;
                         default:
                             return null;
                     }
