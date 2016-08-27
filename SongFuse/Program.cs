@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BFForever;
 using BFForever.Riff;
 
 namespace SongFuse
@@ -11,11 +12,9 @@ namespace SongFuse
     {
         static void Main(string[] args)
         {
-            if (args == null) return;
+            if (args == null || args.Length < 1) return;
 
-            // Opens single rif file
-            RiffFile rif = new RiffFile();
-            rif.Import(args[0]);
+            SongManager sm = new SongManager(args[0]);
 
         }
     }
