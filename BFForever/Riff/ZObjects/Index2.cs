@@ -66,5 +66,10 @@ namespace BFForever.Riff
         public FString Type { get; set; }            // tab
         public List<FString> Packages { get; set; }      // PackageDefs.core.PackageDef
         public List<string> ExternalPaths { get; set; } // songs/halestorm/lovebites/fused.rif (max 240 bytes)
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", this?.InternalPath, this?.Type);
+        }
     }
 }
