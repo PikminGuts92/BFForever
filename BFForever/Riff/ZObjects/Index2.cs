@@ -8,14 +8,6 @@ namespace BFForever.Riff
 {
     public class Index2 : ZObject
     {
-        public class Index2Entry
-        {
-            public FString InternalPath { get; set; }    // songs.Halestorm.LoveBites.bss_adv.tab
-            public FString Type { get; set; }            // tab
-            public List<FString> Packages { get; set; }      // PackageDefs.core.PackageDef
-            public List<string> ExternalPaths { get; set; } // songs/halestorm/lovebites/fused.rif (max 240 bytes)
-        }
-
         public Index2(FString idx) : base(idx)
         {
             Entries = new List<Index2Entry>();
@@ -66,5 +58,13 @@ namespace BFForever.Riff
                 Entries.Add(entry);
             }
         }
+    }
+
+    public class Index2Entry
+    {
+        public FString InternalPath { get; set; }    // songs.Halestorm.LoveBites.bss_adv.tab
+        public FString Type { get; set; }            // tab
+        public List<FString> Packages { get; set; }      // PackageDefs.core.PackageDef
+        public List<string> ExternalPaths { get; set; } // songs/halestorm/lovebites/fused.rif (max 240 bytes)
     }
 }
