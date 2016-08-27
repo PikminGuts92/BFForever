@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BFForever.Riff
 {
-    public abstract class TimeEntry
+    public class TimeEntry
     {
         private float _start;
         private float _end;
