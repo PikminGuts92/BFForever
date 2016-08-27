@@ -26,6 +26,7 @@ namespace BFForever.Riff
         public const long RIFF_Song = 6513106166515406705L;
         public const long RIFF_Tone2 = 7416050649089508853L;
         public const long RIFF_Video = 8038962682362700638L;
+        public const long RIFF_Texture = -1763250323791712995L;
 
         // Note entries (Also song related)
         public const long RIFF_TimeSignature = 6337357091990946694L;

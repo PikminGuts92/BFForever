@@ -86,6 +86,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Video:
                             chunk = new Video(idx);
                             break;
+                        case Constant.RIFF_Texture:
+                            chunk = new Texture(idx);
+                            break;
                         default:
                             return null;
                     }
