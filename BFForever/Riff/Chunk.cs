@@ -59,6 +59,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Vox:
                             chunk = new Vox(idx);
                             break;
+                        case Constant.RIFF_VoxPushPhrase:
+                            chunk = new VoxPushPhrase(idx);
+                            break;
                         default:
                             return null;
                     }
