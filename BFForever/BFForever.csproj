@@ -67,6 +67,7 @@
     <Compile Include="Riff\ZObjects\TextEventEntry.cs" />
     <Compile Include="Riff\ZObjects\TimeEntry.cs" />
     <Compile Include="Riff\ZObjects\TimeSignature.cs" />
+    <Compile Include="Riff\ZObjects\Video.cs" />
     <Compile Include="Riff\ZObjects\Vox.cs" />
     <Compile Include="Riff\ZObjects\VoxPushPhrase.cs" />
     <Compile Include="SongManager.cs" />

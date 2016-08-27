@@ -83,6 +83,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Event:
                             chunk = new Event(idx);
                             break;
+                        case Constant.RIFF_Video:
+                            chunk = new Video(idx);
+                            break;
                         default:
                             return null;
                     }
