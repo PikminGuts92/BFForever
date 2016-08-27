@@ -77,6 +77,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Chord:
                             chunk = new Chord(idx);
                             break;
+                        case Constant.RIFF_AudioEffect:
+                            chunk = new AudioEffect(idx);
+                            break;
                         default:
                             return null;
                     }
