@@ -10,10 +10,10 @@ namespace BFForever.Riff
     {
         public Section(FString idx) : base(idx)
         {
-            Entries = new List<SectionEntry>();
+            Entries = new List<TextEventEntry>();
         }
 
-        public List<SectionEntry> Entries { get; set; }
+        public List<TextEventEntry> Entries { get; set; }
 
         public override void ImportData(AwesomeReader ar)
         {
@@ -26,7 +26,7 @@ namespace BFForever.Riff
             for (int i = 0; i < count; i++)
             {
                 // Reads entry (16 bytes)
-                SectionEntry entry = new SectionEntry();
+                TextEventEntry entry = new TextEventEntry();
 
                 entry.Start = ar.ReadSingle();
                 entry.End = ar.ReadSingle();
@@ -35,18 +35,5 @@ namespace BFForever.Riff
                 Entries.Add(entry);
             }
         }
-    }
-
-    public class SectionEntry : TimeEntry
-    {
-        public SectionEntry()
-        {
-
-        }
-
-        /// <summary>
-        /// Gets or sets section name (ex: "Intro", "Verse 1", etc.)
-        /// </summary>
-        public FString EventName { get; set; }
     }
 }
