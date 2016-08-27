@@ -68,6 +68,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Measure:
                             chunk = new Measure(idx);
                             break;
+                        case Constant.RIFF_TimeSignature:
+                            chunk = new TimeSignature(idx);
+                            break;
                         default:
                             return null;
                     }
