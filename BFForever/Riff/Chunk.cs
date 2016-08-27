@@ -65,6 +65,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_Tempo:
                             chunk = new Tempo(idx);
                             break;
+                        case Constant.RIFF_Measure:
+                            chunk = new Measure(idx);
+                            break;
                         default:
                             return null;
                     }
