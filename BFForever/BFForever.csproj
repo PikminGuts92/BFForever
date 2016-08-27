@@ -53,6 +53,7 @@
     <Compile Include="Riff\StringKey.cs" />
     <Compile Include="Riff\StringTable.cs" />
     <Compile Include="Riff\ZObject.cs" />
+    <Compile Include="Riff\ZObjects\PackageDef.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

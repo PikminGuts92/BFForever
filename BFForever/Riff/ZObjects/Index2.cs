@@ -66,9 +66,5 @@ namespace BFForever.Riff
                 Entries.Add(entry);
             }
         }
-        
-
-        //public override FString ObjectType { get; } = Global.ComputeHash("index2");
-
     }
 }

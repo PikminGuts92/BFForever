@@ -36,14 +36,16 @@ namespace BFForever.Riff
                     FString type = ar.ReadInt64();
                     ar.BaseStream.Position += 8; // Skips zeros
                     
-                    switch(type.Value.ToLower())
+                    switch(type.Key)
                     {
-                        case "index2":
+                        case Constant.RIFF_Index2:
                             chunk = new Index2(idx);
                             break;
-                        default:
-                            chunk = null;
+                        case Constant.RIFF_PackageDef:
+                            chunk = new PackageDef(idx);
                             break;
+                        default:
+                            return null;
                     }
                     ((ZObject)chunk).Directory = directory;
                     chunk.ImportData(ar);

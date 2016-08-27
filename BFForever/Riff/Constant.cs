@@ -14,13 +14,32 @@ namespace BFForever.Riff
         public const int STbl = 1818383443;
         public const int ZOBJ = 1245859674;
 
-        /* Moved to string table enum
-        public const long STbl_English = 5412069155413958780;
-        public const long STbl_Japanese = -4916594395764136780;
-        public const long STbl_German = 8434362063832740322;
-        public const long STbl_Italian = 4181558474080832064;
-        public const long STbl_Spanish = -1868168087102288302;
-        public const long STbl_French = 6388165613802289312;
-        */
+        // 3 main files needed for riffs
+        public const long RIFF_Index2 = 9088292688391085503L;
+        public const long RIFF_PackageDef = 2732979432304615805L;
+        public const long RIFF_Catalog2 = -2491412229276672383L;
+
+        // Song related
+        public const long RIFF_Audio = 2890252404065717805L;
+        public const long RIFF_Instrument = 8077402325500961663L;
+        public const long RIFF_Lick = 3805151244674316159L;
+        public const long RIFF_Song = 6513106166515406705L;
+        public const long RIFF_Tone2 = 7416050649089508853L;
+        public const long RIFF_Video = 8038962682362700638L;
+
+        // Note entries (Also song related)
+        public const long RIFF_TimeSignature = 6337357091990946694L;
+        public const long RIFF_Tempo = 9036615569154774522L;
+        public const long RIFF_Spread = -4367504208474669087L;
+        public const long RIFF_VoxSpread = 4350643521893962914L; // Same file as 'spread'
+        public const long RIFF_Section = 1392567553694744637L;
+        public const long RIFF_Measure = -4712637811320572879L;
+        public const long RIFF_Chord = -7185636719787030249L;
+        public const long RIFF_AudioEffect = -9124590646962395076L;
+        public const long RIFF_Vox = -9052798821044463638L;
+        public const long RIFF_VoxPushPhrase = 3610267684391764180L;
+        public const long RIFF_Tab = -2098839878622417772L;
+        public const long RIFF_Whammy = -2976502283081711182L;
+        public const long RIFF_Event = 4629664052592776185L;
     }
 }
