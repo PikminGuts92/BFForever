@@ -61,8 +61,8 @@ namespace BFForever.Riff
 
         public override string ToString()
         {
-            if (_sk == null)
-                return null;
+            if (_sk == null || _sk.GetValue() == null)
+                return "???";
             else
                 return _sk.GetValue();
         }
