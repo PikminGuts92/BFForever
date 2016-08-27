@@ -62,6 +62,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_VoxPushPhrase:
                             chunk = new VoxPushPhrase(idx);
                             break;
+                        case Constant.RIFF_Tempo:
+                            chunk = new Tempo(idx);
+                            break;
                         default:
                             return null;
                     }
