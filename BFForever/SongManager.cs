@@ -49,5 +49,7 @@ namespace BFForever
 
             return rif;
         }
+
+        public List<Index2Entry> IndexEntries { get { return _index2.Entries; } }
     }
 }
