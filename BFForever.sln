@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFForever", "BFForever\BFFo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongFuse", "SongFuse\SongFuse.csproj", "{AC588F51-3F29-4048-AA97-D5697AC19E51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riff Explorer", "Riff Explorer\Riff Explorer.csproj", "{05C7DF99-C9C2-435B-A900-72101D8BB2B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC588F51-3F29-4048-AA97-D5697AC19E51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
