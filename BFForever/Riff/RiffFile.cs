@@ -16,10 +16,12 @@ namespace BFForever.Riff
         {
             BigEndian = true;
             Objects = new List<ZObject>();
+            Tables = new List<StringTable>();
         }
 
         public bool BigEndian { get; set; }
         public List<ZObject> Objects { get; set; }
+        public List<StringTable> Tables { get; set; }
         
         /// <summary>
         /// Imports objects from riff file.
@@ -84,10 +86,13 @@ namespace BFForever.Riff
                     // Reads chunk
                     // - If it was a string table then all values will be added to global strings
                     Chunk chunk = Chunk.FromStream(ar);
-
-                    // Adds object to riff collection
+                    
                     if (chunk != null && chunk is ZObject)
+                        // Adds object to riff collection
                         Objects.Add(chunk as ZObject);
+                    else if (chunk != null && chunk is StringTable)
+                        // Adds table to riff collection
+                        Tables.Add(chunk as StringTable);
                 }
 
             }
