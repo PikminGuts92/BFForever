@@ -19,6 +19,11 @@ namespace SongFuse
 
             // Loads single rif file
             RiffFile rif = sm.LoadRiffFile(args[1]);
+
+            if (args.Length < 3) return;
+
+            // Exports strings to file
+            StringKey.ExportToFile(args[2]);
         }
     }
 }
