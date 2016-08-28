@@ -31,8 +31,7 @@ namespace BFForever.Riff
                 entry.Type = ar.ReadInt64();
                 int stringCount = ar.ReadInt32(); // Usually 1 for most entries
 
-                entry.Packages = new List<FString>();
-                entry.ExternalPaths = new List<string>();
+                entry.PackagesEntries = new List<Index2PackageEntry>();
 
                 // Jumps to packages/external paths entries
                 long stringOffset = (ar.ReadInt32() - 4) + ar.BaseStream.Position;
@@ -44,11 +43,12 @@ namespace BFForever.Riff
                     ar.BaseStream.Position = stringOffset;
 
                     // Reads string + null-terminated string
-                    entry.Packages.Add(ar.ReadInt64());
-                    entry.ExternalPaths.Add(ar.ReadNullString());
+                    Index2PackageEntry pack = new Index2PackageEntry();
+                    pack.Package = ar.ReadInt64();
+                    pack.ExternalPath = ar.ReadNullString();
+                    entry.PackagesEntries.Add(pack);
 
                     stringOffset += 248;
-
                 }
 
                 // Returns to next entry
@@ -64,12 +64,22 @@ namespace BFForever.Riff
     {
         public FString InternalPath { get; set; }    // songs.Halestorm.LoveBites.bss_adv.tab
         public FString Type { get; set; }            // tab
-        public List<FString> Packages { get; set; }      // PackageDefs.core.PackageDef
-        public List<string> ExternalPaths { get; set; } // songs/halestorm/lovebites/fused.rif (max 240 bytes)
+        public List<Index2PackageEntry> PackagesEntries { get; set; }
 
         public override string ToString()
         {
             return string.Format("{0} - {1}", this?.InternalPath, this?.Type);
+        }
+    }
+
+    public class Index2PackageEntry
+    {
+        public FString Package { get; set; }     // PackageDefs.core.PackageDef
+        public string ExternalPath { get; set; } // songs/halestorm/lovebites/fused.rif (max 240 bytes)
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", this?.Package?.Value, this?.ExternalPath);
         }
     }
 }
