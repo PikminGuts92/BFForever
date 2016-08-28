@@ -33,6 +33,7 @@ namespace BFForever.Riff
             _globalKey = _sk.Key;
         }
 
+        #region Overloaded Operators
         /// <summary>
         /// Returns key value of fused string
         /// </summary>
@@ -60,6 +61,68 @@ namespace BFForever.Riff
         {
             return new FString(key);
         }
+
+        public static bool operator ==(FString a, FString b)
+        {
+            return a._globalKey == b._globalKey;
+        }
+
+        public static bool operator !=(FString a, FString b)
+        {
+            return !(a == b);
+        }
+
+        public static bool operator ==(FString a, long b)
+        {
+            return a._globalKey == b;
+        }
+
+        public static bool operator !=(FString a, long b)
+        {
+            return !(a == b);
+        }
+
+        public static bool operator ==(long a, FString b)
+        {
+            return a == b._globalKey;
+        }
+
+        public static bool operator !=(long a, FString b)
+        {
+            return !(a == b);
+        }
+
+        public static bool operator ==(FString a, string b)
+        {
+            return a.Value == b;
+        }
+
+        public static bool operator !=(FString a, string b)
+        {
+            return !(a == b);
+        }
+
+        public static bool operator ==(string a, FString b)
+        {
+            return a == b.Value;
+        }
+
+        public static bool operator !=(string a, FString b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((FString)obj)._globalKey == _globalKey;
+        }
+
+        public override int GetHashCode()
+        {
+            return _globalKey.GetHashCode();
+        }
+
+        #endregion
 
         public override string ToString()
         {
