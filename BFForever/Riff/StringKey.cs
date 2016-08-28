@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace BFForever.Riff
 {
@@ -22,8 +23,39 @@ namespace BFForever.Riff
         {
             _key = key; // Only set once!
         }
-
         
+        private string GetAnyValue()
+        {
+            if (_english != null) return _english;
+            else if (_japanese != null) return _japanese;
+            else if (_german != null) return _german;
+            else if (_italian != null) return _italian;
+            else if (_spanish != null) return _spanish;
+            else if (_french != null) return _french;
+            else return "";
+        }
+
+        public static void ExportToFile(string path)
+        {
+            List<long> keys = new List<long>();
+
+            foreach (var str in _strings)
+            {
+                keys.Add(str.Key);
+            }
+
+            keys.Sort(); // Sorts keys
+
+            using (StreamWriter sw = new StreamWriter(path, false, Encoding.UTF8))
+            {
+                foreach (long key in keys)
+                {
+                    // Writes string/key pair to file
+                    sw.WriteLine("{0} {1}", key, _strings[key].GetAnyValue());
+                }
+            }
+        }
+
         public static StringKey Find(long key)
         {
             if (Exists(key))
