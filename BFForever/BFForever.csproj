@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +45,7 @@
     <Compile Include="AwesomeReader.cs" />
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
+    <Compile Include="Texture\DDSImageParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Riff\Chunk.cs" />
     <Compile Include="Riff\Constant.cs" />
@@ -74,7 +76,7 @@
     <Compile Include="Riff\ZObjects\Vox.cs" />
     <Compile Include="Riff\ZObjects\VoxPushPhrase.cs" />
     <Compile Include="SongManager.cs" />
-    <Compile Include="XPR2.cs" />
+    <Compile Include="Texture\XPR2.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

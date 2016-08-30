@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BFForever;
 using BFForever.Riff;
+using BFForever.Texture;
 
 namespace SongFuse
 {
@@ -13,6 +14,10 @@ namespace SongFuse
         static void Main(string[] args)
         {
             if (args == null || args.Length < 2) return;
+
+            // Loads texture
+            XPR2 xp = XPR2.FromFile(args[0]);
+            return;
 
             // Loads song resources
             SongManager sm = new SongManager(args[0]);
