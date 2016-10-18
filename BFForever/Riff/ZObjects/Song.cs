@@ -16,7 +16,7 @@ namespace BFForever.Riff
             InstrumentPaths = new List<FString>();
         }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             Title = ar.ReadInt64();
             Artist = ar.ReadInt64();

@@ -15,7 +15,7 @@ namespace BFForever.Riff
 
         public FString ExternalPath { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             // Reads audio path
             ar.BaseStream.Position += 8;

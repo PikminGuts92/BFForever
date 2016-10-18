@@ -28,7 +28,7 @@ namespace BFForever.Riff
         public Language TableLanguage { get; set; }
         public List<FString> Strings { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             BaseDirectory = ar.ReadInt64(); // songs.Halestorm.LoveBites
             TableLanguage = (Language)ar.ReadInt64();

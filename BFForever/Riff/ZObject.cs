@@ -15,7 +15,7 @@ namespace BFForever.Riff
 
         public FString Directory { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             // Must override this!
         }

@@ -16,7 +16,7 @@ namespace BFForever.Riff
         public int Version { get; set; }
         public List<Index2Entry> Entries { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             Version = ar.ReadInt32();
             int count = ar.ReadInt32();

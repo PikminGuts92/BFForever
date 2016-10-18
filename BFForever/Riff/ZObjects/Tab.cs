@@ -16,7 +16,7 @@ namespace BFForever.Riff
 
         public List<TabEntry> Entries { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             ar.ReadInt32(); // Always 11
             ar.ReadInt32(); // Size of each VoxEntry (64 bytes)

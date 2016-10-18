@@ -27,7 +27,7 @@ namespace BFForever.Riff
             EntryPaths = new List<FString>();
         }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             InstrumentType = ar.ReadInt64();
             Difficulty = ar.ReadInt64();

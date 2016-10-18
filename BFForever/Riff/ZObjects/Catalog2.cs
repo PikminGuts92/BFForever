@@ -15,7 +15,7 @@ namespace BFForever.Riff
 
         public List<Catalog2Entry> Entries { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             int count = ar.ReadInt32();
             ar.ReadInt32(); // Offset to entries (Always 4)

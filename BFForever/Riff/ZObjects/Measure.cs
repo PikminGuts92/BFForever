@@ -15,7 +15,7 @@ namespace BFForever.Riff
 
         public List<MeasureEntry> Entries { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             ar.ReadInt32(); // Always 4
             ar.ReadInt32(); // Size of each TimeEntry (12 bytes)

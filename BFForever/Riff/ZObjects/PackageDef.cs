@@ -19,7 +19,7 @@ namespace BFForever.Riff
         public string PackageName { get; set; }
         public List<string> Entries { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             Version = ar.ReadInt32(); // 1100024
 

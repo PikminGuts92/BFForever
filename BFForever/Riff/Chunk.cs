@@ -106,7 +106,7 @@ namespace BFForever.Riff
             return chunk;
         }
 
-        public abstract void ImportData(AwesomeReader ar);
+        protected abstract void ImportData(AwesomeReader ar);
 
         public FString IndexKey { get; set; }
     }

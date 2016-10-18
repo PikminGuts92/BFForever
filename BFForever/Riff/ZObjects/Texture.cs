@@ -15,7 +15,7 @@ namespace BFForever.Riff
 
         public FString InternalPath { get; set; }
 
-        public override void ImportData(AwesomeReader ar)
+        protected override void ImportData(AwesomeReader ar)
         {
             // Reads texture path
             ar.BaseStream.Position += 8;
