@@ -5,7 +5,7 @@ BFForever is an open-source library for managing and creating song files for the
 * Full support for managing RIFF files
 * XPR2 texture conversion
 * CLT (OPUS) audio conversion
-* Import notes from MIDI file
+* MIDI <-> RIFF conversion
 
 # Currently Implemented
 * RIFF (Read Only)
