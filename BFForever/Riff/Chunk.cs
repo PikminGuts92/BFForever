@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace BFForever.Riff
 {
@@ -107,6 +108,174 @@ namespace BFForever.Riff
         }
 
         protected abstract void ImportData(AwesomeReader ar);
+
+        protected virtual byte[] ToBytes(bool bigEndian = true)
+        {
+            if (!(this is IData))
+                // Needed for the GetObjects method
+                return null;
+
+            using (AwesomeWriter aw = new AwesomeWriter(new MemoryStream()))
+            {
+                aw.BigEndian = bigEndian; // Sets endianness
+                aw.Write((long)IndexKey); // Index key
+
+                if (this is ZObject) WriteObjectData(aw);
+                //else if (this is STbl) WriteTableData(aw, man);
+
+                // Returns chunk data
+                return ((MemoryStream)aw.BaseStream).ToArray();
+            }
+        }
+
+        private int GetObjectSize(IEnumerable<string> objects)
+        {
+            int size = 0;
+
+            // Gets length of all objects put together
+            foreach (object obj in objects)
+            {
+                if (obj is sbyte || obj is byte) size++;
+                else if (obj is short || obj is ushort) size += 2;
+                else if (obj is int || obj is uint || obj is float) size += 4;
+                else if (obj is long || obj is ulong || obj is string || obj is IEnumerable<string>) size += 8;
+                else if (obj is IEnumerable<object>) size += ((IEnumerable<object>)obj).Count();
+                else
+                    // Leaving this here for now
+                    throw new NotImplementedException();
+            }
+
+            return size;
+        }
+
+        private void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((long)((ZObject)this).Directory.Key); // Directory key
+            //aw.Write((long)((ZObject)this).); // 64-bit type key
+
+            /*
+             * Implement a switch statement here!
+             */
+
+            aw.Write((long)0); // Zero'd data
+
+            // Read only collection of all data in chunk
+            IReadOnlyCollection<object> objects = ((IData)this).GetObjects();
+
+            int objSize = 0;
+
+            // Gets length of all objects put together
+            foreach (object obj in objects)
+            {
+                if (obj is sbyte || obj is byte) objSize++;
+                else if (obj is short || obj is ushort) objSize += 2;
+                else if (obj is int || obj is uint || obj is float) objSize += 4;
+                else if (obj is long || obj is ulong || obj is string || obj is IEnumerable<string>) objSize += 8;
+            }
+
+            // Bytes to be written at the end
+            List<byte[]> data = new List<byte[]>();
+
+            // Sets next data offset
+            int nextDataOffset = (int)aw.BaseStream.Position + objSize;
+
+            foreach (object obj in objects)
+            {
+                // Writes integers
+                if (obj is sbyte || obj is byte) aw.Write((sbyte)obj);
+                else if (obj is short || obj is ushort) aw.Write((short)obj);
+                else if (obj is int || obj is uint) aw.Write((int)obj);
+                else if (obj is long || obj is ulong) aw.Write((long)obj);
+
+                // Writes float
+                else if (obj is float) aw.Write((float)obj);
+
+                // Writes fused string
+                else if (obj is FString) aw.Write((long)((FString)obj).Key);
+
+                else if (obj is IEnumerable<FString>)
+                {
+                    IEnumerable<FString> strings = obj as IEnumerable<FString>;
+                    aw.Write(strings.Count()); // Writes number of objects in collection
+
+                    int relativeOffset = nextDataOffset - (int)aw.BaseStream.Position;
+                    aw.Write(relativeOffset); // Writes relative offset
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        foreach (string s in strings)
+                        {
+                            // Gets byte data for string key
+                            byte[] key = BitConverter.GetBytes((long)((FString)obj).Key);
+                            if (aw.BigEndian) Array.Reverse(key); // Reverses endianness
+
+                            // Writes data to memory
+                            ms.Write(key, 0, key.Length);
+                        }
+
+                        // Adds to data list
+                        data.Add(ms.ToArray());
+                    }
+
+                    // Updates next data offset
+                    nextDataOffset += data[data.Count - 1].Length;
+                }
+
+                else if (obj is IEnumerable<object>)
+                {
+                    IEnumerable<object> subObj = obj as IEnumerable<object>;
+                    aw.Write(objects.Count()); // Writes number of objects in collection
+
+                    int relativeOffset = nextDataOffset - (int)aw.BaseStream.Position;
+                    aw.Write(relativeOffset); // Writes relative offset
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        foreach (object o in subObj)
+                        {
+                            byte[] oBytes;
+
+                            // Writes integers
+                            if (o is sbyte || o is byte) oBytes = new byte[] { (byte)o };
+                            else if (o is short || o is ushort) oBytes = BitConverter.GetBytes((short)o);
+                            else if (o is int || o is uint) oBytes = BitConverter.GetBytes((int)o);
+                            else if (o is long || o is ulong) oBytes = oBytes = BitConverter.GetBytes((long)o);
+
+                            // Writes float
+                            else if (o is float) oBytes = BitConverter.GetBytes((float)o);
+
+                            // Writes fused string
+                            else if (o is FString) oBytes = BitConverter.GetBytes((long)((FString)o).Key);
+
+                            // Writes byte array
+                            else if (o is byte[]) oBytes = o as byte[];
+
+                            else throw new NotImplementedException();
+
+                            if (!(o is string) && !(o is byte[]) && aw.BigEndian)
+                                Array.Reverse(oBytes); // Reverses endianness
+
+                            // Writes data to memory
+                            ms.Write(oBytes, 0, oBytes.Length);
+                        }
+
+                        // Adds to data list
+                        data.Add(ms.ToArray());
+                    }
+
+                    // Updates next data offset
+                    nextDataOffset += data[data.Count - 1].Length;
+                }
+            }
+
+            // Finally writes all data at the end
+            foreach (byte[] d in data) aw.Write(d);
+        }
+
+        private void WriteTableData(AwesomeWriter aw)
+        {
+
+        }
 
         public FString IndexKey { get; set; }
     }
