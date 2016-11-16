@@ -97,5 +97,27 @@ namespace BFForever.Riff
 
             }
         }
+
+        public void Export(string output)
+        {
+            // Creates directory if it dkoesn't exist
+            if (!Directory.Exists(Path.GetDirectoryName(output)))
+                Directory.CreateDirectory(Path.GetDirectoryName(output));
+
+            using (FileStream fs = File.OpenWrite(output))
+            {
+                // Exports objects to file
+                WriteRiff(fs);
+            }
+        }
+
+        private void WriteRiff(Stream output)
+        {
+            // Writes riff data to stream
+            using (AwesomeWriter aw = new AwesomeWriter(output, this.BigEndian))
+            {
+
+            }
+        }
     }
 }
