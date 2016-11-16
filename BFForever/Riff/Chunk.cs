@@ -19,20 +19,24 @@ namespace BFForever.Riff
             int chunkType = ar.ReadInt32(); // INDX or STbl or ZOBJ
             int chunkSize = ar.ReadInt32();
             
-            long idx = ar.ReadInt64(); // Index key
+            long idx = 0; // Index key
 
             Chunk chunk;
             switch (chunkType)
             {
                 case Constant.INDX:
-                    chunk = null;
+                    chunk = new Index();
+                    chunk.ImportData(ar);
+
                     break;
                 case Constant.STbl:
+                    idx = ar.ReadInt64(); // Reads idx key
                     chunk = new StringTable(idx);
                     chunk.ImportData(ar);
 
                     break;
                 case Constant.ZOBJ:
+                    idx = ar.ReadInt64(); // Reads idx key
                     FString directory = ar.ReadInt64();
                     FString type = ar.ReadInt64();
                     ar.BaseStream.Position += 8; // Skips zeros

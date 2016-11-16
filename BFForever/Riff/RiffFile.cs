@@ -62,26 +62,14 @@ namespace BFForever.Riff
                 BigEndian = ar.BigEndian; // Sets endianess
 
                 int size = ar.ReadInt32();
-                int id = ar.ReadInt32();
-                ar.ReadInt32(); // Reads chunk size (Not needed since we have index chunk)
 
-                // INDX Identifier
-                if (id != Constant.INDX)
-                    throw new Exception("Could not find index chunk.");
-
-                int[] offset = new int[ar.ReadInt32()];
-                ar.ReadInt32(); // Should be 4.
-
-                for (int i = 0; i < offset.Length; i++)
+                Chunk headChunk = Chunk.FromStream(ar);
+                if (headChunk == null || !(headChunk is Index))
+                    throw new Exception("Could not find index chunk");
+                
+                foreach (IndexEntry entry in ((Index)headChunk).Entries)
                 {
-                    ar.ReadInt64(); // Reads index key (Not worth keeping)
-                    offset[i] = ar.ReadInt32();
-                    ar.ReadInt32(); // Sould be 0.
-                }
-
-                foreach (int off in offset)
-                {
-                    ar.BaseStream.Position = off; // Goes to chunk offset
+                    ar.BaseStream.Position = entry.Offset; // Goes to chunk offset
 
                     // Reads chunk
                     // - If it was a string table then all values will be added to global strings
