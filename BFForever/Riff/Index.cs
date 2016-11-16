@@ -8,7 +8,7 @@ namespace BFForever.Riff
 {
     public class Index : Chunk
     {
-        public Index() : base(null)
+        public Index() : base(new FString(0))
         {
             Entries = new List<IndexEntry>();
         }
