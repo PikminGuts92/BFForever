@@ -46,6 +46,7 @@
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
     <Compile Include="Riff\IData.cs" />
+    <Compile Include="Riff\Index.cs" />
     <Compile Include="Texture\DDSImageParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Riff\Chunk.cs" />
