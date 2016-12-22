@@ -42,5 +42,8 @@ namespace BFForever.Riff
         public const long RIFF_Tab = -2098839878622417772L;
         public const long RIFF_Whammy = -2976502283081711182L;
         public const long RIFF_Event = 4629664052592776185L;
+
+        // Misc
+        public const long RIFF_UILocStrings = 7241233698164486062L;
     }
 }
