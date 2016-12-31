@@ -100,6 +100,9 @@ namespace BFForever.Riff
                         case Constant.RIFF_UILocStrings:
                             chunk = new UILocStrings(idx);
                             break;
+                        case Constant.RIFF_TRCPromptGroup:
+                            chunk = new TRCPromptGroup(idx);
+                            break;
                         default:
                             return null;
                     }

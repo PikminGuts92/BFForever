@@ -45,5 +45,6 @@ namespace BFForever.Riff
 
         // Misc
         public const long RIFF_UILocStrings = 7241233698164486062L;
+        public const long RIFF_TRCPromptGroup = 6454115111804180867L;
     }
 }
