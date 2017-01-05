@@ -88,8 +88,12 @@ namespace BFForever
         /// </summary>
         /// <param name="text">Input string</param>
         /// <returns>Hash</returns>
-        public ulong Compute(string text)
+        public ulong Compute(string text, bool ignoreCase = false)
         {
+            if (ignoreCase)
+                // Ex: songs.Halestorm.LoveBites -> songs.halestorm.lovebites
+                text = text.ToLowerInvariant().Replace("\\", ".").Replace("/", ".");
+
             return Compute(Encoding.UTF8.GetBytes(text));
         }
 
