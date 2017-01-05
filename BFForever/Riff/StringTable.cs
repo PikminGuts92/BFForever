@@ -86,5 +86,10 @@ namespace BFForever.Riff
                 Strings.Add(sk.Key);
             }
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1} strings)", IndexKey, Strings.Count);
+        }
     }
 }
