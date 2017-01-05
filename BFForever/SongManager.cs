@@ -36,12 +36,71 @@ namespace BFForever
                 foreach (ZObject zobj in rif.Objects)
                 {
                     if (zobj is Index2)
+                    {
                         _index2 = zobj as Index2;
+                        LoadStringTablePaths();
+                    }
                     else if (zobj is Catalog2)
                         _catalog2 = zobj as Catalog2;
                     else if (zobj is PackageDef)
                         _packageDef = zobj as PackageDef;
                 }
+            }
+        }
+
+        private void LoadStringTablePaths()
+        {
+            if (_index2 == null) return;
+            
+            CRC64 crc = new CRC64();
+
+            foreach (Index2Entry entry in _index2.Entries)
+            {
+                string indexPath = entry.InternalPath;
+
+                // Internal index path must be valid and external package path must be of riff extension (.rif)
+                if (indexPath == "???" || !entry.PackagesEntries[0].ExternalPath.EndsWith(".rif", StringComparison.InvariantCultureIgnoreCase)) continue;
+
+                int dotIndex = indexPath.LastIndexOf('.');
+                if (dotIndex == -1) continue;
+
+                string directoryPath = indexPath.Remove(dotIndex, indexPath.Length - dotIndex);
+
+                // Adds directory path to global strings
+                StringKey directoryPathGlobalString = StringKey.FindCreate((long)crc.Compute(directoryPath, true));
+
+                directoryPathGlobalString.SetValue(directoryPath, Language.English);
+                directoryPathGlobalString.SetValue(directoryPath, Language.French);
+                directoryPathGlobalString.SetValue(directoryPath, Language.German);
+                directoryPathGlobalString.SetValue(directoryPath, Language.Italian);
+                directoryPathGlobalString.SetValue(directoryPath, Language.Japanese);
+                directoryPathGlobalString.SetValue(directoryPath, Language.Spanish);
+
+                StringKey.AddString(directoryPathGlobalString); // Adds string globally
+
+                // All 6 languages found in DLC files
+                string[] localization = { "enUS", "jaJP", "deDE", "itIT", "esES", "frFR" };
+
+                foreach (string local in localization)
+                {
+                    string stringTablePath = directoryPath + ".stringTable@" + local;
+
+                    // Adds string table index path to global strings
+                    StringKey stringTablePathGlobalString = StringKey.FindCreate((long)crc.Compute(stringTablePath, true));
+
+                    stringTablePathGlobalString.SetValue(stringTablePath, Language.English);
+                    stringTablePathGlobalString.SetValue(stringTablePath, Language.French);
+                    stringTablePathGlobalString.SetValue(stringTablePath, Language.German);
+                    stringTablePathGlobalString.SetValue(stringTablePath, Language.Italian);
+                    stringTablePathGlobalString.SetValue(stringTablePath, Language.Japanese);
+                    stringTablePathGlobalString.SetValue(stringTablePath, Language.Spanish);
+
+                    // Adds string globally
+                    StringKey.AddString(stringTablePathGlobalString);
+                }
+
+                
+
             }
         }
 
