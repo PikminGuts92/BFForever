@@ -1,5 +1,5 @@
 # BFForever
-BFForever is an open-source library for handling and creating game files from the short-lived BandFuse video game which released for PS3 and Xbox 360 consoles in November 2013.
+BFForever is an open-source library for managing and creating game files from the short-lived BandFuse video game which released for PS3 and Xbox 360 consoles in November 2013.
 
 # Planned Features
 * Full support for handling RIFF files
