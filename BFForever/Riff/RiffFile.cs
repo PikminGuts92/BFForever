@@ -49,7 +49,7 @@ namespace BFForever.Riff
                 // Checks for "RIFF" magic.
                 switch (ar.ReadInt32())
                 {
-                    case 1380533830: // "FFIR"
+                    case Constant.RIFF_R: // "FFIR"
                         ar.BigEndian = true;
                         break;
                     case Constant.RIFF:
