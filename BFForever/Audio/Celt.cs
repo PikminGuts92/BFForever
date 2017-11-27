@@ -36,8 +36,8 @@ namespace BFForever.Audio
 {
     public class Celt
     {
-        private const int MAGIC = 0x42464144; // "BFAD"
-        private const int MAGIC_R = 0x44414642;
+        private const int MAGIC = 0x44414642; // "BFAD"
+        private const int MAGIC_R = 0x42464144;
 
         public uint Version { get; set; } = 2;
         public bool Encrypted { get; set; } = false;
@@ -72,7 +72,7 @@ namespace BFForever.Audio
         {
             Celt celt = new Celt();
 
-            using (AwesomeReader ar = new AwesomeReader(stream))
+            using (AwesomeReader ar = new AwesomeReader(stream, false))
             {
                 // Checks for "BFAD" magic
                 switch(ar.ReadInt32())
