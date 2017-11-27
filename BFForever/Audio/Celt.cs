@@ -39,26 +39,26 @@ namespace BFForever.Audio
         private const int MAGIC = 0x42464144; // "BFAD"
         private const int MAGIC_R = 0x44414642;
 
-        uint Version { get; set; } = 2;
-        bool Encrypted { get; set; } = false;
-        uint TotalSamples { get; set; }
-        uint Bitrate { get; set; } = 96000;
+        public uint Version { get; set; } = 2;
+        public bool Encrypted { get; set; } = false;
+        public uint TotalSamples { get; set; }
+        public uint Bitrate { get; set; } = 96000;
 
-        ushort FrameSize { get; set; } = 960;
-        ushort Unknown1 { get; set; } = 312;
-        ushort SampleRate { get; set; } = 48000;
-        ushort Unknown2 { get; set; } = 1;
+        public ushort FrameSize { get; set; } = 960;
+        public ushort Unknown1 { get; set; } = 312;
+        public ushort SampleRate { get; set; } = 48000;
+        public ushort Unknown2 { get; set; } = 1;
 
-        uint AudioHeaderOffset { get; set; }
-        uint AudioHeaderSize { get; set; }
+        public uint AudioHeaderOffset { get; set; }
+        public uint AudioHeaderSize { get; set; }
 
-        uint AudioBlockOffset { get; set; }
-        uint AudioBlockSize { get; set; }
+        public uint AudioBlockOffset { get; set; }
+        public uint AudioBlockSize { get; set; }
 
-        byte[] AudioHeader { get; set; }
-        byte[] AudioBlock { get; set; }
+        public byte[] AudioHeader { get; set; }
+        public byte[] AudioBlock { get; set; }
 
-        bool BigEndian { get; set; } = false;
+        public bool BigEndian { get; set; } = false;
 
         public static Celt FromFile(string path)
         {
