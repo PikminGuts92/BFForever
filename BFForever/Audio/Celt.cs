@@ -105,16 +105,12 @@ namespace BFForever.Audio
                 celt.AudioBlockOffset = ar.ReadUInt32();
                 celt.AudioBlockSize = ar.ReadUInt32();
                 celt.FixOffsets(); // Only useful for audio extracted from RAM, harmless
-
-                // Should be divisible by 16 evenly
-                uint headerSize = celt.AudioHeaderSize + (16 - (celt.AudioHeaderSize & 15));
-                uint blockSize = celt.AudioBlockSize + (16 - (celt.AudioBlockSize & 15));
-
-                if (headerSize % 16 != 0)
-                    headerSize += 16 - (headerSize % 16);
-
-                if (blockSize % 16 != 0)
-                    blockSize += 16 - (blockSize % 16);
+                
+                uint headerSize = celt.AudioBlockOffset - celt.AudioHeaderOffset; // Multiple of 4
+                uint blockSize = celt.AudioBlockSize;
+                
+                if ((headerSize + blockSize) % 16 != 0)
+                    blockSize += 16 - ((headerSize + blockSize) % 16);
 
                 celt.AudioHeader = ar.ReadBytes((int)headerSize);
                 celt.AudioBlock = ar.ReadBytes((int)blockSize);
