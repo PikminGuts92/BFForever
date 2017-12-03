@@ -274,6 +274,30 @@ namespace Riff_Explorer
             //rif.SaveToFile(sfd.FileName);
             MessageBox.Show("Riff file saved successfully!");
         }
+
+        private void exportIndex2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            sfd.Title = "Save Index2 Entries";
+            sfd.Filter = "JSON|*.json";
+            //sfd.InitialDirectory = fbd.SelectedPath;
+
+            if (!(sfd.ShowDialog() == DialogResult.OK)) return;
+
+            sm.ExportIndex2(sfd.FileName);
+            MessageBox.Show("Exported Index2 successfully!");
+        }
+
+        private void exportCatalog2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            sfd.Title = "Save Catalog2 Entries";
+            sfd.Filter = "JSON|*.json";
+            //sfd.InitialDirectory = fbd.SelectedPath;
+
+            if (!(sfd.ShowDialog() == DialogResult.OK)) return;
+
+            sm.ExportCatalog2(sfd.FileName);
+            MessageBox.Show("Exported Catalog2 successfully!");
+        }
     }
 
     public class ObjectPair

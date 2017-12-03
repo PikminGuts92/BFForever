@@ -3,10 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BFForever.Riff
 {
+    internal class FStringConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType) => objectType == typeof(FString);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.WriteValue(value.ToString());
+        }
+    }
+
     // Object level keys
+    [JsonConverter(typeof(FStringConverter))]
     public class FString
     {
         private long _globalKey;

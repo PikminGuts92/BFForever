@@ -3,9 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BFForever.Riff
 {
+    internal class PitchConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(byte);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            byte b = (byte)value;
+
+            writer.WriteValue(pitches_flats[b % 12] + ((b / 12) -1).ToString());
+        }
+
+        private string[] pitches_flats = new string[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
+        private string[] pitches_sharps = new string[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+    }
+
     public class Catalog2 : ZObject
     {
         public Catalog2(FString idx) : base(idx)
@@ -233,50 +257,86 @@ namespace BFForever.Riff
 
         public FString VoxTuningName { get; set; }
 
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxRealTuning1 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxRealTuning2 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxRealTuning3 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxRealTuning4 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxRealTuning5 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxRealTuning6 { get; set; }
 
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxOffsetTuning1 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxOffsetTuning2 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxOffsetTuning3 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxOffsetTuning4 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxOffsetTuning5 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte VoxOffsetTuning6 { get; set; }
 
         public FString GuitarTuningName { get; set; }
 
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarRealTuning1 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarRealTuning2 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarRealTuning3 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarRealTuning4 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarRealTuning5 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarRealTuning6 { get; set; }
 
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarOffsetTuning1 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarOffsetTuning2 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarOffsetTuning3 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarOffsetTuning4 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarOffsetTuning5 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte GuitarOffsetTuning6 { get; set; }
 
         public FString BassTuningName { get; set; }
 
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassRealTuning1 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassRealTuning2 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassRealTuning3 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassRealTuning4 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassRealTuning5 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassRealTuning6 { get; set; }
 
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassOffsetTuning1 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassOffsetTuning2 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassOffsetTuning3 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassOffsetTuning4 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassOffsetTuning5 { get; set; }
+        [JsonConverter(typeof(PitchConverter))]
         public byte BassOffsetTuning6 { get; set; }
 
         public List<FString> Labels { get; set; }

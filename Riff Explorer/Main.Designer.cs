@@ -35,6 +35,7 @@
             this.ddb_item_open = new System.Windows.Forms.ToolStripMenuItem();
             this.ddb_item_exportstrings = new System.Windows.Forms.ToolStripMenuItem();
             this.ddb_item_save = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportIndex2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.indexTree = new System.Windows.Forms.TreeView();
             this.objectImages = new System.Windows.Forms.ImageList(this.components);
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -55,6 +56,7 @@
             this.lbl_objkey = new System.Windows.Forms.Label();
             this.cms_index2 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.writeEntriesToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportCatalog2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -85,7 +87,9 @@
             this.ddb_file.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ddb_item_open,
             this.ddb_item_exportstrings,
-            this.ddb_item_save});
+            this.ddb_item_save,
+            this.exportIndex2ToolStripMenuItem,
+            this.exportCatalog2ToolStripMenuItem});
             this.ddb_file.Image = ((System.Drawing.Image)(resources.GetObject("ddb_file.Image")));
             this.ddb_file.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ddb_file.Name = "ddb_file";
@@ -95,23 +99,30 @@
             // ddb_item_open
             // 
             this.ddb_item_open.Name = "ddb_item_open";
-            this.ddb_item_open.Size = new System.Drawing.Size(146, 22);
+            this.ddb_item_open.Size = new System.Drawing.Size(157, 22);
             this.ddb_item_open.Text = "Open";
             this.ddb_item_open.Click += new System.EventHandler(this.ddb_item_open_Click);
             // 
             // ddb_item_exportstrings
             // 
             this.ddb_item_exportstrings.Name = "ddb_item_exportstrings";
-            this.ddb_item_exportstrings.Size = new System.Drawing.Size(146, 22);
+            this.ddb_item_exportstrings.Size = new System.Drawing.Size(157, 22);
             this.ddb_item_exportstrings.Text = "Export Strings";
             this.ddb_item_exportstrings.Click += new System.EventHandler(this.exportStringsToolStripMenuItem_Click);
             // 
             // ddb_item_save
             // 
             this.ddb_item_save.Name = "ddb_item_save";
-            this.ddb_item_save.Size = new System.Drawing.Size(146, 22);
+            this.ddb_item_save.Size = new System.Drawing.Size(157, 22);
             this.ddb_item_save.Text = "Save";
             this.ddb_item_save.Click += new System.EventHandler(this.ddb_item_save_Click);
+            // 
+            // exportIndex2ToolStripMenuItem
+            // 
+            this.exportIndex2ToolStripMenuItem.Name = "exportIndex2ToolStripMenuItem";
+            this.exportIndex2ToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.exportIndex2ToolStripMenuItem.Text = "Export Index2";
+            this.exportIndex2ToolStripMenuItem.Click += new System.EventHandler(this.exportIndex2ToolStripMenuItem_Click);
             // 
             // indexTree
             // 
@@ -181,7 +192,7 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 74F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 76F));
             this.tableLayoutPanel2.Controls.Add(this.listView1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.button1, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.comboBox1, 1, 1);
@@ -241,7 +252,7 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(43, 273);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(212, 21);
+            this.comboBox1.Size = new System.Drawing.Size(211, 21);
             this.comboBox1.TabIndex = 2;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
@@ -249,9 +260,9 @@
             // 
             this.button2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(378, 273);
+            this.button2.Location = new System.Drawing.Point(376, 273);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(69, 19);
+            this.button2.Size = new System.Drawing.Size(71, 19);
             this.button2.TabIndex = 3;
             this.button2.Text = "Save";
             this.button2.UseVisualStyleBackColor = true;
@@ -344,6 +355,13 @@
             this.writeEntriesToFileToolStripMenuItem.Text = "Write Entries To File";
             this.writeEntriesToFileToolStripMenuItem.Click += new System.EventHandler(this.writeEntriesToFileToolStripMenuItem_Click);
             // 
+            // exportCatalog2ToolStripMenuItem
+            // 
+            this.exportCatalog2ToolStripMenuItem.Name = "exportCatalog2ToolStripMenuItem";
+            this.exportCatalog2ToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.exportCatalog2ToolStripMenuItem.Text = "Export Catalog2";
+            this.exportCatalog2ToolStripMenuItem.Click += new System.EventHandler(this.exportCatalog2ToolStripMenuItem_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -399,6 +417,8 @@
         private System.Windows.Forms.ContextMenuStrip cms_index2;
         private System.Windows.Forms.ToolStripMenuItem writeEntriesToFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ddb_item_save;
+        private System.Windows.Forms.ToolStripMenuItem exportIndex2ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportCatalog2ToolStripMenuItem;
     }
 }
 

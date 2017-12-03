@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using BFForever.Riff;
+using Newtonsoft.Json;
 
 namespace BFForever
 {
@@ -124,6 +125,26 @@ namespace BFForever
                 rif.Import(rifPath);
 
             return rif;
+        }
+
+        public void ExportIndex2(string path)
+        {
+            string json = JsonConvert.SerializeObject(_index2, Formatting.Indented);
+
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            File.WriteAllText(path, json);
+        }
+
+        public void ExportCatalog2(string path)
+        {
+            string json = JsonConvert.SerializeObject(_catalog2, Formatting.Indented);
+
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            File.WriteAllText(path, json);
         }
 
         public List<Index2Entry> IndexEntries { get { return _index2.Entries; } }
