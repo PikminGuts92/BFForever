@@ -47,6 +47,23 @@ namespace BFForever
                         _packageDef = zobj as PackageDef;
                 }
             }
+
+            // Look for PackageDef
+            string[] packageDefs = Directory.GetFiles(Path.Combine(_workingDirectory, "packagedefs"), "packagedef.rif", SearchOption.AllDirectories);
+            //packageDefs = packageDefs.OrderBy(x => x).ToArray();
+            if (packageDefs.Length <= 0) return;
+
+            RiffFile packageDef = new RiffFile();
+            packageDef.Import(packageDefs[0]);
+
+            foreach (ZObject zobj in packageDef.Objects)
+            {
+                if (zobj is PackageDef)
+                {
+                    _packageDef = zobj as PackageDef;
+                    break;
+                }
+            }
         }
 
         private void LoadStringTablePaths()
@@ -140,6 +157,16 @@ namespace BFForever
         public void ExportCatalog2(string path)
         {
             string json = JsonConvert.SerializeObject(_catalog2, Formatting.Indented);
+
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            File.WriteAllText(path, json);
+        }
+
+        public void ExportPackageDef(string path)
+        {
+            string json = JsonConvert.SerializeObject(_packageDef, Formatting.Indented);
 
             if (!Directory.Exists(Path.GetDirectoryName(path)))
                 Directory.CreateDirectory(Path.GetDirectoryName(path));

@@ -298,6 +298,18 @@ namespace Riff_Explorer
             sm.ExportCatalog2(sfd.FileName);
             MessageBox.Show("Exported Catalog2 successfully!");
         }
+
+        private void exportPackageDefToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            sfd.Title = "Save PackageDef Entries";
+            sfd.Filter = "JSON|*.json";
+            //sfd.InitialDirectory = fbd.SelectedPath;
+
+            if (!(sfd.ShowDialog() == DialogResult.OK)) return;
+
+            sm.ExportCatalog2(sfd.FileName);
+            MessageBox.Show("Exported PackageDef successfully!");
+        }
     }
 
     public class ObjectPair
