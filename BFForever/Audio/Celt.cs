@@ -18,7 +18,7 @@ using System.IO;
  *   INT16 - Uncompressed Frame Size? (Always 960)
  *   INT16 - Unknown (Always 312)
  *   INT16 - Sample Rate (Always 48000)
- *   INT16 - Uknown (Always 1)
+ *   INT16 - Unknown (Always 1)
  *   INT32 - Audio Header Block Offset
  *   INT32 - Audio Header Block Size
  *   INT32 - Encoded Audio Block Offset

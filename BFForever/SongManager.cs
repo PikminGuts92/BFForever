@@ -15,6 +15,7 @@ namespace BFForever
         private Index2 _index2;
         private Catalog2 _catalog2;
         private PackageDef _packageDef;
+        private CRC64 crc = new CRC64();
 
         /// <summary>
         /// Loads and manages Index2, Catalog2, PackageDef objects
@@ -64,61 +65,67 @@ namespace BFForever
                     break;
                 }
             }
+
+            UpdateStringTableFromHKey(_index2.IndexKey);
+            UpdateStringTableFromHKey(_catalog2.IndexKey);
+            UpdateStringTableFromHKey(_packageDef.IndexKey);
         }
 
         private void LoadStringTablePaths()
         {
             if (_index2 == null) return;
             
-            CRC64 crc = new CRC64();
-
             foreach (Index2Entry entry in _index2.Entries)
             {
                 string indexPath = entry.InternalPath;
 
                 // Internal index path must be valid and external package path must be of riff extension (.rif)
                 if (indexPath == "???" || !entry.PackagesEntries[0].ExternalPath.EndsWith(".rif", StringComparison.InvariantCultureIgnoreCase)) continue;
+                UpdateStringTableFromHKey(entry.InternalPath);
+            }
+        }
 
-                int dotIndex = indexPath.LastIndexOf('.');
-                if (dotIndex == -1) continue;
+        private void UpdateStringTableFromHKey(string hkey)
+        {
+            if (hkey == null) return;
 
-                string directoryPath = indexPath.Remove(dotIndex, indexPath.Length - dotIndex);
+            // HKEY = Hierarchy Key
+            int dotIndex = hkey.LastIndexOf('.');
+            if (dotIndex == -1) return;
 
-                // Adds directory path to global strings
-                StringKey directoryPathGlobalString = StringKey.FindCreate((long)crc.Compute(directoryPath, true));
+            string directoryPath = hkey.Remove(dotIndex, hkey.Length - dotIndex);
 
-                directoryPathGlobalString.SetValue(directoryPath, Language.English);
-                directoryPathGlobalString.SetValue(directoryPath, Language.French);
-                directoryPathGlobalString.SetValue(directoryPath, Language.German);
-                directoryPathGlobalString.SetValue(directoryPath, Language.Italian);
-                directoryPathGlobalString.SetValue(directoryPath, Language.Japanese);
-                directoryPathGlobalString.SetValue(directoryPath, Language.Spanish);
+            // Adds directory path to global strings
+            StringKey directoryPathGlobalString = StringKey.FindCreate((long)crc.Compute(directoryPath, true));
 
-                StringKey.AddString(directoryPathGlobalString); // Adds string globally
+            directoryPathGlobalString.SetValue(directoryPath, Language.English);
+            directoryPathGlobalString.SetValue(directoryPath, Language.French);
+            directoryPathGlobalString.SetValue(directoryPath, Language.German);
+            directoryPathGlobalString.SetValue(directoryPath, Language.Italian);
+            directoryPathGlobalString.SetValue(directoryPath, Language.Japanese);
+            directoryPathGlobalString.SetValue(directoryPath, Language.Spanish);
 
-                // All 6 languages found in DLC files
-                string[] localization = { "enUS", "jaJP", "deDE", "itIT", "esES", "frFR" };
+            StringKey.AddString(directoryPathGlobalString); // Adds string globally
 
-                foreach (string local in localization)
-                {
-                    string stringTablePath = directoryPath + ".stringTable@" + local;
+            // All 6 languages found in DLC files
+            string[] localization = { "enUS", "jaJP", "deDE", "itIT", "esES", "frFR" };
 
-                    // Adds string table index path to global strings
-                    StringKey stringTablePathGlobalString = StringKey.FindCreate((long)crc.Compute(stringTablePath, true));
+            foreach (string local in localization)
+            {
+                string stringTablePath = directoryPath + ".stringTable@" + local;
 
-                    stringTablePathGlobalString.SetValue(stringTablePath, Language.English);
-                    stringTablePathGlobalString.SetValue(stringTablePath, Language.French);
-                    stringTablePathGlobalString.SetValue(stringTablePath, Language.German);
-                    stringTablePathGlobalString.SetValue(stringTablePath, Language.Italian);
-                    stringTablePathGlobalString.SetValue(stringTablePath, Language.Japanese);
-                    stringTablePathGlobalString.SetValue(stringTablePath, Language.Spanish);
+                // Adds string table index path to global strings
+                StringKey stringTablePathGlobalString = StringKey.FindCreate((long)crc.Compute(stringTablePath, true));
 
-                    // Adds string globally
-                    StringKey.AddString(stringTablePathGlobalString);
-                }
+                stringTablePathGlobalString.SetValue(stringTablePath, Language.English);
+                stringTablePathGlobalString.SetValue(stringTablePath, Language.French);
+                stringTablePathGlobalString.SetValue(stringTablePath, Language.German);
+                stringTablePathGlobalString.SetValue(stringTablePath, Language.Italian);
+                stringTablePathGlobalString.SetValue(stringTablePath, Language.Japanese);
+                stringTablePathGlobalString.SetValue(stringTablePath, Language.Spanish);
 
-                
-
+                // Adds string globally
+                StringKey.AddString(stringTablePathGlobalString);
             }
         }
 

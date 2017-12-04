@@ -307,7 +307,7 @@ namespace Riff_Explorer
 
             if (!(sfd.ShowDialog() == DialogResult.OK)) return;
 
-            sm.ExportCatalog2(sfd.FileName);
+            sm.ExportPackageDef(sfd.FileName);
             MessageBox.Show("Exported PackageDef successfully!");
         }
     }
