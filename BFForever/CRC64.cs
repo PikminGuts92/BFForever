@@ -35,7 +35,7 @@ namespace BFForever
         {
             ulong retval = (ulong)index;
             ulong topbit = (ulong)1L << (64 - 1);
-            ulong mask = 0xffffffffffffffffUL;
+            ulong mask = 0xFFFFFFFFFFFFFFFFUL;
 
             retval <<= (64 - 8);
             for (int i = 0; i < 8; i++)
@@ -63,7 +63,7 @@ namespace BFForever
 
         private ulong TableValue(ulong[] table, byte b, ulong crc)
         {
-            return table[((crc >> 56) ^ b) & 0xffUL] ^ (crc << 8);
+            return table[((crc >> 56) ^ b) & 0xFFUL] ^ (crc << 8);
         }
         
         /// <summary>
