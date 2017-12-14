@@ -4,6 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Concentus;
+using Concentus.Common;
+using Concentus.Enums;
+using Concentus.Structs;
+using NAudio;
+using NAudio.Wave;
 
 /* 
  * CELT HEADER (40 bytes)
@@ -162,6 +168,35 @@ namespace BFForever.Audio
 
                 aw.Write(AudioHeader);
                 aw.Write(AudioBlock);
+            }
+        }
+
+        public void WriteToWavFile(string outputPath)
+        {
+            if (Encrypted) throw new Exception("Audio stream is encrypted! Cannot proceed!");
+
+            int numChannels = 2;
+            int offset = 0;
+
+            WaveFormat wavFormat = new WaveFormat(SampleRate, 16, numChannels); // 16-bit PCM
+            OpusDecoder decoder = OpusDecoder.Create(SampleRate, numChannels);
+
+            using (WaveFileWriter writer = new WaveFileWriter(outputPath, wavFormat))
+            {
+                // Decoding loop
+                while (offset < AudioBlockSize)
+                {
+                    short[] outputShorts = new short[FrameSize * numChannels];
+                    int packetSize = ((AudioBlock[offset] & 0x0F) << 8) | AudioBlock[offset + 1]; // 12-bit encoding
+                    offset += 2;
+
+                    // Decodes OPUS packet
+                    decoder.Decode(AudioBlock, offset, packetSize, outputShorts, 0, FrameSize);
+
+                    // Writes frame
+                    writer.WriteSamples(outputShorts, 0, outputShorts.Length);
+                    offset += packetSize;
+                }
             }
         }
     }

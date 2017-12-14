@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFForever", "BFForever\BFForever.csproj", "{835AB612-BE76-4FEA-8E10-8775FD7157D6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongFuse", "SongFuse\SongFuse.csproj", "{AC588F51-3F29-4048-AA97-D5697AC19E51}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riff Explorer", "Riff Explorer\Riff Explorer.csproj", "{05C7DF99-C9C2-435B-A900-72101D8BB2B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Celt2Wav", "Celt2Wav\Celt2Wav.csproj", "{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,8 +29,15 @@ Global
 		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05C7DF99-C9C2-435B-A900-72101D8BB2B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {97555467-FB68-4E42-B267-D311232A416A}
 	EndGlobalSection
 EndGlobal
