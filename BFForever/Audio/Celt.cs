@@ -25,18 +25,23 @@ using NAudio.Wave;
  *   INT16 - Unknown (Always 312)
  *   INT16 - Sample Rate (Always 48000)
  *   INT16 - Unknown (Always 1)
- *   INT32 - Audio Header Block Offset
- *   INT32 - Audio Header Block Size
- *   INT32 - Encoded Audio Block Offset
- *   INT32 - Encoded Audio Block Size
+ *   INT32 - Reckoning Offset
+ *   INT32 - Reckoning Size
+ *   INT32 - Packet Stream Offset
+ *   INT32 - Packet Stream Size
  *  
  *  The following blocks are encrypted...
  *  
- *  AUDIO HEADER BLOCK
+ *  RECKONING BLOCK
  *  ==================
+ *  Packet counts which determine how stream is to be decoded from audio block. Counts are encoded as either 7-bit or 15-bit integers.
+ *  The first bit used as a switch for 2 byte mode. Big endian byte order.
+ *  The first count is # of empty packets to skip (empty frames), next is # of packets to read from audio block, (continue alternating)
  *  
- *  ENCODED AUDIO BLOCK
+ *  PACKET STREAM BLOCK
  *  ===================
+ *  OPUS packet stream. Each packet begins with a size encoded as 12-bits in big endian byte order (The first 4 bits can be ignored).
+ *  TOC byte seems to always be 0xFC -> CELT-mode (Fullband @ 20 ms), stereo, 1 frame
  */
 namespace BFForever.Audio
 {
@@ -45,7 +50,7 @@ namespace BFForever.Audio
         private const int MAGIC = 0x44414642; // "BFAD"
         private const int MAGIC_R = 0x42464144;
 
-        public uint Version { get; set; } = 2;
+        public uint Channels { get; set; } = 2;
         public bool Encrypted { get; set; } = false;
         public uint TotalSamples { get; set; }
         public uint Bitrate { get; set; } = 96000;
@@ -55,14 +60,14 @@ namespace BFForever.Audio
         public ushort SampleRate { get; set; } = 48000;
         public ushort Unknown2 { get; set; } = 1;
 
-        public uint AudioHeaderOffset { get; set; }
-        public uint AudioHeaderSize { get; set; }
+        public uint ReckoningOffset { get; set; } // Thing that counts
+        public uint ReckoningSize { get; set; }
 
-        public uint AudioBlockOffset { get; set; }
-        public uint AudioBlockSize { get; set; }
+        public uint PacketStreamOffset { get; set; }
+        public uint PacketStreamSize { get; set; }
 
-        public byte[] AudioHeader { get; set; }
-        public byte[] AudioBlock { get; set; }
+        public byte[] Reckoning { get; set; }
+        public byte[] PacketStream { get; set; }
 
         public bool BigEndian { get; set; } = false;
 
@@ -96,7 +101,7 @@ namespace BFForever.Audio
                 celt.BigEndian = ar.BigEndian; // Sets endianess
 
                 // Parses header information
-                celt.Version = ar.ReadUInt16();
+                celt.Channels = ar.ReadUInt16();
                 celt.Encrypted = Convert.ToBoolean(ar.ReadInt16());
                 celt.TotalSamples = ar.ReadUInt32();
                 celt.Bitrate = ar.ReadUInt32();
@@ -106,20 +111,20 @@ namespace BFForever.Audio
                 celt.SampleRate = ar.ReadUInt16();
                 celt.Unknown2 = ar.ReadUInt16();
 
-                celt.AudioHeaderOffset = ar.ReadUInt32();
-                celt.AudioHeaderSize = ar.ReadUInt32();
-                celt.AudioBlockOffset = ar.ReadUInt32();
-                celt.AudioBlockSize = ar.ReadUInt32();
+                celt.ReckoningOffset = ar.ReadUInt32();
+                celt.ReckoningSize = ar.ReadUInt32();
+                celt.PacketStreamOffset = ar.ReadUInt32();
+                celt.PacketStreamSize = ar.ReadUInt32();
                 celt.FixOffsets(); // Only useful for audio extracted from RAM, harmless
                 
-                uint headerSize = celt.AudioBlockOffset - celt.AudioHeaderOffset; // Multiple of 4
-                uint blockSize = celt.AudioBlockSize;
+                uint reckonSize = celt.PacketStreamOffset - celt.ReckoningOffset; // Multiple of 4
+                uint streamSize = celt.PacketStreamSize;
                 
-                if ((headerSize + blockSize) % 16 != 0)
-                    blockSize += 16 - ((headerSize + blockSize) % 16);
+                if ((reckonSize + streamSize) % 16 != 0)
+                    streamSize += 16 - ((reckonSize + streamSize) % 16);
 
-                celt.AudioHeader = ar.ReadBytes((int)headerSize);
-                celt.AudioBlock = ar.ReadBytes((int)blockSize);
+                celt.Reckoning = ar.ReadBytes((int)reckonSize);
+                celt.PacketStream = ar.ReadBytes((int)streamSize);
             }
 
             return celt;
@@ -127,11 +132,14 @@ namespace BFForever.Audio
 
         private void FixOffsets()
         {
-            if (AudioBlockOffset <= 40)
+            if (PacketStreamOffset <= 40)
                 return;
+            
+            ReckoningOffset = 40;
+            PacketStreamOffset = ReckoningOffset + ReckoningSize;
 
-            AudioBlockOffset = (AudioBlockOffset - AudioHeaderOffset) + 40;
-            AudioHeaderOffset = 40;
+            if (PacketStreamOffset % 4 != 0)
+                PacketStreamOffset += 4 - (PacketStreamOffset % 4);
         }
 
         public void Export(string path)
@@ -151,7 +159,7 @@ namespace BFForever.Audio
             {
                 aw.BigEndian = BigEndian;
                 aw.Write((int)MAGIC);
-                aw.Write((ushort)Version);
+                aw.Write((ushort)Channels);
                 aw.Write(Convert.ToUInt16(Encrypted));
                 aw.Write((uint)TotalSamples);
                 aw.Write((uint)Bitrate);
@@ -161,13 +169,13 @@ namespace BFForever.Audio
                 aw.Write((ushort)SampleRate);
                 aw.Write((ushort)Unknown2);
 
-                aw.Write((uint)AudioHeaderOffset);
-                aw.Write((uint)AudioHeaderSize);
-                aw.Write((uint)AudioBlockOffset);
-                aw.Write((uint)AudioBlockSize);
+                aw.Write((uint)ReckoningOffset);
+                aw.Write((uint)ReckoningSize);
+                aw.Write((uint)PacketStreamOffset);
+                aw.Write((uint)PacketStreamSize);
 
-                aw.Write(AudioHeader);
-                aw.Write(AudioBlock);
+                aw.Write(Reckoning);
+                aw.Write(PacketStream);
             }
         }
 
@@ -175,51 +183,45 @@ namespace BFForever.Audio
         {
             if (Encrypted) throw new Exception("Audio stream is encrypted! Cannot proceed!");
 
-            int numChannels = 2;
-            int offset = 0;
-            int headerOffset = 0;
             bool skipMode = true;
+            int audioOffset = 0, reckonOffset = 0;
+            OpusDecoder decoder = OpusDecoder.Create(SampleRate, (int)Channels);
 
-            WaveFormat wavFormat = new WaveFormat(SampleRate, 16, numChannels); // 16-bit PCM
-            OpusDecoder decoder = OpusDecoder.Create(SampleRate, numChannels);
-
-            using (WaveFileWriter writer = new WaveFileWriter(outputPath, wavFormat))
+            using (WaveFileWriter writer = new WaveFileWriter(outputPath, new WaveFormat(SampleRate, 16, (int)Channels))) // 16-bit PCM
             {
-                while (headerOffset < AudioHeaderSize)
+                while (reckonOffset < ReckoningSize)
                 {
-                    int numPackets = AudioHeader[headerOffset];
+                    int numPackets = Reckoning[reckonOffset];
 
                     // Checks if first bit is 1
                     if ((numPackets & 0x80) == 0x80)
-                        numPackets = ((numPackets ^ 0x80) << 8) | AudioHeader[++headerOffset];
+                        numPackets = ((numPackets ^ 0x80) << 8) | Reckoning[++reckonOffset];
                     
                     if (skipMode)
                     {
-                        short[] outputShorts = new short[numPackets * FrameSize * numChannels];
+                        short[] outputShorts = new short[numPackets * FrameSize * Channels];
                         writer.WriteSamples(outputShorts, 0, outputShorts.Length);
                     }
                     else
                     {
                         int packetOffset = 0;
+                        short[] outputShorts = new short[FrameSize * Channels];
 
                         // Decoding loop
-                        while (packetOffset < numPackets && offset < AudioBlockSize)
+                        while (packetOffset++ < numPackets && audioOffset < PacketStreamSize)
                         {
-                            short[] outputShorts = new short[FrameSize * numChannels];
-                            int packetSize = ((AudioBlock[offset] & 0x0F) << 8) | AudioBlock[offset + 1]; // 12-bit encoding
-                            offset += 2;
+                            int packetSize = ((PacketStream[audioOffset++] & 0x0F) << 8) | PacketStream[audioOffset++]; // 12-bit encoding
 
                             // Decodes OPUS packet
-                            decoder.Decode(AudioBlock, offset, packetSize, outputShorts, 0, FrameSize);
+                            decoder.Decode(PacketStream, audioOffset, packetSize, outputShorts, 0, FrameSize);
 
                             // Writes frame
                             writer.WriteSamples(outputShorts, 0, outputShorts.Length);
-                            offset += packetSize;
-                            packetOffset++;
+                            audioOffset += packetSize;
                         }
                     }
 
-                    headerOffset++;
+                    reckonOffset++;
                     skipMode = !skipMode;
                 }
             }
