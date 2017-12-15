@@ -28,6 +28,8 @@ BFForever is an open-source library for managing and creating game files from th
   * StringTable
   * UILocStrings
 * XRP2 (~50% WIP)
+* CELT
+  * Decoding (Decrypted-Only)
 
 # Not Implemented
 * RIFF
