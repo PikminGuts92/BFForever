@@ -177,25 +177,50 @@ namespace BFForever.Audio
 
             int numChannels = 2;
             int offset = 0;
+            int headerOffset = 0;
+            bool skipMode = true;
 
             WaveFormat wavFormat = new WaveFormat(SampleRate, 16, numChannels); // 16-bit PCM
             OpusDecoder decoder = OpusDecoder.Create(SampleRate, numChannels);
 
             using (WaveFileWriter writer = new WaveFileWriter(outputPath, wavFormat))
             {
-                // Decoding loop
-                while (offset < AudioBlockSize)
+                while (headerOffset < AudioHeaderSize)
                 {
-                    short[] outputShorts = new short[FrameSize * numChannels];
-                    int packetSize = ((AudioBlock[offset] & 0x0F) << 8) | AudioBlock[offset + 1]; // 12-bit encoding
-                    offset += 2;
+                    int numPackets = AudioHeader[headerOffset];
 
-                    // Decodes OPUS packet
-                    decoder.Decode(AudioBlock, offset, packetSize, outputShorts, 0, FrameSize);
+                    // Checks if first bit is 1
+                    if ((numPackets & 0x80) == 0x80)
+                        numPackets = ((numPackets ^ 0x80) << 8) | AudioHeader[++headerOffset];
+                    
+                    if (skipMode)
+                    {
+                        short[] outputShorts = new short[numPackets * FrameSize * numChannels];
+                        writer.WriteSamples(outputShorts, 0, outputShorts.Length);
+                    }
+                    else
+                    {
+                        int packetOffset = 0;
 
-                    // Writes frame
-                    writer.WriteSamples(outputShorts, 0, outputShorts.Length);
-                    offset += packetSize;
+                        // Decoding loop
+                        while (packetOffset < numPackets && offset < AudioBlockSize)
+                        {
+                            short[] outputShorts = new short[FrameSize * numChannels];
+                            int packetSize = ((AudioBlock[offset] & 0x0F) << 8) | AudioBlock[offset + 1]; // 12-bit encoding
+                            offset += 2;
+
+                            // Decodes OPUS packet
+                            decoder.Decode(AudioBlock, offset, packetSize, outputShorts, 0, FrameSize);
+
+                            // Writes frame
+                            writer.WriteSamples(outputShorts, 0, outputShorts.Length);
+                            offset += packetSize;
+                            packetOffset++;
+                        }
+                    }
+
+                    headerOffset++;
+                    skipMode = !skipMode;
                 }
             }
         }
