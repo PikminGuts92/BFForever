@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Security.Cryptography;
 using Concentus;
 using Concentus.Common;
 using Concentus.Enums;
@@ -49,6 +50,14 @@ namespace BFForever.Audio
     {
         private const int MAGIC = 0x44414642; // "BFAD"
         private const int MAGIC_R = 0x42464144;
+
+        private static readonly byte[] AesKey =
+        {
+            0x07, 0xc2, 0x30, 0x93, 0x4a, 0x52, 0xf1, 0x72,
+            0x1a, 0xa2, 0x77, 0x52, 0xa6, 0x72, 0x43, 0x75,
+            0xe8, 0xff, 0xe1, 0x7e, 0x93, 0xef, 0xcc, 0xa5,
+            0x14, 0x37, 0xde, 0x7f, 0x31, 0x1c, 0xd2, 0x45
+        };
 
         public uint Channels { get; set; } = 2;
         public bool Encrypted { get; set; } = false;
@@ -123,8 +132,34 @@ namespace BFForever.Audio
                 if ((reckonSize + streamSize) % 16 != 0)
                     streamSize += 16 - ((reckonSize + streamSize) % 16);
 
-                celt.Reckoning = ar.ReadBytes((int)reckonSize);
-                celt.PacketStream = ar.ReadBytes((int)streamSize);
+                if(celt.Encrypted)
+                {
+                    var encryptedBytes = ar.ReadBytes((int)(reckonSize + streamSize));
+
+                    // Decrypt audio data in ECB mode with the 256-bit key
+                    using (Aes aes = Aes.Create())
+                    {
+                        aes.Mode = CipherMode.ECB;
+                        aes.KeySize = 256;
+                        aes.BlockSize = 128;
+                        aes.Padding = PaddingMode.None;
+                        using (var decryptor = aes.CreateDecryptor(AesKey, new byte[16]))
+                        {
+                            decryptor.TransformBlock(encryptedBytes, 0, encryptedBytes.Length, encryptedBytes, 0);
+                        }
+                    }
+
+                    celt.Reckoning = new byte[reckonSize];
+                    celt.PacketStream = new byte[streamSize];
+                    Array.Copy(encryptedBytes, celt.Reckoning, reckonSize);
+                    Array.Copy(encryptedBytes, reckonSize, celt.PacketStream, 0, streamSize);
+                    celt.Encrypted = false;
+                }
+                else
+                {
+                    celt.Reckoning = ar.ReadBytes((int)reckonSize);
+                    celt.PacketStream = ar.ReadBytes((int)streamSize);
+                }
             }
 
             return celt;
