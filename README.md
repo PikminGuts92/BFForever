@@ -10,7 +10,7 @@ BFForever is an open-source library for managing and creating game files from th
 # Currently Implemented
 * XRP2 (~50% WIP)
 * CELT
-  * Decoding (Decrypted-Only)
+  * Decoding
 * RIFF (Read Only)
   * Audio
   * AudioEffect
