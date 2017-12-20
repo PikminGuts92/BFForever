@@ -51,8 +51,12 @@
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
     <Compile Include="Riff2\Chunk.cs" />
+    <Compile Include="Riff2\FString.cs" />
+    <Compile Include="Riff2\FEnvironment.cs" />
     <Compile Include="Riff2\Index.cs" />
+    <Compile Include="Riff2\Localization.cs" />
     <Compile Include="Riff2\Riff.cs" />
+    <Compile Include="Riff2\StringKey.cs" />
     <Compile Include="Riff2\StringTable.cs" />
     <Compile Include="Riff2\ZObject.cs" />
     <Compile Include="Riff\IData.cs" />
