@@ -4,6 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Security.Cryptography;
+using Concentus;
+using Concentus.Common;
+using Concentus.Enums;
+using Concentus.Structs;
+using NAudio;
+using NAudio.Wave;
 
 /* 
  * CELT HEADER (40 bytes)
@@ -19,18 +26,23 @@ using System.IO;
  *   INT16 - Unknown (Always 312)
  *   INT16 - Sample Rate (Always 48000)
  *   INT16 - Unknown (Always 1)
- *   INT32 - Audio Header Block Offset
- *   INT32 - Audio Header Block Size
- *   INT32 - Encoded Audio Block Offset
- *   INT32 - Encoded Audio Block Size
+ *   INT32 - Reckoning Offset
+ *   INT32 - Reckoning Size
+ *   INT32 - Packet Stream Offset
+ *   INT32 - Packet Stream Size
  *  
  *  The following blocks are encrypted...
  *  
- *  AUDIO HEADER BLOCK
+ *  RECKONING BLOCK
  *  ==================
+ *  Packet counts which determine how stream is to be decoded from audio block. Counts are encoded as either 7-bit or 15-bit integers.
+ *  The first bit used as a switch for 2 byte mode. Big endian byte order.
+ *  The first count is # of empty packets to skip (empty frames), next is # of packets to read from audio block, (continue alternating)
  *  
- *  ENCODED AUDIO BLOCK
+ *  PACKET STREAM BLOCK
  *  ===================
+ *  OPUS packet stream. Each packet begins with a size encoded as 12-bits in big endian byte order (The first 4 bits can be ignored).
+ *  TOC byte seems to always be 0xFC -> CELT-mode (Fullband @ 20 ms), stereo, 1 frame
  */
 namespace BFForever.Audio
 {
@@ -39,7 +51,15 @@ namespace BFForever.Audio
         private const int MAGIC = 0x44414642; // "BFAD"
         private const int MAGIC_R = 0x42464144;
 
-        public uint Version { get; set; } = 2;
+        private static readonly byte[] AesKey =
+        {
+            0x07, 0xc2, 0x30, 0x93, 0x4a, 0x52, 0xf1, 0x72,
+            0x1a, 0xa2, 0x77, 0x52, 0xa6, 0x72, 0x43, 0x75,
+            0xe8, 0xff, 0xe1, 0x7e, 0x93, 0xef, 0xcc, 0xa5,
+            0x14, 0x37, 0xde, 0x7f, 0x31, 0x1c, 0xd2, 0x45
+        };
+
+        public uint Channels { get; set; } = 2;
         public bool Encrypted { get; set; } = false;
         public uint TotalSamples { get; set; }
         public uint Bitrate { get; set; } = 96000;
@@ -49,14 +69,14 @@ namespace BFForever.Audio
         public ushort SampleRate { get; set; } = 48000;
         public ushort Unknown2 { get; set; } = 1;
 
-        public uint AudioHeaderOffset { get; set; }
-        public uint AudioHeaderSize { get; set; }
+        public uint ReckoningOffset { get; set; } // Thing that counts
+        public uint ReckoningSize { get; set; }
 
-        public uint AudioBlockOffset { get; set; }
-        public uint AudioBlockSize { get; set; }
+        public uint PacketStreamOffset { get; set; }
+        public uint PacketStreamSize { get; set; }
 
-        public byte[] AudioHeader { get; set; }
-        public byte[] AudioBlock { get; set; }
+        public byte[] Reckoning { get; set; }
+        public byte[] PacketStream { get; set; }
 
         public bool BigEndian { get; set; } = false;
 
@@ -90,7 +110,7 @@ namespace BFForever.Audio
                 celt.BigEndian = ar.BigEndian; // Sets endianess
 
                 // Parses header information
-                celt.Version = ar.ReadUInt16();
+                celt.Channels = ar.ReadUInt16();
                 celt.Encrypted = Convert.ToBoolean(ar.ReadInt16());
                 celt.TotalSamples = ar.ReadUInt32();
                 celt.Bitrate = ar.ReadUInt32();
@@ -100,20 +120,46 @@ namespace BFForever.Audio
                 celt.SampleRate = ar.ReadUInt16();
                 celt.Unknown2 = ar.ReadUInt16();
 
-                celt.AudioHeaderOffset = ar.ReadUInt32();
-                celt.AudioHeaderSize = ar.ReadUInt32();
-                celt.AudioBlockOffset = ar.ReadUInt32();
-                celt.AudioBlockSize = ar.ReadUInt32();
+                celt.ReckoningOffset = ar.ReadUInt32();
+                celt.ReckoningSize = ar.ReadUInt32();
+                celt.PacketStreamOffset = ar.ReadUInt32();
+                celt.PacketStreamSize = ar.ReadUInt32();
                 celt.FixOffsets(); // Only useful for audio extracted from RAM, harmless
                 
-                uint headerSize = celt.AudioBlockOffset - celt.AudioHeaderOffset; // Multiple of 4
-                uint blockSize = celt.AudioBlockSize;
+                uint reckonSize = celt.PacketStreamOffset - celt.ReckoningOffset; // Multiple of 4
+                uint streamSize = celt.PacketStreamSize;
                 
-                if ((headerSize + blockSize) % 16 != 0)
-                    blockSize += 16 - ((headerSize + blockSize) % 16);
+                if ((reckonSize + streamSize) % 16 != 0)
+                    streamSize += 16 - ((reckonSize + streamSize) % 16);
 
-                celt.AudioHeader = ar.ReadBytes((int)headerSize);
-                celt.AudioBlock = ar.ReadBytes((int)blockSize);
+                if(celt.Encrypted)
+                {
+                    var encryptedBytes = ar.ReadBytes((int)(reckonSize + streamSize));
+
+                    // Decrypt audio data in ECB mode with the 256-bit key
+                    using (Aes aes = Aes.Create())
+                    {
+                        aes.Mode = CipherMode.ECB;
+                        aes.KeySize = 256;
+                        aes.BlockSize = 128;
+                        aes.Padding = PaddingMode.None;
+                        using (var decryptor = aes.CreateDecryptor(AesKey, new byte[16]))
+                        {
+                            decryptor.TransformBlock(encryptedBytes, 0, encryptedBytes.Length, encryptedBytes, 0);
+                        }
+                    }
+
+                    celt.Reckoning = new byte[reckonSize];
+                    celt.PacketStream = new byte[streamSize];
+                    Array.Copy(encryptedBytes, celt.Reckoning, reckonSize);
+                    Array.Copy(encryptedBytes, reckonSize, celt.PacketStream, 0, streamSize);
+                    celt.Encrypted = false;
+                }
+                else
+                {
+                    celt.Reckoning = ar.ReadBytes((int)reckonSize);
+                    celt.PacketStream = ar.ReadBytes((int)streamSize);
+                }
             }
 
             return celt;
@@ -121,11 +167,14 @@ namespace BFForever.Audio
 
         private void FixOffsets()
         {
-            if (AudioBlockOffset <= 40)
+            if (PacketStreamOffset <= 40)
                 return;
+            
+            ReckoningOffset = 40;
+            PacketStreamOffset = ReckoningOffset + ReckoningSize;
 
-            AudioBlockOffset = (AudioBlockOffset - AudioHeaderOffset) + 40;
-            AudioHeaderOffset = 40;
+            if (PacketStreamOffset % 4 != 0)
+                PacketStreamOffset += 4 - (PacketStreamOffset % 4);
         }
 
         public void Export(string path)
@@ -145,7 +194,7 @@ namespace BFForever.Audio
             {
                 aw.BigEndian = BigEndian;
                 aw.Write((int)MAGIC);
-                aw.Write((ushort)Version);
+                aw.Write((ushort)Channels);
                 aw.Write(Convert.ToUInt16(Encrypted));
                 aw.Write((uint)TotalSamples);
                 aw.Write((uint)Bitrate);
@@ -155,13 +204,61 @@ namespace BFForever.Audio
                 aw.Write((ushort)SampleRate);
                 aw.Write((ushort)Unknown2);
 
-                aw.Write((uint)AudioHeaderOffset);
-                aw.Write((uint)AudioHeaderSize);
-                aw.Write((uint)AudioBlockOffset);
-                aw.Write((uint)AudioBlockSize);
+                aw.Write((uint)ReckoningOffset);
+                aw.Write((uint)ReckoningSize);
+                aw.Write((uint)PacketStreamOffset);
+                aw.Write((uint)PacketStreamSize);
 
-                aw.Write(AudioHeader);
-                aw.Write(AudioBlock);
+                aw.Write(Reckoning);
+                aw.Write(PacketStream);
+            }
+        }
+
+        public void WriteToWavFile(string outputPath)
+        {
+            if (Encrypted) throw new Exception("Audio stream is encrypted! Cannot proceed!");
+
+            bool skipMode = true;
+            int audioOffset = 0, reckonOffset = 0;
+            OpusDecoder decoder = OpusDecoder.Create(SampleRate, (int)Channels);
+
+            using (WaveFileWriter writer = new WaveFileWriter(outputPath, new WaveFormat(SampleRate, 16, (int)Channels))) // 16-bit PCM
+            {
+                while (reckonOffset < ReckoningSize)
+                {
+                    int numPackets = Reckoning[reckonOffset];
+
+                    // Checks if first bit is 1
+                    if ((numPackets & 0x80) == 0x80)
+                        numPackets = ((numPackets ^ 0x80) << 8) | Reckoning[++reckonOffset];
+                    
+                    if (skipMode)
+                    {
+                        short[] outputShorts = new short[numPackets * FrameSize * Channels];
+                        writer.WriteSamples(outputShorts, 0, outputShorts.Length);
+                    }
+                    else
+                    {
+                        int packetOffset = 0;
+                        short[] outputShorts = new short[FrameSize * Channels];
+
+                        // Decoding loop
+                        while (packetOffset++ < numPackets && audioOffset < PacketStreamSize)
+                        {
+                            int packetSize = ((PacketStream[audioOffset++] & 0x0F) << 8) | PacketStream[audioOffset++]; // 12-bit encoding
+
+                            // Decodes OPUS packet
+                            decoder.Decode(PacketStream, audioOffset, packetSize, outputShorts, 0, FrameSize);
+
+                            // Writes frame
+                            writer.WriteSamples(outputShorts, 0, outputShorts.Length);
+                            audioOffset += packetSize;
+                        }
+                    }
+
+                    reckonOffset++;
+                    skipMode = !skipMode;
+                }
             }
         }
     }

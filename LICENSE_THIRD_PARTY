@@ -1,0 +1,5 @@
+The following third-party libraries are re-distributed with their respected licenses.
+
+Concentus https://github.com/lostromb/concentus/blob/master/LICENSE
+NAudio (MS-PL) https://github.com/naudio/NAudio/blob/master/license.txt
+JSON.NET (MIT) https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md

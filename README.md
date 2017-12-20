@@ -1,4 +1,4 @@
-# BFForever
+# BFForever [![Build status](https://ci.appveyor.com/api/projects/status/yt8eu333kn91fv2y?svg=true)](https://ci.appveyor.com/project/PikminGuts92/bfforever)
 BFForever is an open-source library for managing and creating game files from the short-lived BandFuse video game which released for PS3 and Xbox 360 consoles in November 2013.
 
 # Planned Features
@@ -8,6 +8,9 @@ BFForever is an open-source library for managing and creating game files from th
 * MIDI <-> RIFF conversion
 
 # Currently Implemented
+* XRP2 (~50% WIP)
+* CELT
+  * Decoding
 * RIFF (Read Only)
   * Audio
   * AudioEffect
@@ -27,7 +30,6 @@ BFForever is an open-source library for managing and creating game files from th
   * TRCPromptGroup
   * StringTable
   * UILocStrings
-* XRP2 (~50% WIP)
 
 # Not Implemented
 * RIFF
