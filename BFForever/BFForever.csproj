@@ -62,12 +62,13 @@
     <Compile Include="Riff2\Chunk.cs" />
     <Compile Include="Riff2\FString.cs" />
     <Compile Include="Riff2\FEnvironment.cs" />
+    <Compile Include="Riff2\HKey.cs" />
     <Compile Include="Riff2\Index.cs" />
     <Compile Include="Riff2\Localization.cs" />
-    <Compile Include="Riff2\Riff.cs" />
+    <Compile Include="Riff2\RiffFile.cs" />
     <Compile Include="Riff2\StringKey.cs" />
-    <Compile Include="Riff2\StringTable.cs" />
     <Compile Include="Riff2\ZObject.cs" />
+    <Compile Include="Riff2\ZObjects\StringTable.cs" />
     <Compile Include="Riff\IData.cs" />
     <Compile Include="Riff\Index.cs" />
     <Compile Include="Riff\ZObjects\TRCPromptGroup.cs" />
@@ -106,7 +107,9 @@
     <Compile Include="Texture\XPR2.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

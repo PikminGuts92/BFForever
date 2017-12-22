@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace BFForever.Riff2
 {
-    public class StringTable
+    // Hierarchy Key - Globally unique
+    public class HKey : FString
     {
+        public HKey(long key, FEnvironment env) : base(key, env)
+        {
+
+        }
     }
 }

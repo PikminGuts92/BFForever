@@ -8,8 +8,8 @@ namespace BFForever.Riff2
 {
     public class FString
     {
-        private long _stringKey;
-        private readonly FEnvironment _environment;
+        protected long _stringKey;
+        protected readonly FEnvironment _environment;
 
         public FString(long key, FEnvironment env)
         {
@@ -18,7 +18,7 @@ namespace BFForever.Riff2
         }
 
         public long Key => _stringKey;
-        public string Value
+        public virtual string Value
         {
             get => _environment.GetStringValue(_stringKey);
             set
