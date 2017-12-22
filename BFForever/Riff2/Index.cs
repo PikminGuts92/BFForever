@@ -13,6 +13,12 @@ namespace BFForever.Riff2
             Entries = new List<IndexEntry>();
         }
 
+        internal Index(AwesomeReader ar, FEnvironment env) : this()
+        {
+            Entries = new List<IndexEntry>();
+            ReadData(ar, env);
+        }
+
         internal void ReadData(AwesomeReader ar, FEnvironment env)
         {
             Entries.Clear();
