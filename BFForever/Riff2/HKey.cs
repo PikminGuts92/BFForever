@@ -9,9 +9,13 @@ namespace BFForever.Riff2
     // Hierarchy Key - Globally unique
     public class HKey : FString
     {
-        public HKey(long key, FEnvironment env) : base(key, env)
+        private static readonly CRC64 _global = new CRC64();
+
+        public HKey(long key) : base(key)
         {
 
         }
+        
+        internal static long GetHash(string value) => (long)_global.Compute(value, true);
     }
 }

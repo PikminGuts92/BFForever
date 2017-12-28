@@ -12,7 +12,7 @@ namespace BFForever.Riff2
         private readonly long _key;
         private readonly Dictionary<Localization, string> _values;
 
-        private StringKey(long key)
+        public StringKey(long key)
         {
             _key = key;
 
@@ -24,6 +24,21 @@ namespace BFForever.Riff2
             _values.Add(Localization.Italian, "");
             _values.Add(Localization.Spanish, "");
             _values.Add(Localization.French, "");
+        }
+
+        public static StringKey FromHKey(string hkeyValue)
+        {
+            StringKey sk = new StringKey(HKey.GetHash(hkeyValue));
+
+            // Adds localized strings
+            sk[Localization.English] = hkeyValue;
+            sk[Localization.Japanese] = hkeyValue;
+            sk[Localization.German] = hkeyValue;
+            sk[Localization.Italian] = hkeyValue;
+            sk[Localization.Spanish] = hkeyValue;
+            sk[Localization.French] = hkeyValue;
+
+            return sk;
         }
 
         public string GetValue(Localization loc) => _values[loc];

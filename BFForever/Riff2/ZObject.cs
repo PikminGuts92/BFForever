@@ -19,19 +19,17 @@ namespace BFForever.Riff2
     {
         protected readonly HKey _filePath;
         protected readonly HKey _directoryPath;
-        protected readonly HKey _type;
 
-        public ZObject(HKey filePath, HKey directoryPath, HKey type)
+        public ZObject(HKey filePath, HKey directoryPath)
         {
             _filePath = filePath;
             _directoryPath = directoryPath;
-            _type = type;
         }
 
-        internal abstract void ReadData(AwesomeReader ar, FEnvironment env);
+        internal abstract void ReadData(AwesomeReader ar);
 
         public HKey FilePath => _filePath;
         public HKey DirectoryPath => _directoryPath;
-        public HKey Type => _type;
+        //public abstract ReadOnlyHKey Type { get; }
     }
 }

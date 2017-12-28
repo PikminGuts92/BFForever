@@ -18,17 +18,17 @@ namespace BFForever.Riff2
             Objects = new List<ZObject>();
         }
 
-        public static RiffFile FromFile(string input, FEnvironment env)
+        public static RiffFile FromFile(string input)
         {
             if (!File.Exists(input)) return null; // Returns if file doesn't exist
 
             using (FileStream fs = File.OpenRead(input))
             {
-                return FromStream(fs, env);
+                return FromStream(fs);
             }
         }
 
-        private static RiffFile FromStream(Stream stream, FEnvironment env)
+        private static RiffFile FromStream(Stream stream)
         {
             RiffFile riff = new RiffFile();
             AwesomeReader ar = new AwesomeReader(stream);
@@ -54,7 +54,7 @@ namespace BFForever.Riff2
             if (chunkType != "INDX")
                 throw new Exception("First chunk was not an Index!");
 
-            Index index = new Index(ar, env);
+            Index index = new Index(ar);
 
             foreach(IndexEntry entry in index.Entries)
             {
@@ -64,17 +64,66 @@ namespace BFForever.Riff2
                 if (chunkType != "STbl" && chunkType != "ZOBJ") continue;
                 
                 // Reads header info
-                HKey filePath = new HKey(ar.ReadInt64(), env);
-                HKey directoryPath = new HKey(ar.ReadInt64(), env);
-                HKey type = new HKey(ar.ReadInt64(), env);
+                HKey filePath = new HKey(ar.ReadInt64());
+                HKey directoryPath = new HKey(ar.ReadInt64());
+                HKey type = new HKey(ar.ReadInt64());
                 ar.BaseStream.Position += 8;
 
                 ZObject obj;
 
-                if (chunkType == "Stbl")
+                if (chunkType == "STbl")
                 {
-                    obj = new StringTable(filePath, directoryPath, type);
-                    obj.ReadData(ar, env);
+                    Localization loc;
+
+                    // Gets localization
+                    switch(type.Value.ToLower())
+                    {
+                        case "stringtable@enus":
+                            loc = Localization.English;
+                            break;
+                        case "stringtable@jajp":
+                            loc = Localization.Japanese;
+                            break;
+                        case "stringtable@dede":
+                            loc = Localization.German;
+                            break;
+                        case "stringtable@itit":
+                            loc = Localization.Italian;
+                            break;
+                        case "stringtable@eses":
+                            loc = Localization.Spanish;
+                            break;
+                        case "stringtable@frfr":
+                            loc = Localization.French;
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    // Loads string table
+                    obj = new StringTable(filePath, directoryPath, loc);
+                    obj.ReadData(ar);
+                }
+                else if (chunkType == "ZOBJ")
+                {
+                    // Loads ZObject
+                    switch(type.Value.ToLower())
+                    {
+                        case "packagedef":
+                            obj = new PackageDef(filePath, directoryPath);
+                            break;
+                        case "index2":
+                            obj = new Index2(filePath, directoryPath);
+                            break;
+                        case "catalog2":
+                            obj = new Catalog2(filePath, directoryPath);
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    // Loads zobject
+                    obj.ReadData(ar);
                 }
             }
 
