@@ -15,7 +15,7 @@ namespace BFForever.Riff2
         
         public override string Value
         {
-            get => FEnvironment.GetStringValue(_stringKey);
+            get => FEnvironment.GetStringValue(_globalKey);
         }
     }
 }

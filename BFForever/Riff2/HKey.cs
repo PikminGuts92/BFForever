@@ -17,5 +17,14 @@ namespace BFForever.Riff2
         }
         
         internal static long GetHash(string value) => (long)_global.Compute(value, true);
+        internal static long GetHash(string value, long initial)
+        {
+            ulong origInit = _global.Initial, result;
+            _global.Initial = (ulong)initial;
+            
+            result = _global.Compute(value, true);
+            _global.Initial = origInit;
+            return (long)result;
+        }
     }
 }
