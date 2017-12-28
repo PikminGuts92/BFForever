@@ -12,10 +12,12 @@ namespace BFForever.Riff2
         private const int MAGIC = 0x46464952; // "RIFF"
         private const int MAGIC_R = 0x52494646;
 
+        private readonly List<ZObject> _objects;
+
         public RiffFile()
         {
             BigEndian = true;
-            Objects = new List<ZObject>();
+            _objects = new List<ZObject>();
         }
 
         public static RiffFile FromFile(string input)
@@ -47,6 +49,7 @@ namespace BFForever.Riff2
             }
 
             riff.BigEndian = ar.BigEndian; // Sets endianess
+            ar.BaseStream.Position += 4; // Skips total size
 
             string chunkType; uint size;
             GetChunkInfo(ar, out chunkType, out size);
@@ -76,7 +79,7 @@ namespace BFForever.Riff2
                     Localization loc;
 
                     // Gets localization
-                    switch(type.Value.ToLower())
+                    switch (type.Value.ToLower())
                     {
                         case "stringtable@enus":
                             loc = Localization.English;
@@ -106,8 +109,7 @@ namespace BFForever.Riff2
                 }
                 else if (chunkType == "ZOBJ")
                 {
-                    // Loads ZObject
-                    switch(type.Value.ToLower())
+                    switch (type.Value.ToLower())
                     {
                         case "packagedef":
                             obj = new PackageDef(filePath, directoryPath);
@@ -125,6 +127,11 @@ namespace BFForever.Riff2
                     // Loads zobject
                     obj.ReadData(ar);
                 }
+                else
+                    continue;
+
+                // Adds object
+                riff._objects.Add(obj);
             }
 
             return riff;
@@ -140,6 +147,6 @@ namespace BFForever.Riff2
         }
 
         public bool BigEndian { get; set; }
-        public List<ZObject> Objects { get; set; }
+        public List<ZObject> Objects => _objects;
     }
 }

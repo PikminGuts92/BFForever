@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BFForever;
-using BFForever.Riff;
+//using BFForever.Riff;
+using BFForever.Riff2;
 using BFForever.Texture;
 
 namespace SongFuse
@@ -15,10 +16,12 @@ namespace SongFuse
         {
             if (args == null || args.Length < 2) return;
 
+            RiffFile rif = RiffFile.FromFile(args[0]);
+
             // Loads texture
             //XPR2 xp = XPR2.FromFile(args[0]);
             //return;
-
+            /*
             // Loads song resources
             SongManager sm = new SongManager(args[0]);
 
@@ -28,7 +31,7 @@ namespace SongFuse
             if (args.Length < 3) return;
 
             // Exports strings to file
-            StringKey.ExportToFile(args[2]);
+            StringKey.ExportToFile(args[2]);*/
         }
     }
 }

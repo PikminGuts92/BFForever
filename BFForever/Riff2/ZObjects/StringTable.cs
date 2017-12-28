@@ -9,17 +9,65 @@ namespace BFForever.Riff2
     public class StringTable : ZObject
     {
         private readonly Localization _localization;
+        Dictionary<long, string> _strings = new Dictionary<long, string>();
 
         public StringTable(HKey filePath, HKey directoryPath, Localization localization = Localization.English) : base(filePath, directoryPath)
         {
             _localization = Localization;
+            _strings = new Dictionary<long, string>();
         }
         
         internal override void ReadData(AwesomeReader ar)
         {
-            throw new NotImplementedException();
+            _strings.Clear();
+            
+            int count = ar.ReadInt32();
+            ar.BaseStream.Position += 12; // Skips to entries
+            long difference = ar.BaseStream.Position + (count * 16);
+
+            long[] key = new long[count];
+            long[] offset = new long[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                key[i] = ar.ReadInt64();
+                offset[i] = ar.ReadInt32();
+                ar.BaseStream.Position += 4; // Should be zero
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                ar.BaseStream.Position = offset[i] + difference;
+                string text = ar.ReadNullString();
+
+                if (!_strings.ContainsKey(key[i]))
+                {
+                    _strings.Add(key[i], text);
+                    continue;
+                }
+
+                // Evidently the same string with different casings will have the same key (only for directory paths?)
+                if (string.Compare(_strings[key[i]], text, true) == 0)
+                {
+                    _strings.Remove(key[i]);
+                    _strings.Add(key[i], text);
+                }
+                else
+                {
+                    throw new Exception($"STRING ERROR: {_strings[key[i]]} != {text}");
+                }
+            }
+            
+            foreach (var d in _strings)
+            {
+                // Finds/adds key string globally
+                StringKey sk = FEnvironment.FindCreate(d.Key);
+                sk[_localization] = d.Value;
+            }
         }
 
         public Localization Localization => _localization;
+
+        public Dictionary<long, string> Strings => _strings;
     }
 }

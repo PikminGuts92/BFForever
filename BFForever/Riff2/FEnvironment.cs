@@ -8,7 +8,7 @@ namespace BFForever.Riff2
 {
     public class FEnvironment
     {
-        private static Dictionary<long, StringKey> _strings = StringsInit();
+        private static Dictionary<long, StringKey> _globalStrings = StringsInit();
 
         public FEnvironment()
         {
@@ -36,7 +36,17 @@ namespace BFForever.Riff2
         }
 
         // String management
-        internal static string GetStringValue(long key) => _strings[key][Localization];
+        internal static string GetStringValue(long key) => _globalStrings[key][Localization];
+
+        internal static StringKey FindCreate(long key)
+        {
+            if (_globalStrings.ContainsKey(key)) return _globalStrings[key];
+
+            StringKey sk = new StringKey(key);
+            _globalStrings.Add(key, sk);
+            return sk;
+        }
+
 
         public static Localization Localization { get; set; } = Localization.English;
     }

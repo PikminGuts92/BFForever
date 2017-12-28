@@ -42,7 +42,7 @@ namespace BFForever.Riff2
         }
 
         public string GetValue(Localization loc) => _values[loc];
-        public void SetValue(Localization loc, string value) => _values[loc] = value;
+        public void SetValue(string value, Localization loc) => _values[loc] = value;
 
         public string this[Localization loc]
         {
