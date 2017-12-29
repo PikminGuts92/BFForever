@@ -16,7 +16,9 @@ namespace SongFuse
         {
             if (args == null || args.Length < 2) return;
 
-            RiffFile rif = RiffFile.FromFile(args[0]);
+            //RiffFile rif = RiffFile.FromFile(args[0]);
+            FEnvironment env = new FEnvironment();
+            env.LoadPackage(args[0]);
 
             // Loads texture
             //XPR2 xp = XPR2.FromFile(args[0]);
