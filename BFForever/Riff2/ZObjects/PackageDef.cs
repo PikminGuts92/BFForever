@@ -10,12 +10,37 @@ namespace BFForever.Riff2
     {
         public PackageDef(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-
+            Entries = new List<string>();
         }
 
         internal override void ReadData(AwesomeReader ar)
         {
-            throw new NotImplementedException();
+            Entries.Clear();
+
+            Version = ar.ReadInt32();
+
+            long nextString = ar.BaseStream.Position + 256;
+            PackageName = ar.ReadNullString();
+
+            ar.BaseStream.Position = nextString;
+            int count = ar.ReadInt32(); // # of strings
+
+            // Offset - Always 4
+            ar.BaseStream.Position += 4;
+            nextString = ar.BaseStream.Position;
+            
+            for (int i = 0; i < count; i++)
+            {
+                ar.BaseStream.Position = nextString;
+
+                // Reads string
+                Entries.Add(ar.ReadNullString());
+                nextString += 256;
+            }
         }
+
+        public int Version { get; set; }
+        public string PackageName { get; set; }
+        public List<string> Entries { get; set; }
     }
 }
