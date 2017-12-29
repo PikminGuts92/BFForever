@@ -93,25 +93,23 @@ namespace RiffExplorer
             //root.ContextMenu = TreeView_Archive.Resources["CM_Directory"] as ContextMenu;
 
             TreeViewItem tn = root;
-            List<string> entries = manager.Index.Entries.Select(x => ToFilePath(x)).ToList(); // Recursive
-            foreach (string entry in entries)
+            foreach (Index2Entry entry in manager.Index.Entries)
             {
                 tn = root;
                 string currentPath = "";
-                string[] splitNames = entry.Split('/');
-                //string[] splitNames = new string[] { };
+                string[] splitNames = ToFilePath(entry).Split('/');
 
                 for (int i = 0; i < splitNames.Length; i++)
                 {
                     currentPath += splitNames[i];
                     if (i == (splitNames.Length - 1))
                         // File entry
-                        tn = AddNode(tn, currentPath, splitNames[i], false);
+                        tn = AddNode(tn, currentPath, splitNames[i], false, entry);
                     else
                     {
                         // Folder entry
                         currentPath += "/";
-                        tn = AddNode(tn, currentPath, splitNames[i], true);
+                        tn = AddNode(tn, currentPath, splitNames[i], true, entry);
                     }
                 }
             }
@@ -158,7 +156,7 @@ namespace RiffExplorer
             return string.Concat(newKey);
         }
 
-        private TreeViewItem AddNode(TreeViewItem parent, string currentPath, string text, bool folder)
+        private TreeViewItem AddNode(TreeViewItem parent, string currentPath, string text, bool folder, Index2Entry entry)
         {
             //node.Items.Cast<TreeViewItem>().
             string key = CreateKey(currentPath, folder);
@@ -175,11 +173,9 @@ namespace RiffExplorer
                 //temp.Path = currentPath;
                 TreeView_Archive.RegisterName(key, child);
 
-                int returnIdx;
-                returnIdx = parent.Items.Add(child);
-                //child.Tag = new TreeArkEntryInfo(currentPath, folder, key);
+                int returnIdx = parent.Items.Add(child);
+                if (!folder) child.Tag = entry;
                 SetNodeProperties(child);
-
 
                 return parent.Items[returnIdx] as TreeViewItem;
             }
