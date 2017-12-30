@@ -64,7 +64,8 @@ namespace BFForever.Riff2
                 string filePath = Path.Combine(_packagePaths[pkEntry.Package], pkEntry.ExternalFilePath);
 
                 // Checks if cached
-                if (_tempObjectsPackageEntry.ExternalFilePath == pkEntry.ExternalFilePath
+                if (_tempObjectsPackageEntry != null
+                    && _tempObjectsPackageEntry.ExternalFilePath == pkEntry.ExternalFilePath
                     && _tempObjectsPackageEntry.Package == pkEntry.Package)
                 {
                     return _tempObjects.SingleOrDefault(x => x.FilePath == entry.FilePath);
@@ -109,6 +110,12 @@ namespace BFForever.Riff2
             Index2 oldIndex = Index;
             if (oldIndex == null || newIndex.Version >= oldIndex.Version)
                 Index = newIndex;
+        }
+
+        public void ClearCache()
+        {
+            _tempObjects.Clear();
+            _tempObjectsPackageEntry = null;
         }
 
         public PackageDef Definition { get; set; }
