@@ -32,19 +32,11 @@ namespace BFForever.Riff2
         }
 
         #region Overloaded Operators
-        /// <summary>
-        /// Returns key value of fused string
-        /// </summary>
-        /// <param name="f">Fused string</param>
         public static implicit operator long(FString f)
         {
             return f.Key;
         }
-
-        /// <summary>
-        /// Returns English string of fused string
-        /// </summary>
-        /// <param name="f">Fused string</param>
+        
         public static implicit operator string(FString f)
         {
             return f.Value;
@@ -112,6 +104,7 @@ namespace BFForever.Riff2
 
         public override bool Equals(object obj)
         {
+            if (obj is FString) return false;
             return ((FString)obj)._globalKey == _globalKey;
         }
 
