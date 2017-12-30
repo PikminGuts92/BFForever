@@ -11,18 +11,19 @@ namespace BFForever.Riff2
     public class FEnvironment
     {
         private static Dictionary<long, StringKey> _globalStrings = StringsInit();
-        private List<ZObject> _objects;
-        private Dictionary<string, string> _packagePaths;
+        private Dictionary<HKey, string> _packagePaths;
+        private List<ZObject> _tempObjects;
+        private Index2PackageEntry _tempObjectsPackageEntry;
 
         public FEnvironment()
         {
-            _objects = new List<ZObject>();
-            _packagePaths = new Dictionary<string, string>();
+            _packagePaths = new Dictionary<HKey, string>();
+            _tempObjects = new List<ZObject>();
         }
 
-        public ZObject this[string indexPath] => _objects.SingleOrDefault(x => string.Compare(x.FilePath, indexPath, true) == 0);
-        public ZObject this[long indexKey] => _objects.SingleOrDefault(x => x.FilePath == indexKey);
-        public ZObject this[HKey index] => _objects.SingleOrDefault(x => (FString)x.FilePath == (FString)index); // TODO: Fix this code hack?
+        public ZObject this[string indexPath] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath.Value == indexPath));
+        public ZObject this[long indexKey] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath.Key == indexKey));
+        public ZObject this[HKey index] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath == index));
 
         public void LoadPackage(string rootPath)
         {
@@ -33,32 +34,66 @@ namespace BFForever.Riff2
             string[] packageRifs = Directory.GetFiles(Path.Combine(rootPath, "packagedefs"), "*.rif", SearchOption.AllDirectories);
             if (packageRifs.Length <= 0) return;
 
-            foreach(string packageRif in packageRifs)
+            foreach (string packageRif in packageRifs)
             {
                 RiffFile rif = RiffFile.FromFile(packageRif);
                 PackageDef newPackage = rif.Objects.FirstOrDefault(x => x is PackageDef) as PackageDef;
                 if (newPackage == null) continue;
-                
+
                 // Updates package path
-                if (_packagePaths.ContainsKey(newPackage.PackageName))
-                    _packagePaths.Remove(newPackage.PackageName);
-                _packagePaths.Add(newPackage.PackageName, fullRootPath);
+                if (_packagePaths.ContainsKey(newPackage.FilePath))
+                    _packagePaths.Remove(newPackage.FilePath);
+                _packagePaths.Add(newPackage.FilePath, fullRootPath);
 
                 // Updates packagedef object
                 PackageDef oldPackage = Definition;
-
-                if (oldPackage != null && newPackage.Version >= oldPackage.Version)
-                {
-                    _objects.Remove(oldPackage);
-                    _objects.Add(newPackage);
-                }
-                else if (oldPackage == null)
-                {
-                    _objects.Add(newPackage);
-                }
+                if (oldPackage == null || newPackage.Version >= oldPackage.Version)
+                    Definition = newPackage;
             }
 
             ReloadIndex(fullRootPath);
+        }
+
+        private ZObject GetZObject(Index2Entry entry)
+        {
+            if (entry == null || !entry.IsZObject()) return null;
+            
+            foreach(Index2PackageEntry pkEntry in entry.PackageEntries)
+            {
+                if (!_packagePaths.ContainsKey(pkEntry.Package)) continue;
+                string filePath = Path.Combine(_packagePaths[pkEntry.Package], pkEntry.ExternalFilePath);
+
+                // Checks if cached
+                if (_tempObjectsPackageEntry.ExternalFilePath == pkEntry.ExternalFilePath
+                    && _tempObjectsPackageEntry.Package == pkEntry.Package)
+                {
+                    return _tempObjects.SingleOrDefault(x => x.FilePath == entry.FilePath);
+                }
+
+                // Checks if file exists
+                if (!File.Exists(filePath)) continue;
+                if (LoadRiffFile(filePath, pkEntry))
+                    return _tempObjects.SingleOrDefault(x => x.FilePath == entry.FilePath);
+            }
+            
+            return null;
+        }
+
+        private bool LoadRiffFile(string path, Index2PackageEntry packageEntry)
+        {
+            RiffFile rif = RiffFile.FromFile(path);
+            if (rif == null) return false;
+
+            _tempObjects.Clear();
+            _tempObjectsPackageEntry = packageEntry;
+
+            // Loads all zobjects from riff file
+            foreach (ZObject obj in rif.Objects.Where(x => !(x is StringTable)))
+            {
+                _tempObjects.Add(obj);
+            }
+
+            return true;
         }
 
         private void ReloadIndex(string rootPath)
@@ -72,19 +107,12 @@ namespace BFForever.Riff2
 
             // Updates index2 object
             Index2 oldIndex = Index;
-            if (oldIndex != null && newIndex.Version >= oldIndex.Version)
-            {
-                _objects.Remove(oldIndex);
-                _objects.Add(newIndex);
-            }
-            else if (oldIndex == null)
-            {
-                _objects.Add(newIndex);
-            }
+            if (oldIndex == null || newIndex.Version >= oldIndex.Version)
+                Index = newIndex;
         }
 
-        public PackageDef Definition => _objects.SingleOrDefault(x => x is PackageDef) as PackageDef;
-        public Index2 Index => _objects.SingleOrDefault(x => x is Index2) as Index2;
+        public PackageDef Definition { get; set; }
+        public Index2 Index { get; set; }
 
         private static Dictionary<long, StringKey> StringsInit()
         {
