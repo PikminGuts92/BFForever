@@ -31,7 +31,7 @@ namespace RiffExplorer
                 // Index2 entry
                 Index2Entry entry = value as Index2Entry;
 
-                if (entry.PackageEntries.First().ExternalFilePath.EndsWith(".rif"))
+                if (entry.IsZObject())
                 {
                     path += "page_white_text.png";
                     // TODO: Add a pretty switch statement

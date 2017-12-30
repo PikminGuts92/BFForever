@@ -64,14 +64,16 @@ namespace BFForever.Riff2
 
     public class Index2Entry
     {
-        public FString FilePath { get; set; }
-        public FString Type { get; set; }
+        public HKey FilePath { get; set; }
+        public HKey Type { get; set; }
         public List<Index2PackageEntry> PackageEntries { get; set; }
+
+        public bool IsZObject() => (PackageEntries == null || PackageEntries.Count <= 0) ? false : PackageEntries.First().ExternalFilePath.EndsWith(".rif");
     }
 
     public class Index2PackageEntry
     {
-        public FString Package { get; set; }
+        public HKey Package { get; set; }
         public string ExternalFilePath { get; set; }
     }
 }

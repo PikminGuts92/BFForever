@@ -63,7 +63,7 @@ namespace RiffExplorer
             int lastIdx = entry.FilePath.Value.LastIndexOf(".");
             if (lastIdx == -1) return entry.FilePath.Value.ToLower();
 
-            if (entry.PackageEntries.First().ExternalFilePath.EndsWith(".rif"))
+            if (entry.IsZObject())
                 lastIdx++;
 
             char[] chars = entry.FilePath.Value.ToCharArray();
