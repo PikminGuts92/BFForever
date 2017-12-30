@@ -104,7 +104,7 @@ namespace BFForever.Riff2
 
         public override bool Equals(object obj)
         {
-            if (obj is FString) return false;
+            if (!(obj is FString)) return false;
             return ((FString)obj)._globalKey == _globalKey;
         }
 
