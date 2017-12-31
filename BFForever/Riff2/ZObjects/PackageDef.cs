@@ -49,7 +49,7 @@ namespace BFForever.Riff2
             throw new NotImplementedException();
         }
 
-        protected override long TypeKey => Hashes.ZOBJ_PackageDef;
+        protected override HKey Type => Hashes.ZOBJ_PackageDef;
         
         public int Version { get; set; }
         public string PackageName { get; set; }

@@ -9,11 +9,11 @@ namespace BFForever.Riff2
 {
     public class RiffFile
     {
-        private const int MAGIC = 0x46464952; // "RIFF"
-        private const int MAGIC_R = 0x52494646;
-        private const int INDX = 0x58444E49;
-        private const int STBL = 0x6C625453;
-        private const int ZOBJ = 0x4A424F5A;
+        private const int MAGIC_RIFF = 0x46464952; // "RIFF"
+        private const int MAGIC_RIFF_R = 0x52494646;
+        private const int MAGIC_INDX = 0x58444E49;
+        private const int MAGIC_STBL = 0x6C625453;
+        private const int MAGIC_ZOBJ = 0x4A424F5A;
 
         private readonly List<ZObject> _objects;
 
@@ -41,10 +41,10 @@ namespace BFForever.Riff2
             // Checks for "RIFF" magic.
             switch (ar.ReadInt32())
             {
-                case MAGIC:
+                case MAGIC_RIFF:
                     ar.BigEndian = false;
                     break;
-                case MAGIC_R:
+                case MAGIC_RIFF_R:
                     ar.BigEndian = true;
                     break;
                 default:
@@ -54,10 +54,10 @@ namespace BFForever.Riff2
             riff.BigEndian = ar.BigEndian; // Sets endianess
             ar.BaseStream.Position += 4; // Skips total size
 
-            string chunkType; uint size;
+            int chunkType; uint size;
             GetChunkInfo(ar, out chunkType, out size);
 
-            if (chunkType != "INDX")
+            if (chunkType != MAGIC_INDX)
                 throw new Exception("First chunk was not an Index!");
 
             Index index = new Index(ar);
@@ -67,7 +67,7 @@ namespace BFForever.Riff2
                 ar.BaseStream.Position = entry.Offset; // Jumps to offset
                 GetChunkInfo(ar, out chunkType, out size);
 
-                if (chunkType != "STbl" && chunkType != "ZOBJ") continue;
+                if (chunkType != MAGIC_STBL && chunkType != MAGIC_ZOBJ) continue;
                 
                 // Reads header info
                 HKey filePath = new HKey(ar.ReadInt64());
@@ -77,40 +77,16 @@ namespace BFForever.Riff2
 
                 ZObject obj;
 
-                if (chunkType == "STbl")
+                if (chunkType == MAGIC_STBL)
                 {
-                    Localization loc;
-
                     // Gets localization
-                    switch (type.Value.ToLower())
-                    {
-                        case "stringtable@enus":
-                            loc = Localization.English;
-                            break;
-                        case "stringtable@jajp":
-                            loc = Localization.Japanese;
-                            break;
-                        case "stringtable@dede":
-                            loc = Localization.German;
-                            break;
-                        case "stringtable@itit":
-                            loc = Localization.Italian;
-                            break;
-                        case "stringtable@eses":
-                            loc = Localization.Spanish;
-                            break;
-                        case "stringtable@frfr":
-                            loc = Localization.French;
-                            break;
-                        default:
-                            continue;
-                    }
+                    if (!StringTable.IsValidLocalization(type)) continue;
 
                     // Loads string table
-                    obj = new StringTable(filePath, directoryPath, loc);
+                    obj = new StringTable(filePath, directoryPath, StringTable.GetLocalization(type));
                     obj.ReadData(ar);
                 }
-                else if (chunkType == "ZOBJ")
+                else if (chunkType == MAGIC_ZOBJ)
                 {
                     switch (type.Value.ToLower())
                     {
@@ -151,21 +127,56 @@ namespace BFForever.Riff2
         private void WriteToStream(Stream stream)
         {
             AwesomeWriter aw = new AwesomeWriter(stream, BigEndian);
+            long startOffset = aw.BaseStream.Position;
+            long offset = startOffset + 24 + (_objects.Count * 16);
 
-            foreach (var zobj in _objects.Where(x => x is Index2))
+            var chunks = _objects.Select(x => new
             {
-                aw.Write((int)ZOBJ);
-                aw.Write((int)zobj.Size());
-                zobj.WriteData(aw);
+                Path = x.FilePath,
+                Offset = offset,
+                Data = CreateChunk(x, BigEndian, ref offset),
+                IsStringTable = (x is StringTable)
+            }).ToArray();
+
+            aw.Write((int)MAGIC_RIFF);
+            aw.Write((uint)(offset - (startOffset + 16)));
+
+            Index index = new Index()
+            {
+                Entries = new List<IndexEntry>(chunks.Select(x => new IndexEntry()
+                {
+                    FilePath = x.Path,
+                    Offset = (uint)x.Offset}
+                ))
+            };
+
+            // Writes index chunk
+            aw.Write((int)MAGIC_INDX);
+            aw.Write((int)(index.Entries.Count * 16));
+            index.WriteData(aw);
+
+            // Writes other zobjects and string tables
+            foreach (var chunk in chunks)
+            {
+                aw.Write((int)(chunk.IsStringTable ? MAGIC_STBL : MAGIC_ZOBJ));
+                aw.Write((int)chunk.Data.Length);
+                aw.Write(chunk.Data);
             }
         }
 
-        private static void GetChunkInfo(AwesomeReader ar, out string type, out uint size)
+        private byte[] CreateChunk(ZObject obj, bool bigEndian, ref long offset)
         {
-            byte[] data = ar.ReadBytes(4);
-            if (ar.BigEndian) Array.Reverse(data);
+            using (AwesomeWriter aw = new AwesomeWriter(new MemoryStream(), bigEndian))
+            {
+                obj.WriteData(aw);
+                offset += aw.BaseStream.Position + 8; // 8 = Chunk Magic + Size
+                return ((MemoryStream)aw.BaseStream).ToArray();
+            }
+        }
 
-            type = Encoding.UTF8.GetString(data);
+        private static void GetChunkInfo(AwesomeReader ar, out int type, out uint size)
+        {
+            type = ar.ReadInt32();
             size = ar.ReadUInt32();
         }
 

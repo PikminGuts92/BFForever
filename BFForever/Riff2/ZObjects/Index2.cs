@@ -114,7 +114,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override long TypeKey => Hashes.ZOBJ_Index2;
+        protected override HKey Type => Hashes.ZOBJ_Index2;
         
         public int Version { get; set; }
         public List<Index2Entry> Entries { get; set; }

@@ -28,6 +28,6 @@ namespace BFForever.Riff2
             throw new NotImplementedException();
         }
 
-        protected override long TypeKey => Hashes.ZOBJ_Catalog2;
+        protected override HKey Type => Hashes.ZOBJ_Catalog2;
     }
 }

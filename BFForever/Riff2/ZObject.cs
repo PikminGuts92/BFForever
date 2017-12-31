@@ -38,7 +38,7 @@ namespace BFForever.Riff2
         {
             aw.Write((long)_filePath);
             aw.Write((long)_directoryPath);
-            aw.Write((long)TypeKey);
+            aw.Write((long)Type);
             aw.BaseStream.Position += 8;
 
             WriteObjectData(aw);
@@ -48,6 +48,6 @@ namespace BFForever.Riff2
 
         public HKey FilePath => _filePath;
         public HKey DirectoryPath => _directoryPath;
-        protected abstract long TypeKey { get; } 
+        protected abstract HKey Type { get; } 
     }
 }

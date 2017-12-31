@@ -8,6 +8,28 @@ namespace BFForever.Riff2
 {
     public class StringTable : ZObject
     {
+        private class LocalizationPair
+        {
+            private LocalizationPair(long key, Localization loc)
+            {
+                Key = key;
+                EnumValue = loc;
+            }
+
+            public long Key { get; }
+            public Localization EnumValue { get; }
+
+            public static readonly LocalizationPair[] Localizations = new LocalizationPair[]
+            {
+                new LocalizationPair(Hashes.STbl_English, Localization.English),
+                new LocalizationPair(Hashes.STbl_Japanese, Localization.Japanese),
+                new LocalizationPair(Hashes.STbl_German, Localization.German),
+                new LocalizationPair(Hashes.STbl_Italian, Localization.Italian),
+                new LocalizationPair(Hashes.STbl_Spanish, Localization.Spanish),
+                new LocalizationPair(Hashes.STbl_French, Localization.French)
+            };
+        }
+
         private readonly Localization _localization;
         Dictionary<long, string> _strings = new Dictionary<long, string>();
 
@@ -16,6 +38,10 @@ namespace BFForever.Riff2
             _localization = Localization;
             _strings = new Dictionary<long, string>();
         }
+
+        internal static bool IsValidLocalization(HKey key) => LocalizationPair.Localizations.Count(x => x.Key == key) != 0;
+        internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.Key == key).EnumValue;
+        internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).Key;
 
         protected override int CalculateSize()
         {
@@ -73,30 +99,10 @@ namespace BFForever.Riff2
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
-        
-        protected override long TypeKey {
-            get
-            {
-                switch(_localization)
-                {
-                    default:
-                    case Localization.English:
-                        return Hashes.STbl_English;
-                    case Localization.Japanese:
-                        return Hashes.STbl_Japanese;
-                    case Localization.German:
-                        return Hashes.STbl_German;
-                    case Localization.Italian:
-                        return Hashes.STbl_Italian;
-                    case Localization.Spanish:
-                        return Hashes.STbl_Spanish;
-                    case Localization.French:
-                        return Hashes.STbl_French;
-                }
-            }
-        }
+
+        protected override HKey Type => GetHKey(_localization);
 
         public Localization Localization => _localization;
 

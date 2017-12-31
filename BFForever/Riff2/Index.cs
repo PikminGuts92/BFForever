@@ -54,6 +54,19 @@ namespace BFForever.Riff2
             }
         }
 
+        internal void WriteData(AwesomeWriter aw)
+        {
+            aw.Write((int)Entries.Count);
+            aw.Write((int)4);
+            
+            foreach(IndexEntry entry in Entries)
+            {
+                aw.Write((long)entry.FilePath);
+                aw.Write((uint)entry.Offset);
+                aw.BaseStream.Position += 4;
+            }
+        }
+
         public List<IndexEntry> Entries { get; set; }
     }
 
