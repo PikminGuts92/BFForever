@@ -152,7 +152,7 @@ namespace BFForever.Riff2
 
             // Writes index chunk
             aw.Write((int)MAGIC_INDX);
-            aw.Write((int)(index.Entries.Count * 16));
+            aw.Write((int)(8 + (index.Entries.Count * 16)));
             index.WriteData(aw);
 
             // Writes other zobjects and string tables

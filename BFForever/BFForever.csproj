@@ -63,6 +63,8 @@
     <Compile Include="Riff2\FString.cs" />
     <Compile Include="Riff2\FEnvironment.cs" />
     <Compile Include="Riff2\Hashes.cs" />
+    <Compile Include="Riff2\Helpers\Pitch.cs" />
+    <Compile Include="Riff2\Helpers\Tuning.cs" />
     <Compile Include="Riff2\HKey.cs" />
     <Compile Include="Riff2\Index.cs" />
     <Compile Include="Riff2\Localization.cs" />
