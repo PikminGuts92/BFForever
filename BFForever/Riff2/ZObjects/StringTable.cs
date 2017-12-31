@@ -16,11 +16,16 @@ namespace BFForever.Riff2
             _localization = Localization;
             _strings = new Dictionary<long, string>();
         }
-        
+
+        protected override int CalculateSize()
+        {
+            throw new NotImplementedException();
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             _strings.Clear();
-            
+
             int count = ar.ReadInt32();
             ar.BaseStream.Position += 12; // Skips to entries
             long difference = ar.BaseStream.Position + (count * 16);
@@ -57,12 +62,39 @@ namespace BFForever.Riff2
                     throw new Exception($"STRING ERROR: {_strings[key[i]]} != {text}");
                 }
             }
-            
+
             foreach (var d in _strings)
             {
                 // Finds/adds key string globally
                 StringKey sk = FEnvironment.FindCreate(d.Key);
                 sk[_localization] = d.Value;
+            }
+        }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            throw new NotImplementedException();
+        }
+        
+        protected override long TypeKey {
+            get
+            {
+                switch(_localization)
+                {
+                    default:
+                    case Localization.English:
+                        return Hashes.STbl_English;
+                    case Localization.Japanese:
+                        return Hashes.STbl_Japanese;
+                    case Localization.German:
+                        return Hashes.STbl_German;
+                    case Localization.Italian:
+                        return Hashes.STbl_Italian;
+                    case Localization.Spanish:
+                        return Hashes.STbl_Spanish;
+                    case Localization.French:
+                        return Hashes.STbl_French;
+                }
             }
         }
 

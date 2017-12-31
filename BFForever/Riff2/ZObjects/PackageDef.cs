@@ -13,6 +13,11 @@ namespace BFForever.Riff2
             Entries = new List<string>();
         }
 
+        protected override int CalculateSize()
+        {
+            throw new NotImplementedException();
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();
@@ -39,6 +44,13 @@ namespace BFForever.Riff2
             }
         }
 
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override long TypeKey => Hashes.ZOBJ_PackageDef;
+        
         public int Version { get; set; }
         public string PackageName { get; set; }
         public List<string> Entries { get; set; }

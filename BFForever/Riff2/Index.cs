@@ -4,6 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * Description:
+ *  The index chunk lists internal path names and offsets of zobjects / string tables in a riff file.
+ * 
+ * INDEX CHUNK
+ * ===========
+ * INT32 - Count of Entries
+ * INT32 - Offset
+ * IndexEntry[] - Entries
+ * 
+ * IndexEntry (16 bytes)
+ * =====================
+ *  HKEY - File Path
+ * INT32 - Offset
+ * INT32 - Always 0
+ */
+
 namespace BFForever.Riff2
 {
     internal class Index

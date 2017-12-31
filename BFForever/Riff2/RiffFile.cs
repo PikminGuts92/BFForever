@@ -11,6 +11,9 @@ namespace BFForever.Riff2
     {
         private const int MAGIC = 0x46464952; // "RIFF"
         private const int MAGIC_R = 0x52494646;
+        private const int INDX = 0x58444E49;
+        private const int STBL = 0x6C625453;
+        private const int ZOBJ = 0x4A424F5A;
 
         private readonly List<ZObject> _objects;
 
@@ -135,6 +138,26 @@ namespace BFForever.Riff2
             }
 
             return riff;
+        }
+
+        public void WriteToFile(string output)
+        {
+            using (FileStream fs = File.Create(output))
+            {
+                WriteToStream(fs);
+            }
+        }
+
+        private void WriteToStream(Stream stream)
+        {
+            AwesomeWriter aw = new AwesomeWriter(stream, BigEndian);
+
+            foreach (var zobj in _objects.Where(x => x is Index2))
+            {
+                aw.Write((int)ZOBJ);
+                aw.Write((int)zobj.Size());
+                zobj.WriteData(aw);
+            }
         }
 
         private static void GetChunkInfo(AwesomeReader ar, out string type, out uint size)

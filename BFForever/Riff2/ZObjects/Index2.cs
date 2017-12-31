@@ -4,6 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * Index2 ZObject
+ * ==============
+ * INT32 - Version
+ * INT32 - Count of Entries
+ * INT32 - Offset
+ * Index2Entry[] - Index2 Entries
+ * Index2PackageEntry[] - Package Entries
+ * 
+ * Index2Entry (24 bytes)
+ * ======================
+ *  HKEY - File Path
+ *  HKEY - Type
+ * INT32 - Count of Package Entries
+ * INT32 - Package Entries Offset
+ * 
+ * Index2PackageEntry (248 bytes)
+ * ==============================
+ *  HKEY - PackageDef Path
+ * STRNG - External File Path
+ */
+
 namespace BFForever.Riff2
 {
     public class Index2 : ZObject
@@ -12,7 +34,14 @@ namespace BFForever.Riff2
         {
             Entries = new List<Index2Entry>();
         }
-        
+
+        protected override int CalculateSize()
+        {
+            return 12
+                + (Entries.Count * 24)
+                + (Entries.Sum(x => x.PackageEntries.Count) * 248);
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();
@@ -58,6 +87,35 @@ namespace BFForever.Riff2
             }
         }
 
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)Version);
+            aw.Write((int)Entries.Count);
+            aw.Write((int)4); // Should always be 4
+
+            long nextPackageOffset = aw.BaseStream.Position + (Entries.Count * 24);
+
+            // Writes index2 entries
+            foreach(Index2Entry entry in Entries)
+            {
+                aw.Write((long)entry.FilePath.Key);
+                aw.Write((long)entry.Type.Key);
+                aw.Write((int)entry.PackageEntries.Count);
+                aw.Write((int)(nextPackageOffset - aw.BaseStream.Position));
+
+                nextPackageOffset += entry.PackageEntries.Count * 248;
+            }
+
+            // Writes package entries
+            foreach(var entry in Entries.SelectMany(x => x.PackageEntries))
+            {
+                aw.Write((long)entry.Package);
+                aw.WriteNullString(entry.ExternalFilePath, 240);
+            }
+        }
+
+        protected override long TypeKey => Hashes.ZOBJ_Index2;
+        
         public int Version { get; set; }
         public List<Index2Entry> Entries { get; set; }
     }

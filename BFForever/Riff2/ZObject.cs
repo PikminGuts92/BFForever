@@ -5,12 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 /* 
- * ZOBJECT HEADER (32 bytes)
- * =========================
+ * Description:
+ *  The zobject chunk is an internal file system entry. 
+ * 
+ * ZOBJECT CHUNK
+ * =============
  *  HKEY - File Path
  *  HKEY - Directory Path
  *  HKEY - Type
  * INT64 - Always 0
+ * BYTES - ZObject Data
  */
 
 namespace BFForever.Riff2
@@ -26,10 +30,24 @@ namespace BFForever.Riff2
             _directoryPath = directoryPath;
         }
 
+        internal int Size() => CalculateSize() + 32;
+        protected abstract int CalculateSize();
         internal abstract void ReadData(AwesomeReader ar);
+
+        internal void WriteData(AwesomeWriter aw)
+        {
+            aw.Write((long)_filePath);
+            aw.Write((long)_directoryPath);
+            aw.Write((long)TypeKey);
+            aw.BaseStream.Position += 8;
+
+            WriteObjectData(aw);
+        }
+
+        protected abstract void WriteObjectData(AwesomeWriter aw);
 
         public HKey FilePath => _filePath;
         public HKey DirectoryPath => _directoryPath;
-        //public abstract ReadOnlyHKey Type { get; }
+        protected abstract long TypeKey { get; } 
     }
 }

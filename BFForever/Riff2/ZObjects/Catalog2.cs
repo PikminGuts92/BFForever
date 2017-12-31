@@ -13,9 +13,21 @@ namespace BFForever.Riff2
 
         }
 
+        protected override int CalculateSize()
+        {
+            throw new NotImplementedException();
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             throw new NotImplementedException();
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override long TypeKey => Hashes.ZOBJ_Catalog2;
     }
 }

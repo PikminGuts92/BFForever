@@ -131,12 +131,24 @@ namespace BFForever
         /// <summary>
         /// Writes null-terminated string
         /// </summary>
-        /// <param name="value"></param>
-        public void WriteNullString(string value)
+        /// <param name="value">String</param>
+        /// <param maxSize="value">Max Size</param>
+        public void WriteNullString(string value, int maxSize = 0)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(value);
+            if (maxSize <= 0)
+            {
+                byte[] stringData = Encoding.UTF8.GetBytes(value);
+                this.Write(stringData);
+                this.Write((byte)0x00);
+                return;
+            }
+
+            byte[] buffer = new byte[maxSize];
+            byte[] data = Encoding.UTF8.GetBytes(value);
+
+            Array.Copy(data, buffer, Math.Min(data.Length, maxSize));
+            buffer[buffer.Length - 1] = 0x00;
             this.Write(buffer);
-            this.Write((byte)0x00);
         }
 
         /// <summary>
