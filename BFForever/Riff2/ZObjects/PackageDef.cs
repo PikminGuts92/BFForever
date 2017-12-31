@@ -4,6 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * PackageDef ZObject
+ * ==================
+ * INT32 - Version
+ * STRNG - Package Name (256 bytes)
+ * INT32 - Count of Entries
+ * INT32 - Offset
+ * STRNG[] - Previous Package Names (256 bytes)
+ */
+
 namespace BFForever.Riff2
 {
     public class PackageDef : ZObject
@@ -46,7 +56,13 @@ namespace BFForever.Riff2
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            throw new NotImplementedException();
+            aw.Write((int)Version);
+            aw.WriteNullString(PackageName, 256);
+            aw.Write((int)Entries.Count);
+            aw.Write((int)4);
+            
+            foreach (string entry in Entries)
+                aw.WriteNullString(entry, 256);
         }
 
         protected override HKey Type => Hashes.ZOBJ_PackageDef;

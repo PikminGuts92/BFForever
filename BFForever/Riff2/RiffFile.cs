@@ -139,7 +139,7 @@ namespace BFForever.Riff2
             }).ToArray();
 
             aw.Write((int)MAGIC_RIFF);
-            aw.Write((uint)(offset - (startOffset + 16)));
+            aw.Write((uint)(offset - (startOffset + 8)));
 
             Index index = new Index()
             {
@@ -169,6 +169,11 @@ namespace BFForever.Riff2
             using (AwesomeWriter aw = new AwesomeWriter(new MemoryStream(), bigEndian))
             {
                 obj.WriteData(aw);
+
+                // Ensures chunk size is always divisible by 4
+                if (aw.BaseStream.Position % 4 != 0)
+                    aw.Write(new byte[4 - (aw.BaseStream.Position % 4)]);
+
                 offset += aw.BaseStream.Position + 8; // 8 = Chunk Magic + Size
                 return ((MemoryStream)aw.BaseStream).ToArray();
             }
