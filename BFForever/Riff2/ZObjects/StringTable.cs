@@ -4,6 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * Description:
+ *  The string table lists contains all strings for a given zobject directory. Each are seperated by localization.
+ *  
+ *  Note: Entries are sorted by hash key values
+ * 
+ * StringTable ZObject
+ * ===================
+ * INT32 - Count of Entries
+ * INT32 - Offset (Always 12)
+ * INT32 - Size of String Table
+ * INT32 - String Table Offset
+ * Entries[]
+ * StringTable
+ * 
+ * Entry (16 bytes)
+ * ================
+ *  SKEY - String Key
+ * INT32 - Offset in String Table
+ * INT32 - Always 0
+ */
+
 namespace BFForever.Riff2
 {
     public class StringTable : ZObject
@@ -12,11 +34,11 @@ namespace BFForever.Riff2
         {
             private LocalizationPair(long key, Localization loc)
             {
-                Key = key;
+                HashValue = key;
                 EnumValue = loc;
             }
 
-            public long Key { get; }
+            public long HashValue { get; }
             public Localization EnumValue { get; }
 
             public static readonly LocalizationPair[] Localizations = new LocalizationPair[]
@@ -35,13 +57,13 @@ namespace BFForever.Riff2
 
         public StringTable(HKey filePath, HKey directoryPath, Localization localization = Localization.English) : base(filePath, directoryPath)
         {
-            _localization = Localization;
+            _localization = localization;
             _strings = new Dictionary<long, string>();
         }
 
-        internal static bool IsValidLocalization(HKey key) => LocalizationPair.Localizations.Count(x => x.Key == key) != 0;
-        internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.Key == key).EnumValue;
-        internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).Key;
+        internal static bool IsValidLocalization(HKey key) => LocalizationPair.Localizations.Count(x => x.HashValue == key) != 0;
+        internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.HashValue == key).EnumValue;
+        internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).HashValue;
 
         protected override int CalculateSize()
         {
@@ -54,7 +76,7 @@ namespace BFForever.Riff2
 
             int count = ar.ReadInt32();
             ar.BaseStream.Position += 12; // Skips to entries
-            long difference = ar.BaseStream.Position + (count * 16);
+            long stringTableOffset = ar.BaseStream.Position + (count * 16);
 
             long[] key = new long[count];
             long[] offset = new long[count];
@@ -68,7 +90,7 @@ namespace BFForever.Riff2
 
             for (int i = 0; i < count; i++)
             {
-                ar.BaseStream.Position = offset[i] + difference;
+                ar.BaseStream.Position = offset[i] + stringTableOffset;
                 string text = ar.ReadNullString();
 
                 if (!_strings.ContainsKey(key[i]))
@@ -99,7 +121,36 @@ namespace BFForever.Riff2
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            //throw new NotImplementedException();
+            int offset = 0;
+            var strings = _strings.OrderBy(x => (ulong)x.Key).Select(x => new
+            {
+                Value = x.Value,
+                Key = x.Key,
+                Offset = TerminatedOffset(x.Value.Length, ref offset)
+            }).ToList();
+
+            aw.Write((int)_strings.Count);
+            aw.Write((int)12);
+            aw.Write((int)offset);
+            aw.Write((int)(_strings.Count * 16));
+
+            foreach(var entry in strings)
+            {
+                aw.Write((long)entry.Key);
+                aw.Write((int)entry.Offset);
+                aw.BaseStream.Position += 4;
+            }
+
+            foreach (var entry in strings)
+                aw.WriteNullString(entry.Value);
+        }
+
+        private int TerminatedOffset(int size, ref int offset)
+        {
+            int origOffset = offset;
+            offset += size + 1;
+
+            return origOffset;
         }
 
         protected override HKey Type => GetHKey(_localization);
