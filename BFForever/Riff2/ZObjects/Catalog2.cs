@@ -16,7 +16,7 @@ using System.Threading.Tasks;
  * =========================
  *  HKEY - Identifier
  * INT32 - Song Type? (1-5)
- * INT32 - Unknown (Always 0?)
+ * INT32 - Always 0
  *  SKEY - Title
  *  SKEY - Artist
  *  SKEY - Album
@@ -28,7 +28,7 @@ using System.Threading.Tasks;
  * FLOAT - Vocals Intensity
  *  HKEY - Era Tag
  * INT32 - Year
- * INT32 - Unknown (Always 0?)
+ * INT32 - Always 0
  * Tuning - Lead Guitar  \
  * Tuning - Rhythm Guitar | Each are 40 bytes (120 bytes total)
  * Tuning - Bass         /
@@ -41,7 +41,15 @@ using System.Threading.Tasks;
  * INT32 - Metadata Tags Offset
  * INT32 - Count of Genre Tags
  * INT32 - Genre Tags Offset
- * BYTE[24] - Zero'd Data
+ * INT32 - Flags?
+ *   [0] - Sometimes 1
+ *   [1] - Sometimes 1
+ *   [2] - Always 0
+ *   [3] - Always 0
+ * INT32 - Unknown
+ * INT32 - Unknown
+ * INT32 - Unknown
+ * INT64 - Always 0
  * 
  * Tuning (40 bytes)
  * =================
@@ -52,11 +60,12 @@ using System.Threading.Tasks;
  *   [2] - Pitch
  *   [3] - Alternate Pitch?
  * INT32 - String 2 \
- * INT32 - String 3  | Same as first string data
+ * INT32 - String 3  |
  * INT32 - String 4  |
- * INT32 - String 5  |
- * INT32 - String 6 /
- * BYTE[8] - Zero'd Data
+ * INT32 - String 5  | Same as first string data
+ * INT32 - String 6  |
+ * INT32 - String 7  |
+ * INT32 - String 8 /
  */
 
 namespace BFForever.Riff2
@@ -87,7 +96,7 @@ namespace BFForever.Riff2
                 // 280 bytes
                 entry.Identifier = ar.ReadInt64();
                 entry.SongType = ar.ReadInt32();
-                entry.Unknown1 = ar.ReadInt32(); // Should be 0
+                ar.BaseStream.Position += 4; // Should be 0
 
                 entry.Title = ar.ReadInt64();
                 entry.Artist = ar.ReadInt64();
@@ -102,7 +111,7 @@ namespace BFForever.Riff2
 
                 entry.EraTag = ar.ReadInt64();
                 entry.Year = ar.ReadInt32();
-                entry.Unknown2 = ar.ReadInt32(); // Should be 0
+                ar.BaseStream.Position += 4; // Should be 0
 
                 entry.LeadGuitarTuning = ReadTuning(ar);
                 entry.RhythmGuitarTuning = ReadTuning(ar);
@@ -148,7 +157,14 @@ namespace BFForever.Riff2
                 }
 
                 ar.BaseStream.Position = previousPosition;
-                ar.BaseStream.Position += 24;
+
+                int unknown = ar.ReadInt32();
+                entry.Unknown1 = (byte)((unknown & 0xFF000000) >> 24);
+                entry.Unknown2 = (byte)((unknown & 0x00FF0000) >> 16);
+                entry.Unknown3 = ar.ReadInt32();
+                entry.Unknown4 = ar.ReadInt32();
+                entry.Unknown5 = ar.ReadInt32();
+                ar.BaseStream.Position += 8; // Should be 0
 
                 Entries.Add(entry);
                 entryCount--;
@@ -158,7 +174,7 @@ namespace BFForever.Riff2
         private Tuning ReadTuning(AwesomeReader ar)
         {
             Tuning tuning = new Tuning();
-
+            
             // 40 bytes
             tuning.Name = ar.ReadInt64();
 
@@ -180,7 +196,12 @@ namespace BFForever.Riff2
             tuning.String6 = ar.ReadInt24() & 0xFF;
             tuning.String6Alt = ar.ReadByte();
 
-            ar.BaseStream.Position += 8;
+            tuning.String7 = ar.ReadInt24() & 0xFF;
+            tuning.String7Alt = ar.ReadByte();
+
+            tuning.String8 = ar.ReadInt24() & 0xFF;
+            tuning.String8Alt = ar.ReadByte();
+            
             return tuning;
         }
 
@@ -191,10 +212,11 @@ namespace BFForever.Riff2
             aw.Write((int)(tuning.String1 << 8 | tuning.String1Alt));
             aw.Write((int)(tuning.String2 << 8 | tuning.String2Alt));
             aw.Write((int)(tuning.String3 << 8 | tuning.String3Alt));
-            aw.Write((int)(tuning.String2 << 8 | tuning.String4Alt));
+            aw.Write((int)(tuning.String4 << 8 | tuning.String4Alt));
             aw.Write((int)(tuning.String5 << 8 | tuning.String5Alt));
             aw.Write((int)(tuning.String6 << 8 | tuning.String6Alt));
-            aw.BaseStream.Position += 8;
+            aw.Write((int)(tuning.String7 << 8 | tuning.String7Alt));
+            aw.Write((int)(tuning.String8 << 8 | tuning.String8Alt));
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
@@ -212,7 +234,7 @@ namespace BFForever.Riff2
             {
                 aw.Write((long)entry.Identifier);
                 aw.Write((int)entry.SongType);
-                aw.Write((int)entry.Unknown1);
+                aw.Write((int)0);
 
                 aw.Write((long)entry.Title);
                 aw.Write((long)entry.Artist);
@@ -227,7 +249,7 @@ namespace BFForever.Riff2
 
                 aw.Write((long)entry.EraTag);
                 aw.Write((int)entry.Year);
-                aw.Write((int)entry.Unknown2);
+                aw.Write((int)0);
 
                 // Tunings
                 WriteTuning(aw, entry.LeadGuitarTuning);
@@ -255,8 +277,12 @@ namespace BFForever.Riff2
                 aw.Write((int)(tagOffset - aw.BaseStream.Position));
                 tagOffset += entry.GenreTags.Count * 8;
                 tags.AddRange(entry.GenreTags);
-
-                aw.BaseStream.Position += 24;
+                
+                aw.Write((int)(entry.Unknown1 << 24 | entry.Unknown2 << 16));
+                aw.Write((int)entry.Unknown3);
+                aw.Write((int)entry.Unknown4);
+                aw.Write((int)entry.Unknown5);
+                aw.BaseStream.Position += 8;
             }
 
             // Writes tags
@@ -280,7 +306,6 @@ namespace BFForever.Riff2
 
         public HKey Identifier { get; set; }
         public int SongType { get; set; }
-        public int Unknown1 { get; set; }
 
         public FString Title { get; set; }
         public FString Artist { get; set; }
@@ -295,7 +320,6 @@ namespace BFForever.Riff2
 
         public HKey EraTag { get; set; }
         public int Year { get; set; }
-        public int Unknown2 { get; set; }
 
         public Tuning LeadGuitarTuning { get; set; }
         public Tuning RhythmGuitarTuning { get; set; }
@@ -308,5 +332,11 @@ namespace BFForever.Riff2
 
         public List<HKey> MetadataTags { get; set; }
         public List<HKey> GenreTags { get; set; }
+
+        public byte Unknown1 { get; set; }
+        public byte Unknown2 { get; set; }
+        public int Unknown3 { get; set; }
+        public int Unknown4 { get; set; }
+        public int Unknown5 { get; set; }
     }
 }
