@@ -184,9 +184,84 @@ namespace BFForever.Riff2
             return tuning;
         }
 
+        private void WriteTuning(AwesomeWriter aw, Tuning tuning)
+        {
+            // 40 bytes
+            aw.Write((long)tuning.Name);
+            aw.Write((int)(tuning.String1 << 8 | tuning.String1Alt));
+            aw.Write((int)(tuning.String2 << 8 | tuning.String2Alt));
+            aw.Write((int)(tuning.String3 << 8 | tuning.String3Alt));
+            aw.Write((int)(tuning.String2 << 8 | tuning.String4Alt));
+            aw.Write((int)(tuning.String5 << 8 | tuning.String5Alt));
+            aw.Write((int)(tuning.String6 << 8 | tuning.String6Alt));
+            aw.BaseStream.Position += 8;
+        }
+
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            throw new NotImplementedException();
+            // Combines all the tags together
+            List<FString> tags = new List<FString>();
+            
+            aw.Write((int)Entries.Count);
+            aw.Write((int)4);
+
+            long tagOffset = aw.BaseStream.Position + (Entries.Count * 280);
+
+            // Writes entries
+            foreach (Catalog2Entry entry in Entries)
+            {
+                aw.Write((long)entry.Identifier);
+                aw.Write((int)entry.SongType);
+                aw.Write((int)entry.Unknown1);
+
+                aw.Write((long)entry.Title);
+                aw.Write((long)entry.Artist);
+                aw.Write((long)entry.Album);
+                aw.Write((long)entry.Description);
+                aw.Write((long)entry.LegendTag);
+
+                aw.Write((float)entry.SongLength);
+                aw.Write((float)entry.GuitarIntensity);
+                aw.Write((float)entry.BassIntensity);
+                aw.Write((float)entry.VoxIntensity);
+
+                aw.Write((long)entry.EraTag);
+                aw.Write((int)entry.Year);
+                aw.Write((int)entry.Unknown2);
+
+                // Tunings
+                WriteTuning(aw, entry.LeadGuitarTuning);
+                WriteTuning(aw, entry.RhythmGuitarTuning);
+                WriteTuning(aw, entry.BassTuning);
+
+                // Label tags
+                aw.Write((int)entry.LabelTags.Count);
+                aw.Write((int)(tagOffset - aw.BaseStream.Position));
+                tagOffset += entry.LabelTags.Count * 8;
+                tags.AddRange(entry.LabelTags);
+
+                aw.Write((long)entry.SongPath);
+                aw.Write((long)entry.TexturePath);
+                aw.Write((long)entry.PreviewPath);
+
+                // Metadata tags
+                aw.Write((int)entry.MetadataTags.Count);
+                aw.Write((int)(tagOffset - aw.BaseStream.Position));
+                tagOffset += entry.MetadataTags.Count * 8;
+                tags.AddRange(entry.MetadataTags);
+
+                // Genre tags
+                aw.Write((int)entry.GenreTags.Count);
+                aw.Write((int)(tagOffset - aw.BaseStream.Position));
+                tagOffset += entry.GenreTags.Count * 8;
+                tags.AddRange(entry.GenreTags);
+
+                aw.BaseStream.Position += 24;
+            }
+
+            // Writes tags
+            foreach (FString tag in tags)
+                aw.Write((long)tag);
         }
 
         protected override HKey Type => Hashes.ZOBJ_Catalog2;

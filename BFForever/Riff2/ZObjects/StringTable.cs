@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 /* 
  * Description:
@@ -13,11 +14,11 @@ using System.Threading.Tasks;
  * StringTable ZObject
  * ===================
  * INT32 - Count of Entries
- * INT32 - Offset (Always 12)
- * INT32 - Size of String Table
- * INT32 - String Table Offset
+ * INT32 - Entries Offset (Always 12)
+ * INT32 - Size of String Blob
+ * INT32 - String Blob Offset
  * Entries[]
- * StringTable
+ * StringBlob
  * 
  * Entry (16 bytes)
  * ================
@@ -121,36 +122,42 @@ namespace BFForever.Riff2
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            int offset = 0;
-            var strings = _strings.OrderBy(x => (ulong)x.Key).Select(x => new
-            {
-                Value = x.Value,
-                Key = x.Key,
-                Offset = TerminatedOffset(x.Value.Length, ref offset)
-            }).ToList();
+            Dictionary<long, int> offsets;
+            byte[] blob = CreateBlob(out offsets);
 
             aw.Write((int)_strings.Count);
             aw.Write((int)12);
-            aw.Write((int)offset);
-            aw.Write((int)(_strings.Count * 16));
+            aw.Write((int)blob.Length);
+            aw.Write((int)(_strings.Count * 16) + 4);
 
-            foreach(var entry in strings)
+            foreach(var entry in _strings)
             {
                 aw.Write((long)entry.Key);
-                aw.Write((int)entry.Offset);
+                aw.Write((int)offsets[entry.Key]);
                 aw.BaseStream.Position += 4;
             }
 
-            foreach (var entry in strings)
-                aw.WriteNullString(entry.Value);
+            aw.Write(blob);
         }
 
-        private int TerminatedOffset(int size, ref int offset)
+        private byte[] CreateBlob(out Dictionary<long, int> offsets)
         {
-            int origOffset = offset;
-            offset += size + 1;
+            offsets = new Dictionary<long, int>();
+            byte[] nullByte = { 0x00 };
 
-            return origOffset;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                foreach (var s in _strings)
+                {
+                    offsets.Add(s.Key, (int)ms.Position);
+
+                    byte[] data = Encoding.UTF8.GetBytes(s.Value);
+                    ms.Write(data, 0, data.Length);
+                    ms.Write(nullByte, 0, nullByte.Length);
+                }
+
+                return ms.ToArray();
+            }
         }
 
         protected override HKey Type => GetHKey(_localization);
