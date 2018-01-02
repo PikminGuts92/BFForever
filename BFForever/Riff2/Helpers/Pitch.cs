@@ -30,7 +30,7 @@ namespace BFForever.Riff2
         public int Value
         {
             get => _value;
-            set => _value = Math.Abs(value) % 0x80; // 0-127
+            set => _value = (byte)(Math.Abs(value) % 0x80); // 0-127
         }
 
         public string Name => _pitchesFlat[_value % 12] + ((_value / 12) - 1).ToString(); // C-1 -> G9
