@@ -8,6 +8,8 @@ namespace BFForever.Riff2
 {
     public class FString
     {
+        protected static long _lastNumber = 1210976091438049082; // Used as key assignment - Highest value found in BF
+        protected static readonly CRC64 _global = new CRC64();
         protected long _globalKey;
 
         public FString(long key)
@@ -17,7 +19,14 @@ namespace BFForever.Riff2
 
         public FString(string s)
         {
-            throw new NotImplementedException();
+            ulong hash = _global.Compute("#bFfStRiNg::" + s);
+            _globalKey = (long)hash;
+            //_globalKey = _lastNumber++;
+            
+            if (FEnvironment.ContainsStringKey(_globalKey)) return; // ?
+
+            StringKey sk = StringKey.FromString(s, _globalKey);
+            FEnvironment.AddStringKey(sk);
         }
 
         public long Key => _globalKey;
@@ -27,7 +36,11 @@ namespace BFForever.Riff2
             set
             {
                 // TODO: Implement this
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
+                
+                StringKey sk = FEnvironment.FindCreate(_globalKey);
+                sk[Localization.English] = value;
+                sk[Localization.Japanese] = value;
             }
         }
 

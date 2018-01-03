@@ -27,11 +27,13 @@ namespace BFForever.Riff2
 
         public void LoadPackage(string rootPath)
         {
-            // Loads PackageDef
-            if (!Directory.Exists(rootPath)) return;
             string fullRootPath = Path.GetFullPath(rootPath);
+            string defDirectory = Path.Combine(rootPath, "packagedefs");
 
-            string[] packageRifs = Directory.GetFiles(Path.Combine(rootPath, "packagedefs"), "*.rif", SearchOption.AllDirectories);
+            // Loads PackageDef
+            if (!Directory.Exists(fullRootPath) || !Directory.Exists(defDirectory)) return;
+            
+            string[] packageRifs = Directory.GetFiles(defDirectory, "*.rif", SearchOption.AllDirectories);
             if (packageRifs.Length <= 0) return;
 
             foreach (string packageRif in packageRifs)
@@ -152,6 +154,9 @@ namespace BFForever.Riff2
             _globalStrings.Add(key, sk);
             return sk;
         }
+
+        internal static void AddStringKey(StringKey sk) => _globalStrings.Add(sk.Key, sk);
+        internal static bool ContainsStringKey(long key) => _globalStrings.ContainsKey(key);
         
         public static Localization Localization { get; set; } = Localization.English;
     }

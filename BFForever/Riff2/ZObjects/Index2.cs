@@ -127,6 +127,8 @@ namespace BFForever.Riff2
         public List<Index2PackageEntry> PackageEntries { get; set; }
 
         public bool IsZObject() => (PackageEntries == null || PackageEntries.Count <= 0) ? false : PackageEntries.First().ExternalFilePath.EndsWith(".rif");
+
+        public override string ToString() => FilePath ?? base.ToString();
     }
 
     public class Index2PackageEntry

@@ -338,5 +338,7 @@ namespace BFForever.Riff2
         public int Unknown3 { get; set; }
         public int Unknown4 { get; set; }
         public int Unknown5 { get; set; }
+
+        public override string ToString() => Identifier ?? base.ToString();
     }
 }

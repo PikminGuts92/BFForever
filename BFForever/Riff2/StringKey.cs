@@ -41,6 +41,21 @@ namespace BFForever.Riff2
             return sk;
         }
 
+        public static StringKey FromString(string value, long hash)
+        {
+            StringKey sk = new StringKey(hash);
+
+            // Adds localized strings
+            sk[Localization.English] = value;
+            sk[Localization.Japanese] = value;
+            sk[Localization.German] = value;
+            sk[Localization.Italian] = value;
+            sk[Localization.Spanish] = value;
+            sk[Localization.French] = value;
+
+            return sk;
+        }
+
         public string GetValue(Localization loc) => _values[loc];
         public void SetValue(string value, Localization loc) => _values[loc] = value;
 
