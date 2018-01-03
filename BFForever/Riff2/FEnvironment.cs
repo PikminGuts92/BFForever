@@ -137,14 +137,15 @@ namespace BFForever.Riff2
                 // ZObject types
                 { HKey.GetHash("PackageDef"), StringKey.FromHKey("PackageDef") },
                 { HKey.GetHash("Index2"), StringKey.FromHKey("Index2") },
-                { HKey.GetHash("Catalog2"), StringKey.FromHKey("Catalog2") }
+                { HKey.GetHash("Catalog2"), StringKey.FromHKey("Catalog2") },
+                { HKey.GetHash("Song"), StringKey.FromHKey("Song") }
             };
 
             return strings;
         }
 
         // String management
-        internal static string GetStringValue(long key) => _globalStrings[key][Localization];
+        internal static string GetStringValue(long key) => _globalStrings.ContainsKey(key) ?  _globalStrings[key][Localization] : null;
 
         internal static StringKey FindCreate(long key)
         {

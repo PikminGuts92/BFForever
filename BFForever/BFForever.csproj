@@ -74,6 +74,7 @@
     <Compile Include="Riff2\ZObjects\Catalog2.cs" />
     <Compile Include="Riff2\ZObjects\Index2.cs" />
     <Compile Include="Riff2\ZObjects\PackageDef.cs" />
+    <Compile Include="Riff2\ZObjects\Song.cs" />
     <Compile Include="Riff2\ZObjects\StringTable.cs" />
     <Compile Include="Riff\IData.cs" />
     <Compile Include="Riff\Index.cs" />

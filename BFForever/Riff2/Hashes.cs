@@ -19,5 +19,6 @@ namespace BFForever.Riff2
         public static readonly long ZOBJ_PackageDef = HKey.GetHash("PackageDef");
         public static readonly long ZOBJ_Index2 = HKey.GetHash("Index2");
         public static readonly long ZOBJ_Catalog2 = HKey.GetHash("Catalog2");
+        public static readonly long ZOBJ_Song = HKey.GetHash("Song");
     }
 }

@@ -88,6 +88,9 @@ namespace BFForever.Riff2
                 }
                 else if (chunkType == MAGIC_ZOBJ)
                 {
+                    // TODO: Update this to not use switch statement
+                    if (type.Value == null) continue;
+
                     switch (type.Value.ToLower())
                     {
                         case "packagedef":
@@ -98,6 +101,9 @@ namespace BFForever.Riff2
                             break;
                         case "catalog2":
                             obj = new Catalog2(filePath, directoryPath);
+                            break;
+                        case "song":
+                            obj = new Song(filePath, directoryPath);
                             break;
                         default:
                             continue;
