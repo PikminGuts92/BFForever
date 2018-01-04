@@ -136,6 +136,12 @@ namespace BFForever.Riff2
                         case "video":
                             obj = new Video(filePath, directoryPath);
                             break;
+                        case "vox":
+                            obj = new Vox(filePath, directoryPath);
+                            break;
+                        case "voxpushphrase":
+                            obj = new VoxPushPhrase(filePath, directoryPath);
+                            break;
                         default:
                             continue;
                     }

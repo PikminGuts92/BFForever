@@ -87,6 +87,8 @@
     <Compile Include="Riff2\ZObjects\Tempo.cs" />
     <Compile Include="Riff2\ZObjects\TimeSignature.cs" />
     <Compile Include="Riff2\ZObjects\Video.cs" />
+    <Compile Include="Riff2\ZObjects\Vox.cs" />
+    <Compile Include="Riff2\ZObjects\VoxPushPhrase.cs" />
     <Compile Include="Riff\IData.cs" />
     <Compile Include="Riff\Index.cs" />
     <Compile Include="Riff\ZObjects\TRCPromptGroup.cs" />
