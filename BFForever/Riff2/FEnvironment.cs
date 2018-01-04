@@ -140,9 +140,24 @@ namespace BFForever.Riff2
                 { HKey.GetHash("Catalog2"), StringKey.FromHKey("Catalog2") },
                 // Instrument related
                 { HKey.GetHash("Audio"), StringKey.FromHKey("Audio") },
+                { HKey.GetHash("AudioEffect"), StringKey.FromHKey("AudioEffect") },
+                { HKey.GetHash("Chord"), StringKey.FromHKey("Chord") },
+                { HKey.GetHash("Concert"), StringKey.FromHKey("Concert") },
+                { HKey.GetHash("Event"), StringKey.FromHKey("Event") },
                 { HKey.GetHash("Instrument"), StringKey.FromHKey("Instrument") },
+                { HKey.GetHash("Measure"), StringKey.FromHKey("Measure") },
+                { HKey.GetHash("Section"), StringKey.FromHKey("Section") },
                 { HKey.GetHash("Song"), StringKey.FromHKey("Song") },
-                { HKey.GetHash("Video"), StringKey.FromHKey("Video") }
+                { HKey.GetHash("Spread"), StringKey.FromHKey("Spread") },
+                { HKey.GetHash("Tab"), StringKey.FromHKey("Tab") },
+                { HKey.GetHash("Tempo"), StringKey.FromHKey("Tempo") },
+                { HKey.GetHash("TimeSignature"), StringKey.FromHKey("TimeSignature") },
+                { HKey.GetHash("Tone2"), StringKey.FromHKey("Tone2") },
+                { HKey.GetHash("Video"), StringKey.FromHKey("Video") },
+                { HKey.GetHash("Vox"), StringKey.FromHKey("Vox") },
+                { HKey.GetHash("VoxPushPhrase"), StringKey.FromHKey("VoxPushPhrase") },
+                { HKey.GetHash("VoxSpread"), StringKey.FromHKey("VoxSpread") },
+                { HKey.GetHash("Whammy"), StringKey.FromHKey("Whammy") }
             };
 
             return strings;

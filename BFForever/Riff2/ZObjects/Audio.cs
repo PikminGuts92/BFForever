@@ -8,7 +8,7 @@ using System.Threading.Tasks;
  * Audio ZObject
  * =============
  * INT64 - Always 0
- *  HKEY - Path
+ *  HKEY - Audio Path
  * INT64 - Always 0
  */
 
@@ -29,19 +29,19 @@ namespace BFForever.Riff2
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
-            Path = ar.ReadInt64();
+            AudioPath = ar.ReadInt64();
             ar.BaseStream.Position += 8;
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
             aw.BaseStream.Position += 8;
-            aw.Write((long)Path);
+            aw.Write((long)AudioPath);
             aw.Write((long)0);
         }
 
         protected override HKey Type => Hashes.ZOBJ_Audio;
 
-        public HKey Path { get; set; }
+        public HKey AudioPath { get; set; }
     }
 }

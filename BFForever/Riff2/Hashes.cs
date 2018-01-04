@@ -21,8 +21,23 @@ namespace BFForever.Riff2
         public static readonly long ZOBJ_Catalog2 = HKey.GetHash("Catalog2");
         // Instrument related
         public static readonly long ZOBJ_Audio = HKey.GetHash("Audio");
+        public static readonly long ZOBJ_AudioEffect = HKey.GetHash("AudioEffect");
+        public static readonly long ZOBJ_Chord = HKey.GetHash("Chord");
+        public static readonly long ZOBJ_Concert = HKey.GetHash("Concert");
+        public static readonly long ZOBJ_Event = HKey.GetHash("Event");
         public static readonly long ZOBJ_Instrument = HKey.GetHash("Instrument");
+        public static readonly long ZOBJ_Measure = HKey.GetHash("Measure");
+        public static readonly long ZOBJ_Section = HKey.GetHash("Section");
         public static readonly long ZOBJ_Song = HKey.GetHash("Song");
+        public static readonly long ZOBJ_Spread = HKey.GetHash("Spread");
+        public static readonly long ZOBJ_Tab = HKey.GetHash("Tab");
+        public static readonly long ZOBJ_Tempo = HKey.GetHash("Tempo");
+        public static readonly long ZOBJ_TimeSignature = HKey.GetHash("TimeSignature");
+        public static readonly long ZOBJ_Tone2 = HKey.GetHash("Tone2");
         public static readonly long ZOBJ_Video = HKey.GetHash("Video");
+        public static readonly long ZOBJ_Vox = HKey.GetHash("Vox");
+        public static readonly long ZOBJ_VoxPushPhrase = HKey.GetHash("VoxPushPhrase");
+        public static readonly long ZOBJ_VoxSpread = HKey.GetHash("VoxSpread");
+        public static readonly long ZOBJ_Whammy = HKey.GetHash("Whammy");
     }
 }

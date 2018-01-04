@@ -8,7 +8,7 @@ using System.Threading.Tasks;
  * Video ZObject
  * =============
  * INT64 - Always 0
- *  HKEY - Path
+ *  HKEY - Video Path
  */
 
 namespace BFForever.Riff2
@@ -28,18 +28,18 @@ namespace BFForever.Riff2
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
-            Path = ar.ReadInt64();
+            VideoPath = ar.ReadInt64();
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
             aw.BaseStream.Position += 8;
-            aw.Write((long)Path);
+            aw.Write((long)VideoPath);
         }
 
 
         protected override HKey Type => Hashes.ZOBJ_Video;
 
-        public HKey Path { get; set; }
+        public HKey VideoPath { get; set; }
     }
 }
