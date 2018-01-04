@@ -59,7 +59,6 @@
     <Compile Include="AwesomeReader.cs" />
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
-    <Compile Include="Riff2\Chunk.cs" />
     <Compile Include="Riff2\FString.cs" />
     <Compile Include="Riff2\FEnvironment.cs" />
     <Compile Include="Riff2\Hashes.cs" />
