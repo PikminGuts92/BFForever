@@ -106,8 +106,23 @@ namespace BFForever.Riff2
                         case "audio":
                             obj = new Audio(filePath, directoryPath);
                             break;
+                        case "audioeffect":
+                            obj = new AudioEffect(filePath, directoryPath);
+                            break;
+                        case "chord":
+                            obj = new Chord(filePath, directoryPath);
+                            break;
+                        case "event":
+                            obj = new Event(filePath, directoryPath);
+                            break;
                         case "instrument":
                             obj = new Instrument(filePath, directoryPath);
+                            break;
+                        case "measure":
+                            obj = new Measure(filePath, directoryPath);
+                            break;
+                        case "section":
+                            obj = new Section(filePath, directoryPath);
                             break;
                         case "song":
                             obj = new Song(filePath, directoryPath);
