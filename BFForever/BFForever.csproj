@@ -84,6 +84,8 @@
     <Compile Include="Riff2\ZObjects\Section.cs" />
     <Compile Include="Riff2\ZObjects\Song.cs" />
     <Compile Include="Riff2\ZObjects\StringTable.cs" />
+    <Compile Include="Riff2\ZObjects\Tempo.cs" />
+    <Compile Include="Riff2\ZObjects\TimeSignature.cs" />
     <Compile Include="Riff2\ZObjects\Video.cs" />
     <Compile Include="Riff\IData.cs" />
     <Compile Include="Riff\Index.cs" />

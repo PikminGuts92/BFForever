@@ -127,6 +127,12 @@ namespace BFForever.Riff2
                         case "song":
                             obj = new Song(filePath, directoryPath);
                             break;
+                        case "tempo":
+                            obj = new Tempo(filePath, directoryPath);
+                            break;
+                        case "timesignature":
+                            obj = new TimeSignature(filePath, directoryPath);
+                            break;
                         case "video":
                             obj = new Video(filePath, directoryPath);
                             break;
