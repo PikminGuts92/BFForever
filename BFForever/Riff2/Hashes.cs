@@ -32,6 +32,7 @@ namespace BFForever.Riff2
         public static readonly long ZOBJ_Spread = HKey.GetHash("Spread");
         public static readonly long ZOBJ_Tab = HKey.GetHash("Tab");
         public static readonly long ZOBJ_Tempo = HKey.GetHash("Tempo");
+        public static readonly long ZOBJ_Texture = HKey.GetHash("Texture");
         public static readonly long ZOBJ_TimeSignature = HKey.GetHash("TimeSignature");
         public static readonly long ZOBJ_Tone2 = HKey.GetHash("Tone2");
         public static readonly long ZOBJ_Video = HKey.GetHash("Video");

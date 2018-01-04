@@ -133,6 +133,9 @@ namespace BFForever.Riff2
                         case "timesignature":
                             obj = new TimeSignature(filePath, directoryPath);
                             break;
+                        case "texture":
+                            obj = new Texture(filePath, directoryPath);
+                            break;
                         case "video":
                             obj = new Video(filePath, directoryPath);
                             break;

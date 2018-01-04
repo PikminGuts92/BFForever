@@ -151,6 +151,7 @@ namespace BFForever.Riff2
                 { HKey.GetHash("Spread"), StringKey.FromHKey("Spread") },
                 { HKey.GetHash("Tab"), StringKey.FromHKey("Tab") },
                 { HKey.GetHash("Tempo"), StringKey.FromHKey("Tempo") },
+                { HKey.GetHash("Texture"), StringKey.FromHKey("Texture") },
                 { HKey.GetHash("TimeSignature"), StringKey.FromHKey("TimeSignature") },
                 { HKey.GetHash("Tone2"), StringKey.FromHKey("Tone2") },
                 { HKey.GetHash("Video"), StringKey.FromHKey("Video") },

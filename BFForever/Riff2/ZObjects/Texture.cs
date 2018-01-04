@@ -5,17 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*
- * Video ZObject
- * =============
+ * Texture ZObject
+ * ===============
  * INT64 - Always 0
- *  HKEY - Video Path
+ *  HKEY - Texture Path
  */
 
 namespace BFForever.Riff2
 {
-    public class Video : ZObject
+    public class Texture : ZObject
     {
-        public Video(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
+        public Texture(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
 
         }
@@ -28,17 +28,17 @@ namespace BFForever.Riff2
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
-            VideoPath = ar.ReadInt64();
+            TexturePath = ar.ReadInt64();
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
             aw.BaseStream.Position += 8;
-            aw.Write((long)VideoPath);
+            aw.Write((long)TexturePath);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Video;
+        protected override HKey Type => Hashes.ZOBJ_Texture;
 
-        public HKey VideoPath { get; set; }
+        public HKey TexturePath { get; set; }
     }
 }
