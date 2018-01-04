@@ -71,12 +71,14 @@
     <Compile Include="Riff2\RiffFile.cs" />
     <Compile Include="Riff2\StringKey.cs" />
     <Compile Include="Riff2\ZObject.cs" />
+    <Compile Include="Riff2\ZObjects\Audio.cs" />
     <Compile Include="Riff2\ZObjects\Catalog2.cs" />
     <Compile Include="Riff2\ZObjects\Index2.cs" />
     <Compile Include="Riff2\ZObjects\Instrument.cs" />
     <Compile Include="Riff2\ZObjects\PackageDef.cs" />
     <Compile Include="Riff2\ZObjects\Song.cs" />
     <Compile Include="Riff2\ZObjects\StringTable.cs" />
+    <Compile Include="Riff2\ZObjects\Video.cs" />
     <Compile Include="Riff\IData.cs" />
     <Compile Include="Riff\Index.cs" />
     <Compile Include="Riff\ZObjects\TRCPromptGroup.cs" />

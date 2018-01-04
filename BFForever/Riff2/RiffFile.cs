@@ -102,11 +102,18 @@ namespace BFForever.Riff2
                         case "catalog2":
                             obj = new Catalog2(filePath, directoryPath);
                             break;
-                        case "song":
-                            obj = new Song(filePath, directoryPath);
+                        // Instrument related
+                        case "audio":
+                            obj = new Audio(filePath, directoryPath);
                             break;
                         case "instrument":
                             obj = new Instrument(filePath, directoryPath);
+                            break;
+                        case "song":
+                            obj = new Song(filePath, directoryPath);
+                            break;
+                        case "video":
+                            obj = new Video(filePath, directoryPath);
                             break;
                         default:
                             continue;

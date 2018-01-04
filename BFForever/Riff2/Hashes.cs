@@ -20,7 +20,9 @@ namespace BFForever.Riff2
         public static readonly long ZOBJ_Index2 = HKey.GetHash("Index2");
         public static readonly long ZOBJ_Catalog2 = HKey.GetHash("Catalog2");
         // Instrument related
-        public static readonly long ZOBJ_Song = HKey.GetHash("Song");
+        public static readonly long ZOBJ_Audio = HKey.GetHash("Audio");
         public static readonly long ZOBJ_Instrument = HKey.GetHash("Instrument");
+        public static readonly long ZOBJ_Song = HKey.GetHash("Song");
+        public static readonly long ZOBJ_Video = HKey.GetHash("Video");
     }
 }
