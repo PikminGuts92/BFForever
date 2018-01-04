@@ -138,7 +138,9 @@ namespace BFForever.Riff2
                 { HKey.GetHash("PackageDef"), StringKey.FromHKey("PackageDef") },
                 { HKey.GetHash("Index2"), StringKey.FromHKey("Index2") },
                 { HKey.GetHash("Catalog2"), StringKey.FromHKey("Catalog2") },
-                { HKey.GetHash("Song"), StringKey.FromHKey("Song") }
+                // Instrument related
+                { HKey.GetHash("Song"), StringKey.FromHKey("Song") },
+                { HKey.GetHash("Instrument"), StringKey.FromHKey("Instrument") },
             };
 
             return strings;

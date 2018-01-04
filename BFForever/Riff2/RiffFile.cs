@@ -105,6 +105,9 @@ namespace BFForever.Riff2
                         case "song":
                             obj = new Song(filePath, directoryPath);
                             break;
+                        case "instrument":
+                            obj = new Instrument(filePath, directoryPath);
+                            break;
                         default:
                             continue;
                     }
