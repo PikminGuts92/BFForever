@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BFForever.Riff2
 {
+    // Note: Bends and 'Harmonic' are deprecated it seems
     public enum TabNoteType : int
     {
         Note,

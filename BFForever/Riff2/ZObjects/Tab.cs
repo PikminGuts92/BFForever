@@ -85,7 +85,7 @@ namespace BFForever.Riff2
                 entry.Tremelo = ar.ReadBoolean();
                 ar.BaseStream.Position += 1; // Always 0
 
-                entry.BassType = (TabBendType)ar.ReadInt32();
+                entry.BassType = (TabBassType)ar.ReadInt32();
                 Events.Add(entry);
             }
         }
@@ -147,6 +147,6 @@ namespace BFForever.Riff2
         public bool ExtendedNote { get; set; }
         public bool PalmMute { get; set; }
         public bool Tremelo { get; set; }
-        public TabBendType BassType { get; set; }
+        public TabBassType BassType { get; set; }
     }
 }
