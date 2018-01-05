@@ -63,9 +63,15 @@
     <Compile Include="Riff2\FEnvironment.cs" />
     <Compile Include="Riff2\Hashes.cs" />
     <Compile Include="Riff2\Helpers\Pitch.cs" />
+    <Compile Include="Riff2\Helpers\TabBassType.cs" />
+    <Compile Include="Riff2\Helpers\TabBendType.cs" />
+    <Compile Include="Riff2\Helpers\TabFinger.cs" />
+    <Compile Include="Riff2\Helpers\TabNoteType.cs" />
+    <Compile Include="Riff2\Helpers\VibratoType.cs" />
     <Compile Include="Riff2\Helpers\TextEvent.cs" />
     <Compile Include="Riff2\Helpers\TimeEvent.cs" />
     <Compile Include="Riff2\Helpers\Tuning.cs" />
+    <Compile Include="Riff2\Helpers\VoxNoteType.cs" />
     <Compile Include="Riff2\HKey.cs" />
     <Compile Include="Riff2\Index.cs" />
     <Compile Include="Riff2\Localization.cs" />
@@ -84,6 +90,7 @@
     <Compile Include="Riff2\ZObjects\Section.cs" />
     <Compile Include="Riff2\ZObjects\Song.cs" />
     <Compile Include="Riff2\ZObjects\StringTable.cs" />
+    <Compile Include="Riff2\ZObjects\Tab.cs" />
     <Compile Include="Riff2\ZObjects\Tempo.cs" />
     <Compile Include="Riff2\ZObjects\Texture.cs" />
     <Compile Include="Riff2\ZObjects\TimeSignature.cs" />
