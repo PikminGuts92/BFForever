@@ -62,7 +62,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => throw new NotImplementedException();
+        protected override HKey Type => Hashes.ZOBJ_Measure;
 
         public List<MeasureEntry> Events { get; set; }
     }
