@@ -49,25 +49,15 @@ namespace BFForever.MIDI
 
                 // Delta time from previous event
                 realTime += ((double)events.First().AbsoluteTime / _midiFile.DeltaTicksPerQuarterNote) * (60000.0 / _tempoIdx.Last().BPM);
+            }
 
-                // Adds first entry
-                _tempoIdx.Add(new TempoIndex()
-                {
-                    AbsoluteTime = events[0].AbsoluteTime,
-                    RealTime = realTime,
-                    BPM = events.First().Tempo
-                });
-            }
-            else
+            // Adds first entry
+            _tempoIdx.Add(new TempoIndex()
             {
-                // Adds first entry
-                _tempoIdx.Add(new TempoIndex()
-                {
-                    AbsoluteTime = events[0].AbsoluteTime,
-                    RealTime = realTime,
-                    BPM = events.First().Tempo
-                });
-            }
+                AbsoluteTime = events.First().AbsoluteTime,
+                RealTime = realTime,
+                BPM = events.First().Tempo
+            });
             
             foreach (TempoEvent ev in events.Skip(1))
             {
