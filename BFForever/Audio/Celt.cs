@@ -16,7 +16,7 @@ using NAudio.Wave;
  * CELT HEADER (40 bytes)
  * ======================
  * BYTE[4] - "BFAD"
- *   INT16 - Version (Always 2)
+ *   INT16 - Num Channels?
  *   INT16 - Encryption Flag
  *            0: Non-encrypted
  *            1: Encrypted
@@ -50,6 +50,7 @@ namespace BFForever.Audio
     {
         private const int MAGIC = 0x44414642; // "BFAD"
         private const int MAGIC_R = 0x42464144;
+        private const int MAX_PACKET_SIZE = 1275;
 
         private static readonly byte[] AesKey =
         {
@@ -260,6 +261,69 @@ namespace BFForever.Audio
                     skipMode = !skipMode;
                 }
             }
+        }
+
+        public static Celt FromAudio(string path)
+        {
+            // TODO: Clean all of this up and implement tracking packet offsets
+            AudioFileReader afr = new AudioFileReader(path);
+            Celt celt = new Celt()
+            {
+                SampleRate = (ushort)afr.WaveFormat.SampleRate,
+                Channels = (ushort)afr.WaveFormat.Channels
+            };
+
+            OpusEncoder encoder = OpusEncoder.Create(celt.SampleRate, (int)celt.Channels, OpusApplication.OPUS_APPLICATION_AUDIO);
+            encoder.Bitrate = (int)celt.Bitrate;
+            encoder.ForceMode = OpusMode.MODE_CELT_ONLY;
+
+            float[] buffer = new float[celt.FrameSize * celt.Channels];
+            byte[] packet = new byte[MAX_PACKET_SIZE];
+            
+            byte[] packetSize = new byte[2];
+            int packetCount = 0;
+
+            MemoryStream ms = new MemoryStream();
+
+            // Encoding loop
+            while (afr.Position < afr.Length)
+            {
+                int bufferLength = afr.Read(buffer, 0, buffer.Length);
+                int packetLength = encoder.Encode(buffer, 0, celt.FrameSize, packet, 0, packet.Length);
+
+                // Encodes 15-bit packet size
+                packetSize[0] = (byte)(0x80 | (0xFF & (packetLength >> 8)));
+                packetSize[1] = (byte)(0xFF & packetLength);
+
+                ms.Write(packetSize, 0, packetSize.Length);
+                ms.Write(packet, 0, packetLength);
+
+                packetCount++;
+            }
+
+            // Writes packet offsets (finish later)
+            byte[] header = new byte[4];
+            header[0] = 0;
+            header[1] = (byte)(0x80 | (0xFF & (packetCount >> 8)));
+            header[2] = (byte)(0xFF & packetCount);
+            header[3] = 0;
+
+            celt.Reckoning = header;
+            celt.ReckoningOffset = 40;
+            celt.ReckoningSize = 3;
+
+            celt.PacketStreamOffset = 44;
+            celt.PacketStreamSize = (uint)ms.Length;
+
+            // Adds remaining bytes
+            if ((ms.Length + header.Length) % 16 != 0)
+            {
+                int difference = 16 - ((int)(ms.Length + header.Length) % 16);
+                ms.Write(new byte[difference], 0, difference);
+            }
+
+            celt.PacketStream = ms.ToArray();
+            return celt;
         }
     }
 }
