@@ -46,7 +46,7 @@ namespace BFForever.Riff2
             for (int i = 0; i < count; i++)
             {
                 IndexEntry entry = new IndexEntry();
-                entry.FilePath = new HKey(ar.ReadInt64());
+                entry.FilePath = new HKey(ar.ReadUInt64());
                 entry.Offset = ar.ReadUInt32();
 
                 ar.BaseStream.Position += 4; // Always 0?
@@ -61,7 +61,7 @@ namespace BFForever.Riff2
             
             foreach(IndexEntry entry in Entries)
             {
-                aw.Write((long)entry.FilePath);
+                aw.Write((ulong)entry.FilePath);
                 aw.Write((uint)entry.Offset);
                 aw.BaseStream.Position += 4;
             }

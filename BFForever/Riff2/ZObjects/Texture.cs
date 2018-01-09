@@ -28,16 +28,16 @@ namespace BFForever.Riff2
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
-            TexturePath = ar.ReadInt64();
+            TexturePath = ar.ReadUInt64();
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
             aw.BaseStream.Position += 8;
-            aw.Write((long)TexturePath);
+            aw.Write((ulong)TexturePath);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Texture;
+        protected override HKey Type => Global.ZOBJ_Texture;
 
         public HKey TexturePath { get; set; }
     }

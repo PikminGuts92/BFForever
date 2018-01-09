@@ -61,7 +61,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Hashes.ZOBJ_VoxPushPhrase;
+        protected override HKey Type => Global.ZOBJ_VoxPushPhrase;
 
         public List<TimeEvent> Events { get; set; }
     }

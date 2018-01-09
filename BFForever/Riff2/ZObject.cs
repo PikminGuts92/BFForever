@@ -36,9 +36,9 @@ namespace BFForever.Riff2
 
         internal void WriteData(AwesomeWriter aw)
         {
-            aw.Write((long)_filePath);
-            aw.Write((long)_directoryPath);
-            aw.Write((long)Type);
+            aw.Write((ulong)_filePath);
+            aw.Write((ulong)_directoryPath);
+            aw.Write((ulong)Type);
             aw.BaseStream.Position += 8;
 
             WriteObjectData(aw);

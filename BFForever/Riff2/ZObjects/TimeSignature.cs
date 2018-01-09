@@ -64,7 +64,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Hashes.ZOBJ_TimeSignature;
+        protected override HKey Type => Global.ZOBJ_TimeSignature;
 
         public List<TimeSignatureEntry> Events { get; set; }
     }

@@ -54,8 +54,7 @@ namespace BFForever.Riff2
             riff.BigEndian = ar.BigEndian; // Sets endianess
             ar.BaseStream.Position += 4; // Skips total size
 
-            int chunkType; uint size;
-            GetChunkInfo(ar, out chunkType, out size);
+            int chunkType = GetChunkType(ar);
 
             if (chunkType != MAGIC_INDX)
                 throw new Exception("First chunk was not an Index!");
@@ -65,101 +64,37 @@ namespace BFForever.Riff2
             foreach(IndexEntry entry in index.Entries)
             {
                 ar.BaseStream.Position = entry.Offset; // Jumps to offset
-                GetChunkInfo(ar, out chunkType, out size);
+                chunkType = GetChunkType(ar);
 
                 if (chunkType != MAGIC_STBL && chunkType != MAGIC_ZOBJ) continue;
                 
                 // Reads header info
-                HKey filePath = new HKey(ar.ReadInt64());
-                HKey directoryPath = new HKey(ar.ReadInt64());
-                HKey type = new HKey(ar.ReadInt64());
+                HKey filePath = new HKey(ar.ReadUInt64());
+                HKey directoryPath = new HKey(ar.ReadUInt64());
+                HKey type = new HKey(ar.ReadUInt64());
                 ar.BaseStream.Position += 8;
-
-                ZObject obj;
-
+                
                 if (chunkType == MAGIC_STBL)
                 {
                     // Gets localization
                     if (!StringTable.IsValidLocalization(type)) continue;
 
                     // Loads string table
-                    obj = new StringTable(filePath, directoryPath, StringTable.GetLocalization(type));
-                    obj.ReadData(ar);
+                    StringTable table = new StringTable(filePath, directoryPath, StringTable.GetLocalization(type));
+                    table.ReadData(ar);
                 }
                 else if (chunkType == MAGIC_ZOBJ)
                 {
-                    // TODO: Update this to not use switch statement
-                    if (type.Value == null) continue;
-
-                    switch (type.Value.ToLower())
-                    {
-                        case "packagedef":
-                            obj = new PackageDef(filePath, directoryPath);
-                            break;
-                        case "index2":
-                            obj = new Index2(filePath, directoryPath);
-                            break;
-                        case "catalog2":
-                            obj = new Catalog2(filePath, directoryPath);
-                            break;
-                        // Instrument related
-                        case "audio":
-                            obj = new Audio(filePath, directoryPath);
-                            break;
-                        case "audioeffect":
-                            obj = new AudioEffect(filePath, directoryPath);
-                            break;
-                        case "chord":
-                            obj = new Chord(filePath, directoryPath);
-                            break;
-                        case "event":
-                            obj = new Event(filePath, directoryPath);
-                            break;
-                        case "instrument":
-                            obj = new Instrument(filePath, directoryPath);
-                            break;
-                        case "measure":
-                            obj = new Measure(filePath, directoryPath);
-                            break;
-                        case "section":
-                            obj = new Section(filePath, directoryPath);
-                            break;
-                        case "song":
-                            obj = new Song(filePath, directoryPath);
-                            break;
-                        case "tab":
-                            obj = new Tab(filePath, directoryPath);
-                            break;
-                        case "tempo":
-                            obj = new Tempo(filePath, directoryPath);
-                            break;
-                        case "timesignature":
-                            obj = new TimeSignature(filePath, directoryPath);
-                            break;
-                        case "texture":
-                            obj = new Texture(filePath, directoryPath);
-                            break;
-                        case "video":
-                            obj = new Video(filePath, directoryPath);
-                            break;
-                        case "vox":
-                            obj = new Vox(filePath, directoryPath);
-                            break;
-                        case "voxpushphrase":
-                            obj = new VoxPushPhrase(filePath, directoryPath);
-                            break;
-                        default:
-                            continue;
-                    }
-
+                    if (!Global.ZObjectTypes.ContainsKey(type)) continue; // Unsupported type
+                    ZObject obj = Activator.CreateInstance(Global.ZObjectTypes[type], new object[] { filePath, directoryPath }) as ZObject;
+                    
                     // Loads zobject
                     obj.ReadData(ar);
+                    riff._objects.Add(obj);
                 }
                 else
+                     // Unknown chunk
                     continue;
-
-                // Adds object
-                riff._objects.Add(obj);
             }
 
             return riff;
@@ -228,10 +163,12 @@ namespace BFForever.Riff2
             }
         }
 
-        private static void GetChunkInfo(AwesomeReader ar, out int type, out uint size)
+        private static int GetChunkType(AwesomeReader ar)
         {
-            type = ar.ReadInt32();
-            size = ar.ReadUInt32();
+            int type = ar.ReadInt32();
+            ar.BaseStream.Position += 4; // Skips size
+
+            return type;
         }
 
         public bool BigEndian { get; set; }

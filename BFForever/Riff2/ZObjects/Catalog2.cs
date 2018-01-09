@@ -78,22 +78,22 @@ namespace BFForever.Riff2
                 Catalog2Entry entry = new Catalog2Entry();
 
                 // 280 bytes
-                entry.Identifier = ar.ReadInt64();
+                entry.Identifier = ar.ReadUInt64();
                 entry.SongType = ar.ReadInt32();
                 ar.BaseStream.Position += 4; // Should be 0
 
-                entry.Title = ar.ReadInt64();
-                entry.Artist = ar.ReadInt64();
-                entry.Album = ar.ReadInt64();
-                entry.Description = ar.ReadInt64();
-                entry.LegendTag = ar.ReadInt64();
+                entry.Title = ar.ReadUInt64();
+                entry.Artist = ar.ReadUInt64();
+                entry.Album = ar.ReadUInt64();
+                entry.Description = ar.ReadUInt64();
+                entry.LegendTag = ar.ReadUInt64();
 
                 entry.SongLength = ar.ReadSingle();
                 entry.GuitarIntensity = ar.ReadSingle();
                 entry.BassIntensity = ar.ReadSingle();
                 entry.VoxIntensity = ar.ReadSingle();
 
-                entry.EraTag = ar.ReadInt64();
+                entry.EraTag = ar.ReadUInt64();
                 entry.Year = ar.ReadInt32();
                 ar.BaseStream.Position += 4; // Should be 0
 
@@ -109,13 +109,13 @@ namespace BFForever.Riff2
                 ar.BaseStream.Position += offset - 4;
                 for (int i = 0; i < count; i++)
                 {
-                    entry.LabelTags.Add(ar.ReadInt64());
+                    entry.LabelTags.Add(ar.ReadUInt64());
                 }
                 ar.BaseStream.Position = previousPosition;
 
-                entry.SongPath = ar.ReadInt64();
-                entry.TexturePath = ar.ReadInt64();
-                entry.PreviewPath = ar.ReadInt64();
+                entry.SongPath = ar.ReadUInt64();
+                entry.TexturePath = ar.ReadUInt64();
+                entry.PreviewPath = ar.ReadUInt64();
 
                 // Reads metadata tags
                 count = ar.ReadInt32();
@@ -125,7 +125,7 @@ namespace BFForever.Riff2
                 ar.BaseStream.Position += offset - 4;
                 for (int i = 0; i < count; i++)
                 {
-                    entry.MetadataTags.Add(ar.ReadInt64());
+                    entry.MetadataTags.Add(ar.ReadUInt64());
                 }
                 ar.BaseStream.Position = previousPosition;
 
@@ -137,7 +137,7 @@ namespace BFForever.Riff2
                 ar.BaseStream.Position += offset - 4;
                 for (int i = 0; i < count; i++)
                 {
-                    entry.GenreTags.Add(ar.ReadInt64());
+                    entry.GenreTags.Add(ar.ReadUInt64());
                 }
 
                 ar.BaseStream.Position = previousPosition;
@@ -168,22 +168,22 @@ namespace BFForever.Riff2
             // Writes entries
             foreach (Catalog2Entry entry in Entries)
             {
-                aw.Write((long)entry.Identifier);
+                aw.Write((ulong)entry.Identifier);
                 aw.Write((int)entry.SongType);
                 aw.Write((int)0);
 
-                aw.Write((long)entry.Title);
-                aw.Write((long)entry.Artist);
-                aw.Write((long)entry.Album);
-                aw.Write((long)entry.Description);
-                aw.Write((long)entry.LegendTag);
+                aw.Write((ulong)entry.Title);
+                aw.Write((ulong)entry.Artist);
+                aw.Write((ulong)entry.Album);
+                aw.Write((ulong)entry.Description);
+                aw.Write((ulong)entry.LegendTag);
 
                 aw.Write((float)entry.SongLength);
                 aw.Write((float)entry.GuitarIntensity);
                 aw.Write((float)entry.BassIntensity);
                 aw.Write((float)entry.VoxIntensity);
 
-                aw.Write((long)entry.EraTag);
+                aw.Write((ulong)entry.EraTag);
                 aw.Write((int)entry.Year);
                 aw.Write((int)0);
 
@@ -198,9 +198,9 @@ namespace BFForever.Riff2
                 tagOffset += entry.LabelTags.Count * 8;
                 tags.AddRange(entry.LabelTags);
 
-                aw.Write((long)entry.SongPath);
-                aw.Write((long)entry.TexturePath);
-                aw.Write((long)entry.PreviewPath);
+                aw.Write((ulong)entry.SongPath);
+                aw.Write((ulong)entry.TexturePath);
+                aw.Write((ulong)entry.PreviewPath);
 
                 // Metadata tags
                 aw.Write((int)entry.MetadataTags.Count);
@@ -223,10 +223,10 @@ namespace BFForever.Riff2
 
             // Writes tags
             foreach (FString tag in tags)
-                aw.Write((long)tag);
+                aw.Write((ulong)tag);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Catalog2;
+        protected override HKey Type => Global.ZOBJ_Catalog2;
 
         public List<Catalog2Entry> Entries { get; set; }
     }

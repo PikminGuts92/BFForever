@@ -9,10 +9,11 @@ namespace BFForever.Riff2
     // Globabl strings
     internal class StringKey
     {
-        private readonly long _key;
+        private static Dictionary<ulong, StringKey> _globalStrings = new Dictionary<ulong, StringKey>();
+        private readonly ulong _key;
         private readonly Dictionary<Localization, string> _values;
 
-        public StringKey(long key)
+        public StringKey(ulong key)
         {
             _key = key;
 
@@ -25,37 +26,7 @@ namespace BFForever.Riff2
             _values.Add(Localization.Spanish, "");
             _values.Add(Localization.French, "");
         }
-
-        public static StringKey FromHKey(string hkeyValue)
-        {
-            StringKey sk = new StringKey(HKey.GetHash(hkeyValue));
-
-            // Adds localized strings
-            sk[Localization.English] = hkeyValue;
-            sk[Localization.Japanese] = hkeyValue;
-            sk[Localization.German] = hkeyValue;
-            sk[Localization.Italian] = hkeyValue;
-            sk[Localization.Spanish] = hkeyValue;
-            sk[Localization.French] = hkeyValue;
-
-            return sk;
-        }
-
-        public static StringKey FromString(string value, long hash)
-        {
-            StringKey sk = new StringKey(hash);
-
-            // Adds localized strings
-            sk[Localization.English] = value;
-            sk[Localization.Japanese] = value;
-            sk[Localization.German] = value;
-            sk[Localization.Italian] = value;
-            sk[Localization.Spanish] = value;
-            sk[Localization.French] = value;
-
-            return sk;
-        }
-
+        
         public string GetValue(Localization loc) => _values[loc];
         public void SetValue(string value, Localization loc) => _values[loc] = value;
 
@@ -65,7 +36,7 @@ namespace BFForever.Riff2
             set => _values[loc] = value;
         }
 
-        public long Key => _key;
+        public ulong Key => _key;
 
         public static StringKey operator +(StringKey a, StringKey b)
         {
@@ -85,5 +56,20 @@ namespace BFForever.Riff2
 
             return c;
         }
+
+        // String management
+        internal static string GetStringValue(ulong key) => _globalStrings.ContainsKey(key) ? _globalStrings[key][Localization.English] : null;
+
+        internal static StringKey FindCreate(ulong key)
+        {
+            if (_globalStrings.ContainsKey(key)) return _globalStrings[key];
+
+            StringKey sk = new StringKey(key);
+            _globalStrings.Add(key, sk);
+            return sk;
+        }
+
+        internal static void AddStringKey(StringKey sk) => _globalStrings.Add(sk.Key, sk);
+        internal static bool ContainsStringKey(ulong key) => _globalStrings.ContainsKey(key);
     }
 }

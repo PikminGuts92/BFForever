@@ -62,7 +62,7 @@ namespace BFForever.Riff2
             }
         }
         
-        protected override HKey Type => Hashes.ZOBJ_Tempo;
+        protected override HKey Type => Global.ZOBJ_Tempo;
 
         public List<TempoEntry> Events { get; set; }
     }

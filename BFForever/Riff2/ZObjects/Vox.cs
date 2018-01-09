@@ -47,7 +47,7 @@ namespace BFForever.Riff2
                 ev.PitchAlt = ar.ReadByte();
                 ar.BaseStream.Position += 4; // Always 0
 
-                ev.Lyric = ar.ReadInt64();
+                ev.Lyric = ar.ReadUInt64();
                 ev.NoteType = (VoxNote)ar.ReadInt32();
                 ar.BaseStream.Position += 4; // Always 0
 
@@ -70,13 +70,13 @@ namespace BFForever.Riff2
                 aw.Write((int)(ev.Pitch << 8 | ev.PitchAlt));
                 aw.BaseStream.Position += 4; // Always 0
 
-                aw.Write((long)ev.Lyric);
+                aw.Write((ulong)ev.Lyric);
                 aw.Write((int)ev.NoteType);
                 aw.Write((int)0); // Always 0
             }
         }
         
-        protected override HKey Type => Hashes.ZOBJ_Vox;
+        protected override HKey Type => Global.ZOBJ_Vox;
 
         public List<VoxEntry> Events { get; set; }
     }

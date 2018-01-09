@@ -29,18 +29,18 @@ namespace BFForever.Riff2
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
-            AudioPath = ar.ReadInt64();
+            AudioPath = ar.ReadUInt64();
             ar.BaseStream.Position += 8;
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
             aw.BaseStream.Position += 8;
-            aw.Write((long)AudioPath);
-            aw.Write((long)0);
+            aw.Write((ulong)AudioPath);
+            aw.Write((ulong)0);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Audio;
+        protected override HKey Type => Global.ZOBJ_Audio;
 
         public HKey AudioPath { get; set; }
     }

@@ -51,7 +51,7 @@ namespace BFForever.Riff2
             Tuning tuning = new Tuning();
 
             // 40 bytes
-            tuning.Name = ar.ReadInt64();
+            tuning.Name = ar.ReadUInt64();
 
             tuning.String1 = ar.ReadInt24() & 0xFF;
             tuning.String1Alt = ar.ReadByte();
@@ -83,7 +83,7 @@ namespace BFForever.Riff2
         internal static void WriteData(AwesomeWriter aw, Tuning tuning)
         {
             // 40 bytes
-            aw.Write((long)tuning.Name);
+            aw.Write((ulong)tuning.Name);
             aw.Write((int)(tuning.String1 << 8 | tuning.String1Alt));
             aw.Write((int)(tuning.String2 << 8 | tuning.String2Alt));
             aw.Write((int)(tuning.String3 << 8 | tuning.String3Alt));

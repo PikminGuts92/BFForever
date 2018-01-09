@@ -65,7 +65,7 @@ namespace BFForever.Riff2
                 aw.WriteNullString(entry, 256);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_PackageDef;
+        protected override HKey Type => Global.ZOBJ_PackageDef;
         
         public int Version { get; set; }
         public string PackageName { get; set; }

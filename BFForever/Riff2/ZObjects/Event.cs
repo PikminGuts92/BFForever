@@ -41,7 +41,7 @@ namespace BFForever.Riff2
                 EventEntry ev = new EventEntry();
                 ev.Start = ar.ReadSingle();
                 ev.End = ar.ReadSingle();
-                ev.EventName = ar.ReadInt64();
+                ev.EventName = ar.ReadUInt64();
 
                 ar.BaseStream.Position += 4; // Always 0
                 ev.Index = ar.ReadInt32();
@@ -61,13 +61,13 @@ namespace BFForever.Riff2
             {
                 aw.Write((float)ev.Start);
                 aw.Write((float)ev.End);
-                aw.Write((long)ev.EventName);
+                aw.Write((ulong)ev.EventName);
                 aw.Write((int)0);
                 aw.Write((int)ev.Index);
             }
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Event;
+        protected override HKey Type => Global.ZOBJ_Event;
 
         public List<EventEntry> Events { get; set; }
     }

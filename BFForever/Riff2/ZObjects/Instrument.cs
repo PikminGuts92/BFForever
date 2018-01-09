@@ -34,8 +34,8 @@ namespace BFForever.Riff2
         {
             TrackPaths.Clear();
             
-            InstrumentType = ar.ReadInt64();
-            Difficulty = ar.ReadInt64();
+            InstrumentType = ar.ReadUInt64();
+            Difficulty = ar.ReadUInt64();
             ar.BaseStream.Position += 8; // Should be zero'd
 
             // Reads tuning info
@@ -47,14 +47,14 @@ namespace BFForever.Riff2
 
             for (int i = 0; i < count; i++)
             {
-                TrackPaths.Add(ar.ReadInt64());
+                TrackPaths.Add(ar.ReadUInt64());
             }
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            aw.Write((long)InstrumentType);
-            aw.Write((long)Difficulty);
+            aw.Write((ulong)InstrumentType);
+            aw.Write((ulong)Difficulty);
             aw.BaseStream.Position += 8; // Should be zero'd
 
             Tuning.WriteData(aw, Tuning);
@@ -62,10 +62,10 @@ namespace BFForever.Riff2
             aw.Write((int)4);
 
             foreach (HKey path in TrackPaths)
-                aw.Write((long)path);
+                aw.Write((ulong)path);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Instrument;
+        protected override HKey Type => Global.ZOBJ_Instrument;
 
         public HKey InstrumentType { get; set; }
         public HKey Difficulty { get; set; }

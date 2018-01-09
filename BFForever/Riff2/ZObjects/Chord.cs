@@ -41,7 +41,7 @@ namespace BFForever.Riff2
                 TextEvent ev = new TextEvent();
                 ev.Start = ar.ReadSingle();
                 ev.End = ar.ReadSingle();
-                ev.EventName = ar.ReadInt64();
+                ev.EventName = ar.ReadUInt64();
                 ar.BaseStream.Position += 8; // Always 0
 
                 Events.Add(ev);
@@ -59,12 +59,12 @@ namespace BFForever.Riff2
             {
                 aw.Write((float)ev.Start);
                 aw.Write((float)ev.End);
-                aw.Write((long)ev.EventName);
-                aw.Write((long)0);
+                aw.Write((ulong)ev.EventName);
+                aw.Write((ulong)0);
             }
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Chord;
+        protected override HKey Type => Global.ZOBJ_Chord;
 
         public List<TextEvent> Events { get; set; }
     }

@@ -66,13 +66,13 @@ namespace BFForever.Riff2
             InstrumentPaths.Clear();
 
             // 184 bytes
-            Title = ar.ReadInt64();
-            Artist = ar.ReadInt64();
-            Description = ar.ReadInt64();
-            Album = ar.ReadInt64();
-            TexturePath = ar.ReadInt64();
-            LegendTag = ar.ReadInt64();
-            EraTag = ar.ReadInt64();
+            Title = ar.ReadUInt64();
+            Artist = ar.ReadUInt64();
+            Description = ar.ReadUInt64();
+            Album = ar.ReadUInt64();
+            TexturePath = ar.ReadUInt64();
+            LegendTag = ar.ReadUInt64();
+            EraTag = ar.ReadUInt64();
 
             Year = ar.ReadInt32();
             GuitarIntensity = ar.ReadSingle();
@@ -87,7 +87,7 @@ namespace BFForever.Riff2
             ar.BaseStream.Position += offset - 4;
             for (int i = 0; i < count; i++)
             {
-                MetadataTags.Add(ar.ReadInt64());
+                MetadataTags.Add(ar.ReadUInt64());
             }
             ar.BaseStream.Position = previousPosition;
 
@@ -99,7 +99,7 @@ namespace BFForever.Riff2
             ar.BaseStream.Position += offset - 4;
             for (int i = 0; i < count; i++)
             {
-                GenreTags.Add(ar.ReadInt64());
+                GenreTags.Add(ar.ReadUInt64());
             }
             ar.BaseStream.Position = previousPosition;
 
@@ -111,15 +111,15 @@ namespace BFForever.Riff2
             ar.BaseStream.Position += offset - 4;
             for (int i = 0; i < count; i++)
             {
-                LabelTags.Add(ar.ReadInt64());
+                LabelTags.Add(ar.ReadUInt64());
             }
             ar.BaseStream.Position = previousPosition;
 
             SongLength = ar.ReadSingle();
             ar.BaseStream.Position += 4; // Should be zero
 
-            PreviewPath = ar.ReadInt64();
-            VideoPath = ar.ReadInt64();
+            PreviewPath = ar.ReadUInt64();
+            VideoPath = ar.ReadUInt64();
             ar.BaseStream.Position += 8; // Should be zero
 
             // Reads instrument paths.
@@ -130,17 +130,17 @@ namespace BFForever.Riff2
             ar.BaseStream.Position += offset - 4;
             for (int i = 0; i < count; i++)
             {
-                InstrumentPaths.Add(ar.ReadInt64());
+                InstrumentPaths.Add(ar.ReadUInt64());
             }
             ar.BaseStream.Position = previousPosition;
 
             // Reads audio paths
-            BackingAudioPath = ar.ReadInt64();
-            BassAudioPath = ar.ReadInt64();
-            DrumsAudioPath = ar.ReadInt64();
-            LeadGuitarAudioPath = ar.ReadInt64();
-            RhythmGuitarAudioPath = ar.ReadInt64();
-            VoxAudioPath = ar.ReadInt64();
+            BackingAudioPath = ar.ReadUInt64();
+            BassAudioPath = ar.ReadUInt64();
+            DrumsAudioPath = ar.ReadUInt64();
+            LeadGuitarAudioPath = ar.ReadUInt64();
+            RhythmGuitarAudioPath = ar.ReadUInt64();
+            VoxAudioPath = ar.ReadUInt64();
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
@@ -149,13 +149,13 @@ namespace BFForever.Riff2
             List<FString> tags = new List<FString>();
             long tagOffset = aw.BaseStream.Position + 184;
 
-            aw.Write((long)Title);
-            aw.Write((long)Artist);
-            aw.Write((long)Description);
-            aw.Write((long)Album);
-            aw.Write((long)TexturePath);
-            aw.Write((long)LegendTag);
-            aw.Write((long)EraTag);
+            aw.Write((ulong)Title);
+            aw.Write((ulong)Artist);
+            aw.Write((ulong)Description);
+            aw.Write((ulong)Album);
+            aw.Write((ulong)TexturePath);
+            aw.Write((ulong)LegendTag);
+            aw.Write((ulong)EraTag);
 
             aw.Write((int)Year);
             aw.Write((float)GuitarIntensity);
@@ -183,8 +183,8 @@ namespace BFForever.Riff2
             aw.Write((float)SongLength);
             aw.BaseStream.Position += 4; // Should be zero
 
-            aw.Write((long)PreviewPath);
-            aw.Write((long)VideoPath);
+            aw.Write((ulong)PreviewPath);
+            aw.Write((ulong)VideoPath);
             aw.BaseStream.Position += 8; // Should be zero
 
             // Instrument paths
@@ -194,19 +194,19 @@ namespace BFForever.Riff2
             tags.AddRange(InstrumentPaths);
 
             // Audio paths
-            aw.Write((long)BackingAudioPath);
-            aw.Write((long)BassAudioPath);
-            aw.Write((long)DrumsAudioPath);
-            aw.Write((long)LeadGuitarAudioPath);
-            aw.Write((long)RhythmGuitarAudioPath);
-            aw.Write((long)VoxAudioPath);
+            aw.Write((ulong)BackingAudioPath);
+            aw.Write((ulong)BassAudioPath);
+            aw.Write((ulong)DrumsAudioPath);
+            aw.Write((ulong)LeadGuitarAudioPath);
+            aw.Write((ulong)RhythmGuitarAudioPath);
+            aw.Write((ulong)VoxAudioPath);
 
             // Writes tags
             foreach (FString tag in tags)
-                aw.Write((long)tag);
+                aw.Write((ulong)tag);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Song;
+        protected override HKey Type => Global.ZOBJ_Song;
 
         public FString Title { get; set; }
         public FString Artist { get; set; }

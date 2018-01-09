@@ -28,16 +28,16 @@ namespace BFForever.Riff2
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
-            VideoPath = ar.ReadInt64();
+            VideoPath = ar.ReadUInt64();
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
             aw.BaseStream.Position += 8;
-            aw.Write((long)VideoPath);
+            aw.Write((ulong)VideoPath);
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Video;
+        protected override HKey Type => Global.ZOBJ_Video;
 
         public HKey VideoPath { get; set; }
     }

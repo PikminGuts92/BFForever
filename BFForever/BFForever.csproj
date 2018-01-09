@@ -63,7 +63,7 @@
     <Compile Include="MIDI\TempoIndex.cs" />
     <Compile Include="Riff2\FString.cs" />
     <Compile Include="Riff2\FEnvironment.cs" />
-    <Compile Include="Riff2\Hashes.cs" />
+    <Compile Include="Riff2\Global.cs" />
     <Compile Include="Riff2\Helpers\Pitch.cs" />
     <Compile Include="Riff2\Helpers\TabBassType.cs" />
     <Compile Include="Riff2\Helpers\TabBendType.cs" />

@@ -55,8 +55,8 @@ namespace BFForever.Riff2
                 Index2Entry entry = new Index2Entry();
 
                 // 24 bytes
-                entry.FilePath = ar.ReadInt64();
-                entry.Type = ar.ReadInt64();
+                entry.FilePath = ar.ReadUInt64();
+                entry.Type = ar.ReadUInt64();
                 int stringCount = ar.ReadInt32(); // Usually 1 for most entries
 
                 entry.PackageEntries = new List<Index2PackageEntry>();
@@ -72,7 +72,7 @@ namespace BFForever.Riff2
 
                     // Reads string + null-terminated string
                     Index2PackageEntry pack = new Index2PackageEntry();
-                    pack.Package = ar.ReadInt64();
+                    pack.Package = ar.ReadUInt64();
                     pack.ExternalFilePath = ar.ReadNullString();
                     entry.PackageEntries.Add(pack);
 
@@ -109,12 +109,12 @@ namespace BFForever.Riff2
             // Writes package entries
             foreach(var entry in Entries.SelectMany(x => x.PackageEntries))
             {
-                aw.Write((long)entry.Package);
+                aw.Write((ulong)entry.Package);
                 aw.WriteNullString(entry.ExternalFilePath, 240);
             }
         }
 
-        protected override HKey Type => Hashes.ZOBJ_Index2;
+        protected override HKey Type => Global.ZOBJ_Index2;
         
         public int Version { get; set; }
         public List<Index2Entry> Entries { get; set; }

@@ -33,23 +33,23 @@ namespace BFForever.Riff2
     {
         private class LocalizationPair
         {
-            private LocalizationPair(long key, Localization loc)
+            private LocalizationPair(ulong key, Localization loc)
             {
                 HashValue = key;
                 EnumValue = loc;
             }
 
-            public long HashValue { get; }
+            public ulong HashValue { get; }
             public Localization EnumValue { get; }
 
             public static readonly LocalizationPair[] Localizations = new LocalizationPair[]
             {
-                new LocalizationPair(Hashes.STbl_English, Localization.English),
-                new LocalizationPair(Hashes.STbl_Japanese, Localization.Japanese),
-                new LocalizationPair(Hashes.STbl_German, Localization.German),
-                new LocalizationPair(Hashes.STbl_Italian, Localization.Italian),
-                new LocalizationPair(Hashes.STbl_Spanish, Localization.Spanish),
-                new LocalizationPair(Hashes.STbl_French, Localization.French)
+                new LocalizationPair(Global.STbl_English, Localization.English),
+                new LocalizationPair(Global.STbl_Japanese, Localization.Japanese),
+                new LocalizationPair(Global.STbl_German, Localization.German),
+                new LocalizationPair(Global.STbl_Italian, Localization.Italian),
+                new LocalizationPair(Global.STbl_Spanish, Localization.Spanish),
+                new LocalizationPair(Global.STbl_French, Localization.French)
             };
         }
 
@@ -62,7 +62,7 @@ namespace BFForever.Riff2
             _strings = new Dictionary<long, string>();
         }
 
-        internal static bool IsValidLocalization(HKey key) => LocalizationPair.Localizations.Count(x => x.HashValue == key) != 0;
+        internal static bool IsValidLocalization(HKey key) => LocalizationPair.Localizations.Count(x => x.HashValue == key.Key) != 0;
         internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.HashValue == key).EnumValue;
         internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).HashValue;
 
@@ -115,7 +115,7 @@ namespace BFForever.Riff2
             foreach (var d in _strings)
             {
                 // Finds/adds key string globally
-                StringKey sk = FEnvironment.FindCreate(d.Key);
+                StringKey sk = StringKey.FindCreate((ulong)d.Key);
                 sk[_localization] = d.Value;
             }
         }
