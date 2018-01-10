@@ -19,9 +19,14 @@ namespace BFForever.Riff2
         public FString(string value)
         {
             if (!IsValidValue(value)) throw new Exception();
-
             _key = CalculateHash(value);
-            if (_key == 0) return;
+
+            if (_key == 0)
+            {
+                // Adds null if not already present
+                if (!StringKey.ContainsStringKey(0)) StringKey.UpdateValue(0, "");
+                return;
+            }
 
             StringKey.UpdateValue(_key, value);
         }

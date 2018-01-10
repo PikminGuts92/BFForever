@@ -9,6 +9,7 @@ namespace BFForever.Riff2
     // Constant hierarchy keys
     internal static class Global
     {
+        public static readonly HKey NULL_STRING = new HKey(0);
         // String tables types (Only english/japanese on-disc)
         public static readonly HKey STbl_English = new HKey("stringTable@enUS");
         public static readonly HKey STbl_Japanese = new HKey("stringTable@jaJP");
