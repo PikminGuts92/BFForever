@@ -23,6 +23,8 @@ namespace BFForever.Riff2
             Entries = new List<string>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings) { }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();
@@ -60,7 +62,7 @@ namespace BFForever.Riff2
                 aw.WriteNullString(entry, 256);
         }
 
-        protected override HKey Type => Global.ZOBJ_PackageDef;
+        public override HKey Type => Global.ZOBJ_PackageDef;
         
         public int Version { get; set; }
         public string PackageName { get; set; }

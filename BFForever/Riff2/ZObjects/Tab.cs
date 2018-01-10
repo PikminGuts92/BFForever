@@ -45,6 +45,8 @@ namespace BFForever.Riff2
             Events = new List<TabEntry>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings) { }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Events.Clear();
@@ -121,7 +123,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Global.ZOBJ_Tab;
+        public override HKey Type => Global.ZOBJ_Tab;
 
         public List<TabEntry> Events { get; set; }
     }

@@ -23,6 +23,8 @@ namespace BFForever.Riff2
             Events = new List<TimeEvent>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings) { }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Events.Clear();
@@ -56,7 +58,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Global.ZOBJ_VoxPushPhrase;
+        public override HKey Type => Global.ZOBJ_VoxPushPhrase;
 
         public List<TimeEvent> Events { get; set; }
     }

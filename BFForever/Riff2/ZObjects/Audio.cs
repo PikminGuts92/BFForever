@@ -21,6 +21,8 @@ namespace BFForever.Riff2
 
         }
 
+        protected override void AddMemberStrings(List<FString> strings) => strings.Add(AudioPath);
+
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
@@ -34,8 +36,8 @@ namespace BFForever.Riff2
             aw.Write((ulong)AudioPath);
             aw.Write((ulong)0);
         }
-
-        protected override HKey Type => Global.ZOBJ_Audio;
+        
+        public override HKey Type => Global.ZOBJ_Audio;
 
         public HKey AudioPath { get; set; }
     }

@@ -23,6 +23,8 @@ namespace BFForever.Riff2
             Events = new List<TextEvent>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings) => strings.AddRange(Events.Select(x => x.EventName));
+
         internal override void ReadData(AwesomeReader ar)
         {
             Events.Clear();
@@ -57,7 +59,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Global.ZOBJ_Section;
+        public override HKey Type => Global.ZOBJ_Section;
 
         public List<TextEvent> Events { get; set; }
     }

@@ -66,6 +66,8 @@ namespace BFForever.Riff2
         internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.HashValue == key).EnumValue;
         internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).HashValue;
 
+        protected override void AddMemberStrings(List<FString> strings) { }
+
         internal override void ReadData(AwesomeReader ar)
         {
             _strings.Clear();
@@ -112,6 +114,10 @@ namespace BFForever.Riff2
                 // Updates global string value
                 StringKey.UpdateValue(d.Key, d.Value, _localization);
             }
+
+            // English localization is missing directory path entry
+            if (Localization == Localization.Japanese)
+                StringKey.UpdateValue(DirectoryPath.Key, _strings[DirectoryPath.Key], Localization.English);
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
@@ -157,7 +163,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => GetHKey(_localization);
+        public override HKey Type => GetHKey(_localization);
         public Localization Localization => _localization;
         public Dictionary<ulong, string> Strings => _strings;
     }

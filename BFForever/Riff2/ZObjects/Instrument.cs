@@ -25,6 +25,14 @@ namespace BFForever.Riff2
             TrackPaths = new List<HKey>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings)
+        {
+            strings.Add(InstrumentType);
+            strings.Add(Difficulty);
+            strings.Add(Tuning.Name);
+            strings.AddRange(TrackPaths);
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             TrackPaths.Clear();
@@ -60,7 +68,7 @@ namespace BFForever.Riff2
                 aw.Write((ulong)path);
         }
 
-        protected override HKey Type => Global.ZOBJ_Instrument;
+        public override HKey Type => Global.ZOBJ_Instrument;
 
         public HKey InstrumentType { get; set; }
         public HKey Difficulty { get; set; }

@@ -61,6 +61,33 @@ namespace BFForever.Riff2
             Entries = new List<Catalog2Entry>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings)
+        {
+            foreach(Catalog2Entry entry in Entries)
+            {
+                strings.Add(entry.Identifier);
+
+                strings.Add(entry.Title);
+                strings.Add(entry.Artist);
+                strings.Add(entry.Album);
+                strings.Add(entry.Description);
+                strings.Add(entry.LegendTag);
+                
+                strings.Add(entry.EraTag);
+                strings.Add(entry.LeadGuitarTuning.Name);
+                strings.Add(entry.RhythmGuitarTuning.Name);
+                strings.Add(entry.BassTuning.Name);
+
+                strings.AddRange(entry.Labels);
+                strings.Add(entry.SongPath);
+                strings.Add(entry.TexturePath);
+                strings.Add(entry.PreviewPath);
+
+                strings.AddRange(entry.MetadataTags);
+                strings.AddRange(entry.GenreTags);
+            }
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();
@@ -221,7 +248,7 @@ namespace BFForever.Riff2
                 aw.Write((ulong)tag);
         }
 
-        protected override HKey Type => Global.ZOBJ_Catalog2;
+        public override HKey Type => Global.ZOBJ_Catalog2;
 
         public List<Catalog2Entry> Entries { get; set; }
     }

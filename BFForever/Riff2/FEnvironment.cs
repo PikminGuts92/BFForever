@@ -109,8 +109,23 @@ namespace BFForever.Riff2
 
             // Updates index2 object
             Index2 oldIndex = Index;
+
             if (oldIndex == null || newIndex.Version >= oldIndex.Version)
+            {
                 Index = newIndex;
+
+                // Creates directory paths for entries
+                foreach (Index2Entry entry in Index.Entries)
+                    new HKey(GetParentDirectory(entry.FilePath));
+            }
+        }
+
+        private string GetParentDirectory(string path)
+        {
+            int idx = path.LastIndexOf('.');
+            if (idx < 0) return "";
+
+            return path.Substring(0, idx);
         }
 
         public void ClearCache()

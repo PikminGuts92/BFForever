@@ -23,6 +23,8 @@ namespace BFForever.Riff2
             Events = new List<MeasureEntry>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings) { }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Events.Clear();
@@ -57,7 +59,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Global.ZOBJ_Measure;
+        public override HKey Type => Global.ZOBJ_Measure;
 
         public List<MeasureEntry> Events { get; set; }
     }

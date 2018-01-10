@@ -52,6 +52,33 @@ namespace BFForever.Riff2
             InstrumentPaths = new List<HKey>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings)
+        {
+            strings.Add(Title);
+            strings.Add(Artist);
+            strings.Add(Description);
+            strings.Add(Album);
+            strings.Add(TexturePath);
+            strings.Add(LegendTag);
+            strings.Add(EraTag);
+            
+            strings.AddRange(MetadataTags);
+            strings.AddRange(GenreTags);
+            strings.AddRange(Labels);
+
+            strings.Add(PreviewPath);
+            strings.Add(VideoPath);
+
+            strings.AddRange(InstrumentPaths);
+
+            strings.Add(BackingAudioPath);
+            strings.Add(BassAudioPath);
+            strings.Add(DrumsAudioPath);
+            strings.Add(LeadGuitarAudioPath);
+            strings.Add(RhythmGuitarAudioPath);
+            strings.Add(VoxAudioPath);
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             // Clears tag/path lists
@@ -201,7 +228,7 @@ namespace BFForever.Riff2
                 aw.Write((ulong)tag);
         }
 
-        protected override HKey Type => Global.ZOBJ_Song;
+        public override HKey Type => Global.ZOBJ_Song;
 
         public FString Title { get; set; }
         public FString Artist { get; set; }

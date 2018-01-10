@@ -35,6 +35,16 @@ namespace BFForever.Riff2
             Entries = new List<Index2Entry>();
         }
 
+        protected override void AddMemberStrings(List<FString> strings)
+        {
+            foreach(Index2Entry entry in Entries)
+            {
+                strings.Add(entry.FilePath);
+                strings.Add(entry.Type);
+                strings.AddRange(entry.PackageEntries.Select(x => x.Package));
+            }
+        }
+
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();
@@ -107,7 +117,7 @@ namespace BFForever.Riff2
             }
         }
 
-        protected override HKey Type => Global.ZOBJ_Index2;
+        public override HKey Type => Global.ZOBJ_Index2;
         
         public int Version { get; set; }
         public List<Index2Entry> Entries { get; set; }

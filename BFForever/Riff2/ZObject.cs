@@ -29,7 +29,16 @@ namespace BFForever.Riff2
             _filePath = filePath;
             _directoryPath = directoryPath;
         }
-        
+
+        internal List<FString> GetAllStrings()
+        {
+            List<FString> strings = new List<FString>() { FilePath, DirectoryPath, Type };
+            AddMemberStrings(strings);
+            return strings.Distinct().ToList();
+        }
+
+        protected abstract void AddMemberStrings(List<FString> strings);
+
         internal abstract void ReadData(AwesomeReader ar);
 
         internal void WriteData(AwesomeWriter aw)

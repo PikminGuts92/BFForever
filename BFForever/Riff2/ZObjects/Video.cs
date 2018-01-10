@@ -20,6 +20,8 @@ namespace BFForever.Riff2
 
         }
 
+        protected override void AddMemberStrings(List<FString> strings) => strings.Add(VideoPath);
+
         internal override void ReadData(AwesomeReader ar)
         {
             ar.BaseStream.Position += 8;
@@ -32,7 +34,7 @@ namespace BFForever.Riff2
             aw.Write((ulong)VideoPath);
         }
 
-        protected override HKey Type => Global.ZOBJ_Video;
+        public override HKey Type => Global.ZOBJ_Video;
 
         public HKey VideoPath { get; set; }
     }
