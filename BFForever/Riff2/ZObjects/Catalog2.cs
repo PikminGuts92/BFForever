@@ -61,11 +61,6 @@ namespace BFForever.Riff2
             Entries = new List<Catalog2Entry>();
         }
 
-        protected override int CalculateSize()
-        {
-            throw new NotImplementedException();
-        }
-
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();

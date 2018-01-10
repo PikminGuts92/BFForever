@@ -52,11 +52,6 @@ namespace BFForever.Riff2
             InstrumentPaths = new List<HKey>();
         }
 
-        protected override int CalculateSize()
-        {
-            throw new NotImplementedException();
-        }
-
         internal override void ReadData(AwesomeReader ar)
         {
             // Clears tag/path lists

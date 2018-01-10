@@ -66,11 +66,6 @@ namespace BFForever.Riff2
         internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.HashValue == key).EnumValue;
         internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).HashValue;
 
-        protected override int CalculateSize()
-        {
-            throw new NotImplementedException();
-        }
-
         internal override void ReadData(AwesomeReader ar)
         {
             _strings.Clear();

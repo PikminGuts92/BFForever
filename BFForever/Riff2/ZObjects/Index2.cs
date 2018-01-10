@@ -35,13 +35,6 @@ namespace BFForever.Riff2
             Entries = new List<Index2Entry>();
         }
 
-        protected override int CalculateSize()
-        {
-            return 12
-                + (Entries.Count * 24)
-                + (Entries.Sum(x => x.PackageEntries.Count) * 248);
-        }
-
         internal override void ReadData(AwesomeReader ar)
         {
             Entries.Clear();

@@ -24,11 +24,6 @@ namespace BFForever.Riff2
         {
             TrackPaths = new List<HKey>();
         }
-        
-        protected override int CalculateSize()
-        {
-            throw new NotImplementedException();
-        }
 
         internal override void ReadData(AwesomeReader ar)
         {

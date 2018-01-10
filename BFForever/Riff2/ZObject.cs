@@ -29,9 +29,7 @@ namespace BFForever.Riff2
             _filePath = filePath;
             _directoryPath = directoryPath;
         }
-
-        internal int Size() => CalculateSize() + 32;
-        protected abstract int CalculateSize();
+        
         internal abstract void ReadData(AwesomeReader ar);
 
         internal void WriteData(AwesomeWriter aw)

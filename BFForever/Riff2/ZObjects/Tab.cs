@@ -45,11 +45,6 @@ namespace BFForever.Riff2
             Events = new List<TabEntry>();
         }
 
-        protected override int CalculateSize()
-        {
-            throw new NotImplementedException();
-        }
-
         internal override void ReadData(AwesomeReader ar)
         {
             Events.Clear();
