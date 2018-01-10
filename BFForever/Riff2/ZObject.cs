@@ -21,8 +21,8 @@ namespace BFForever.Riff2
 {
     public abstract class ZObject
     {
-        protected readonly HKey _filePath;
-        protected readonly HKey _directoryPath;
+        protected HKey _filePath;
+        protected HKey _directoryPath;
 
         public ZObject(HKey filePath, HKey directoryPath)
         {
@@ -44,8 +44,18 @@ namespace BFForever.Riff2
 
         protected abstract void WriteObjectData(AwesomeWriter aw);
 
-        public HKey FilePath => _filePath;
-        public HKey DirectoryPath => _directoryPath;
-        protected abstract HKey Type { get; } 
+        public HKey FilePath
+        {
+            get => _filePath ?? new HKey(null);
+            set => _filePath = value;
+        }
+
+        public HKey DirectoryPath
+        {
+            get => _directoryPath ?? new HKey(null);
+            set => _directoryPath = value;
+        }
+
+        public abstract HKey Type { get; } 
     }
 }
