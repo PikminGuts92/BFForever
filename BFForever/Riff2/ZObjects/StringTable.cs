@@ -54,12 +54,12 @@ namespace BFForever.Riff2
         }
 
         private readonly Localization _localization;
-        Dictionary<long, string> _strings = new Dictionary<long, string>();
+        Dictionary<ulong, string> _strings = new Dictionary<ulong, string>();
 
         public StringTable(HKey filePath, HKey directoryPath, Localization localization = Localization.English) : base(filePath, directoryPath)
         {
             _localization = localization;
-            _strings = new Dictionary<long, string>();
+            _strings = new Dictionary<ulong, string>();
         }
 
         internal static bool IsValidLocalization(HKey key) => LocalizationPair.Localizations.Count(x => x.HashValue == key.Key) != 0;
@@ -79,12 +79,12 @@ namespace BFForever.Riff2
             ar.BaseStream.Position += 12; // Skips to entries
             long stringTableOffset = ar.BaseStream.Position + (count * 16);
 
-            long[] key = new long[count];
+            ulong[] key = new ulong[count];
             long[] offset = new long[count];
 
             for (int i = 0; i < count; i++)
             {
-                key[i] = ar.ReadInt64();
+                key[i] = ar.ReadUInt64();
                 offset[i] = ar.ReadInt32();
                 ar.BaseStream.Position += 4; // Should be zero
             }
@@ -114,15 +114,17 @@ namespace BFForever.Riff2
 
             foreach (var d in _strings)
             {
-                // Finds/adds key string globally
-                StringKey sk = StringKey.FindCreate((ulong)d.Key);
-                sk[_localization] = d.Value;
+                // Updates global string value
+                StringKey.UpdateValue(d.Key, d.Value, _localization);
             }
         }
 
         protected override void WriteObjectData(AwesomeWriter aw)
         {
-            Dictionary<long, int> offsets;
+            // Sorts by key value
+            _strings = _strings.OrderBy(x => x.Key).ToDictionary(key => key.Key, value => value.Value);
+
+            Dictionary<ulong, int> offsets;
             byte[] blob = CreateBlob(out offsets);
 
             aw.Write((int)_strings.Count);
@@ -140,9 +142,9 @@ namespace BFForever.Riff2
             aw.Write(blob);
         }
 
-        private byte[] CreateBlob(out Dictionary<long, int> offsets)
+        private byte[] CreateBlob(out Dictionary<ulong, int> offsets)
         {
-            offsets = new Dictionary<long, int>();
+            offsets = new Dictionary<ulong, int>();
             byte[] nullByte = { 0x00 };
 
             using (MemoryStream ms = new MemoryStream())
@@ -161,9 +163,7 @@ namespace BFForever.Riff2
         }
 
         protected override HKey Type => GetHKey(_localization);
-
         public Localization Localization => _localization;
-
-        public Dictionary<long, string> Strings => _strings;
+        public Dictionary<ulong, string> Strings => _strings;
     }
 }

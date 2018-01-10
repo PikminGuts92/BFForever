@@ -9,22 +9,37 @@ namespace BFForever.Riff2
     // Hierarchy Key - Globally unique
     public class HKey : FString
     {
-        public HKey(ulong key) : base(key)
-        {
+        public HKey(ulong key) : base(key) { }
+        public HKey(string s) : base(GetHash(s)) { }
 
+        internal HKey Extend(string extension)
+        {
+            if (!IsValidValue(extension))
+                throw new Exception(InvalidValueMessage());
+
+            ulong newKey = HKey.GetHash(extension, _key);
+
+            if (StringKey.ContainsStringKey(_key))
+            {
+                // Adds new value
+                string newValue = StringKey.GetValue(_key, Localization.English) + extension;
+                StringKey.UpdateValue(newKey, newValue);
+                return new HKey(newKey);
+            }
+            
+            return new HKey(newKey);
         }
 
-        public HKey(string s) : base(GetHash(s))
-        {
-            //throw new NotImplementedException();
-        }
+        // TODO: Change this to regex expression
+        protected override bool IsValidValue(string value) => value == null || value.Any(x => !(char.IsLetterOrDigit(x) || x == '.' || x == '@' || x == '_' || x == '!'));
+        protected override string InvalidValueMessage() => "Invalid HKey: May only contain alphanumerics or the symbols ('.', '_', '@', '!')";
+        protected override ulong CalculateHash(string value) => string.IsNullOrEmpty(value) ? 0 : _crc.Compute(value, true);
 
         #region Overloaded Operators
         public static implicit operator ulong(HKey h) => h.Key;
         public static implicit operator string(HKey h) => h.Value;
         public static implicit operator HKey(string s) => new HKey(s);
         public static implicit operator HKey(ulong key) => new HKey(key);
-        //public static implicit operator HKey(FString f) => new HKey(f.Value, f.Key);
 
         public static bool operator ==(HKey a, HKey b) => a.Key == b.Key;
         public static bool operator !=(HKey a, HKey b) => !(a == b);
@@ -43,14 +58,15 @@ namespace BFForever.Riff2
         public override int GetHashCode() => Key.GetHashCode();
         #endregion
 
-        internal static ulong GetHash(string value) => _global.Compute(value, true);
-        internal static ulong GetHash(string value, long initial)
+        private static ulong GetHash(string value) => _crc.Compute(value, true);
+        private static ulong GetHash(string value, ulong initial)
         {
-            ulong origInit = _global.Initial, result;
-            _global.Initial = (ulong)initial;
-            
-            result = _global.Compute(value, true);
-            _global.Initial = origInit;
+            ulong origInit = _crc.Initial, result;
+
+            _crc.Initial = initial ^ _crc.Final;
+            result = _crc.Compute(value, true);
+
+            _crc.Initial = origInit;
             return result;
         }
     }

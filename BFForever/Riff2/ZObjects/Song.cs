@@ -22,8 +22,8 @@ using System.Threading.Tasks;
  * INT32 - Metadata Tags Offset
  * INT32 - Count of Genre Tags
  * INT32 - Genre Tags Offset
- * INT32 - Count of Label Tags
- * INT32 - Label Tags Offset
+ * INT32 - Count of Labels
+ * INT32 - Labels Offset
  * FLOAT - Song Length
  * INT32 - Always 0?
  *  HKEY - Preview Path
@@ -37,7 +37,7 @@ using System.Threading.Tasks;
  *  HKEY - Lead Guitar Audio Path
  *  HKEY - Rhythm Guitar Audio Path
  *  HKEY - Vocals Audio Path
- * HKEY[] - Paths + Tags
+ * SKEY[]/HKEY[] - Labels + Paths + Tags
  */
 
 namespace BFForever.Riff2
@@ -48,7 +48,7 @@ namespace BFForever.Riff2
         {
             MetadataTags = new List<HKey>();
             GenreTags = new List<HKey>();
-            LabelTags = new List<HKey>();
+            Labels = new List<FString>();
             InstrumentPaths = new List<HKey>();
         }
 
@@ -62,7 +62,7 @@ namespace BFForever.Riff2
             // Clears tag/path lists
             MetadataTags.Clear();
             GenreTags.Clear();
-            LabelTags.Clear();
+            Labels.Clear();
             InstrumentPaths.Clear();
 
             // 184 bytes
@@ -103,7 +103,7 @@ namespace BFForever.Riff2
             }
             ar.BaseStream.Position = previousPosition;
 
-            // Reads label tags
+            // Reads labels
             count = ar.ReadInt32();
             offset = ar.ReadInt32();
             previousPosition = ar.BaseStream.Position;
@@ -111,7 +111,7 @@ namespace BFForever.Riff2
             ar.BaseStream.Position += offset - 4;
             for (int i = 0; i < count; i++)
             {
-                LabelTags.Add(ar.ReadUInt64());
+                Labels.Add(ar.ReadUInt64());
             }
             ar.BaseStream.Position = previousPosition;
 
@@ -174,11 +174,11 @@ namespace BFForever.Riff2
             tagOffset += GenreTags.Count * 8;
             tags.AddRange(GenreTags);
 
-            // Label tags
-            aw.Write((int)LabelTags.Count);
+            // Labels
+            aw.Write((int)Labels.Count);
             aw.Write((int)(tagOffset - aw.BaseStream.Position));
-            tagOffset += LabelTags.Count * 8;
-            tags.AddRange(LabelTags);
+            tagOffset += Labels.Count * 8;
+            tags.AddRange(Labels);
 
             aw.Write((float)SongLength);
             aw.BaseStream.Position += 4; // Should be zero
@@ -221,7 +221,7 @@ namespace BFForever.Riff2
         public float VoxIntensity { get; set; }
         public List<HKey> MetadataTags { get; set; }
         public List<HKey> GenreTags { get; set; }
-        public List<HKey> LabelTags { get; set; }
+        public List<FString> Labels { get; set; }
         public float SongLength { get; set; }
         public HKey PreviewPath { get; set; }
         public HKey VideoPath { get; set; }

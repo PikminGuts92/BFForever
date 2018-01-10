@@ -9,7 +9,7 @@ namespace BFForever.Riff2
     // Constant hierarchy keys
     internal static class Global
     {
-        // String tables types
+        // String tables types (Only english/japanese on-disc)
         public static readonly HKey STbl_English = new HKey("stringTable@enUS");
         public static readonly HKey STbl_Japanese = new HKey("stringTable@jaJP");
         public static readonly HKey STbl_German = new HKey("stringTable@deDE");
@@ -67,6 +67,30 @@ namespace BFForever.Riff2
             { ZOBJ_VoxPushPhrase, typeof(VoxPushPhrase) },
             //{ ZOBJ_VoxSpread, typeof(VoxSpread) },
             //{ ZOBJ_Whammy, typeof(Whammy) }
+        };
+
+        public static readonly HKey[] StringTableLocalizations = new HKey[]
+        {
+            STbl_English,
+            STbl_Japanese,
+            STbl_German,
+            STbl_Italian,
+            STbl_Spanish,
+            STbl_French
+        };
+
+        public static readonly HKey[] StringTableLocalizationsOnDisc = new HKey[]
+        {
+            STbl_English,
+            STbl_Japanese
+        };
+
+        public static readonly HKey[] StringTableLocalizationsDLC = new HKey[]
+        {
+            STbl_German,
+            STbl_Italian,
+            STbl_Spanish,
+            STbl_French
         };
     }
 }

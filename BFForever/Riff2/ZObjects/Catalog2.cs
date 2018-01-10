@@ -10,7 +10,7 @@ using System.Threading.Tasks;
  * INT32 - Count of Entries
  * INT32 - Offset
  * Catalog2Entry[] - Catalog2 Entries
- * HKEY[] - Tags
+ * SKEY[]/HKEY[] - Labels + Tags
  * 
  * Catalog2Entry (280 bytes)
  * =========================
@@ -32,8 +32,8 @@ using System.Threading.Tasks;
  * Tuning - Lead Guitar  \
  * Tuning - Rhythm Guitar | Each are 40 bytes (120 bytes total)
  * Tuning - Bass         /
- * INT32 - Count of Label Tags
- * INT32 - Label Tags Offset
+ * INT32 - Count of Labels
+ * INT32 - Labels Offset
  *  HKEY - Song Path
  *  HKEY - Texture Path
  *  HKEY - Audio Preview Path
@@ -101,7 +101,7 @@ namespace BFForever.Riff2
                 entry.RhythmGuitarTuning = Tuning.ReadData(ar);
                 entry.BassTuning = Tuning.ReadData(ar);
 
-                // Reads label tags
+                // Reads labels
                 int count = ar.ReadInt32();
                 int offset = ar.ReadInt32();
                 long previousPosition = ar.BaseStream.Position;
@@ -109,7 +109,7 @@ namespace BFForever.Riff2
                 ar.BaseStream.Position += offset - 4;
                 for (int i = 0; i < count; i++)
                 {
-                    entry.LabelTags.Add(ar.ReadUInt64());
+                    entry.Labels.Add(ar.ReadUInt64());
                 }
                 ar.BaseStream.Position = previousPosition;
 
@@ -192,11 +192,11 @@ namespace BFForever.Riff2
                 Tuning.WriteData(aw, entry.RhythmGuitarTuning);
                 Tuning.WriteData(aw, entry.BassTuning);
 
-                // Label tags
-                aw.Write((int)entry.LabelTags.Count);
+                // Labels
+                aw.Write((int)entry.Labels.Count);
                 aw.Write((int)(tagOffset - aw.BaseStream.Position));
-                tagOffset += entry.LabelTags.Count * 8;
-                tags.AddRange(entry.LabelTags);
+                tagOffset += entry.Labels.Count * 8;
+                tags.AddRange(entry.Labels);
 
                 aw.Write((ulong)entry.SongPath);
                 aw.Write((ulong)entry.TexturePath);
@@ -235,7 +235,7 @@ namespace BFForever.Riff2
     {
         public Catalog2Entry()
         {
-            LabelTags = new List<HKey>();
+            Labels = new List<FString>();
             MetadataTags = new List<HKey>();
             GenreTags = new List<HKey>();
         }
@@ -261,7 +261,7 @@ namespace BFForever.Riff2
         public Tuning RhythmGuitarTuning { get; set; }
         public Tuning BassTuning { get; set; }
 
-        public List<HKey> LabelTags { get; set; }
+        public List<FString> Labels { get; set; }
         public HKey SongPath { get; set; }
         public HKey TexturePath { get; set; }
         public HKey PreviewPath { get; set; }
