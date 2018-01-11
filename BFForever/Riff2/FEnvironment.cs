@@ -116,17 +116,11 @@ namespace BFForever.Riff2
 
                 // Creates directory paths for entries
                 foreach (Index2Entry entry in Index.Entries)
-                    new HKey(GetParentDirectory(entry.FilePath));
+                    entry.FilePath.GetParentDirectory();
             }
         }
 
-        private string GetParentDirectory(string path)
-        {
-            int idx = path.LastIndexOf('.');
-            if (idx < 0) return "";
-
-            return path.Substring(0, idx);
-        }
+        
 
         public void ClearCache()
         {

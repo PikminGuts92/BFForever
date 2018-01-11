@@ -36,7 +36,9 @@ namespace BFForever.Riff2
 
         private void UpdateAllValues(string value)
         {
-            foreach(var k in _values.Keys)
+            var keys = _values.Keys.ToList();
+
+            foreach(var k in keys)
                 _values[k] = value;
         }
         

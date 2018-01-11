@@ -10,7 +10,7 @@ namespace BFForever.Riff2
     public class HKey : FString
     {
         public HKey(ulong key) : base(key) { }
-        public HKey(string s) : base(GetHash(s)) { }
+        public HKey(string value) : base(value) { }
 
         internal HKey Extend(string extension)
         {
@@ -30,8 +30,18 @@ namespace BFForever.Riff2
             return new HKey(newKey);
         }
 
+        internal HKey GetParentDirectory() => string.IsNullOrEmpty(Value) ? "" : GetParentDirectory(Value);
+
+        private string GetParentDirectory(string path)
+        {
+            int idx = path.LastIndexOf('.');
+            if (idx < 0) return "";
+
+            return path.Substring(0, idx);
+        }
+
         // TODO: Change this to regex expression
-        protected override bool IsValidValue(string value) => value == null || value.Any(x => !(char.IsLetterOrDigit(x) || x == '.' || x == '@' || x == '_' || x == '!'));
+        protected override bool IsValidValue(string value) => value == null || !value.Any(x => !(char.IsLetterOrDigit(x) || x == '.' || x == '@' || x == '_' || x == '!'));
         protected override string InvalidValueMessage() => "Invalid HKey: May only contain alphanumerics or the symbols ('.', '_', '@', '!')";
         protected override ulong CalculateHash(string value) => string.IsNullOrEmpty(value) ? 0 : _crc.Compute(value, true);
 
