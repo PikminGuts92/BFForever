@@ -32,7 +32,7 @@ namespace BFForever.Riff2
 
         internal List<FString> GetAllStrings()
         {
-            List<FString> strings = new List<FString>() { FilePath, DirectoryPath, Type };
+            List<FString> strings = new List<FString>() { Type }; // Only writes type, just like real BF data
             AddMemberStrings(strings);
             return strings.Distinct().ToList();
         }
