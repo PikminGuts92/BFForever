@@ -110,13 +110,14 @@ namespace BFForever.Riff2
 
         private void WriteToStream(Stream stream)
         {
-            AwesomeWriter aw = new AwesomeWriter(stream, BigEndian);
-            long startOffset = aw.BaseStream.Position;
-            long offset = startOffset + 24 + (_objects.Count * 16);
-
-            List<ZObject> objects = _objects.Where(x => x is ZObject).ToList();
+            // Creates string tables
+            List<ZObject> objects = _objects.Where(x => !(x is StringTable)).ToList();
             objects.AddRange(CreateStringTables(_objects));
 
+            AwesomeWriter aw = new AwesomeWriter(stream, BigEndian);
+            long startOffset = aw.BaseStream.Position;
+            long offset = startOffset + 24 + (objects.Count * 16);
+            
             var chunks = objects.Select(x => new
             {
                 Path = x.FilePath,
@@ -178,18 +179,18 @@ namespace BFForever.Riff2
                 }
 
                 // Creates string table for singular zobject (Uses file path)
-                foreach (HKey local in Global.StringTableLocalizationsOnDisc)
+                foreach (ZObject obj in group)
                 {
-                    foreach (ZObject obj in group)
-                    {
-                        List<FString> strings = obj.GetAllStrings();
+                    List<FString> strings = obj.GetAllStrings();
 
+                    foreach (HKey local in Global.StringTableLocalizationsOnDisc)
+                    {
                         HKey objectDirectory = obj.FilePath.Extend("." + local);
                         StringTable table = new StringTable(objectDirectory, obj.FilePath.GetParentDirectory(), StringTable.GetLocalization(local));
 
                         foreach (FString str in strings)
                             table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
-
+                        
                         tables.Add(table);
                     }
                 }
