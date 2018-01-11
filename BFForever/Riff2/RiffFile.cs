@@ -114,7 +114,10 @@ namespace BFForever.Riff2
             long startOffset = aw.BaseStream.Position;
             long offset = startOffset + 24 + (_objects.Count * 16);
 
-            var chunks = _objects.Select(x => new
+            List<ZObject> objects = _objects.Where(x => x is ZObject).ToList();
+            objects.AddRange(CreateStringTables(_objects));
+
+            var chunks = objects.Select(x => new
             {
                 Path = x.FilePath,
                 Offset = offset,
@@ -146,6 +149,53 @@ namespace BFForever.Riff2
                 aw.Write((int)chunk.Data.Length);
                 aw.Write(chunk.Data);
             }
+        }
+
+        private List<StringTable> CreateStringTables(List<ZObject> zobjects)
+        {
+            List<StringTable> tables = new List<StringTable>();
+            var groups = zobjects.Where(x => !(x is StringTable)).GroupBy(x => x.DirectoryPath);
+
+            foreach (var group in groups)
+            {
+                if (group.Key.Key != 0)
+                {
+                    // Creates shared string tables
+                    foreach (HKey local in Global.StringTableLocalizationsOnDisc)
+                    {
+                        List<FString> strings = group.SelectMany(x => x.GetAllStrings()).ToList();
+
+                        HKey localGroupDirectory = group.Key.Extend("." + local);
+                        StringTable table = new StringTable(localGroupDirectory, group.Key.GetParentDirectory(), StringTable.GetLocalization(local));
+
+                        foreach (FString str in strings)
+                            table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
+
+                        tables.Add(table);
+                    }
+
+                    continue;
+                }
+
+                // Creates string table for singular zobject (Uses file path)
+                foreach (HKey local in Global.StringTableLocalizationsOnDisc)
+                {
+                    foreach (ZObject obj in group)
+                    {
+                        List<FString> strings = obj.GetAllStrings();
+
+                        HKey objectDirectory = obj.FilePath.Extend("." + local);
+                        StringTable table = new StringTable(objectDirectory, obj.FilePath.GetParentDirectory(), StringTable.GetLocalization(local));
+
+                        foreach (FString str in strings)
+                            table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
+
+                        tables.Add(table);
+                    }
+                }
+            }
+
+            return tables;
         }
 
         private byte[] CreateChunk(ZObject obj, bool bigEndian, ref long offset)

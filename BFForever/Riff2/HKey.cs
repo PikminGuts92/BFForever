@@ -64,7 +64,7 @@ namespace BFForever.Riff2
 
         public static bool operator !=(string a, HKey b) => !(a == b);
 
-        public override bool Equals(object obj) => (obj is HKey) && ((HKey)obj).Key == Key;
+        public override bool Equals(object obj) => base.Equals(obj);
         public override int GetHashCode() => Key.GetHashCode();
         #endregion
 
