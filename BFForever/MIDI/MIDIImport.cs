@@ -181,5 +181,126 @@ namespace BFForever.MIDI
 
             return tsEntries;
         }
+
+        private List<ZObject> GetGuitarObjects(string trackName, bool guitar)
+        {
+            List<ZObject> objects = new List<ZObject>();
+            List<TabEntry> tabEntries = new List<TabEntry>();
+            //List<Riff2.TextEvent> chordEntries = new List<Riff2.TextEvent>();
+
+            int stringStart;
+            var trackEvents = GetGuitarTrack(guitar);
+
+            switch (trackName)
+            {
+                case "jam":
+                    // Easy
+                    stringStart = 24;
+                    break;
+                case "nov":
+                    // Medium
+                    stringStart = 48;
+                    break;
+                case "beg":
+                    // Hard
+                    stringStart = 70;
+                    break;
+                case "int":
+                case "rhy":
+                case "adv": // Lead
+                default:
+                    // Expert
+                    stringStart = 96;
+                    break;
+            }
+
+            foreach (NoteOnEvent note in trackEvents.Where(x => x is NoteOnEvent).Select(x => x as NoteOnEvent))
+            {
+                if (note.NoteNumber < stringStart || note.NoteNumber >= (stringStart + 6) || note.Velocity < 100) continue;
+                int stringNumber = 6 - (note.NoteNumber - stringStart); // 1-6
+
+                TabEntry tabEntry = new TabEntry()
+                {
+                    Start = (float)GetRealTime(note.AbsoluteTime),
+                    End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
+                    FretNumber = note.Velocity - 100,
+                    StringNumber = stringNumber,
+                    Finger = GetRBStringColor(stringNumber)
+                    // TODO: Implement bends, left hand mutes, etc.
+                };
+
+                tabEntries.Add(tabEntry);
+            }
+
+            Tab tab = new Tab("", "");
+            tab.Events = tabEntries;
+            objects.Add(tab);
+
+            // TODO: Implement chord events
+
+            return objects;
+        }
+
+        private TabFinger GetRBStringColor(int idx)
+        {
+            // Purple
+            // Yellow
+            // Blue
+            // Orange
+            // Green
+            // Red
+
+            switch(idx)
+            {
+                case 1:
+                    return TabFinger.Open;
+                case 2:
+                    return TabFinger.Three;
+                case 3:
+                    return TabFinger.Four;
+                case 4:
+                    return TabFinger.Five;
+                case 5:
+                    return TabFinger.One;
+                case 6:
+                    return TabFinger.Two;
+                default:
+                    return TabFinger.Tap; // Black
+            }
+        }
+
+        private IList<MidiEvent> GetGuitarTrack(bool guitar)
+        {
+            string trackNameBegin = "PART REAL_" + (guitar ? "GUITAR" : "BASS");
+            var tracks = _midiFile.Events.Where(x => x[0].ToString().Contains(trackNameBegin)).ToList();
+
+            switch(tracks.Count)
+            {
+                case 0:
+                    return new List<MidiEvent>();
+                case 1:
+                    return tracks[0];
+                default:
+                    // Looks for 22-fret version, returns first if not found
+                    var track22 = tracks.FirstOrDefault((x => x[0].ToString().Contains(trackNameBegin + "_22")));
+                    return (track22 != null) ? track22 : tracks.First();
+            }
+        }
+
+        public List<ZObject> ExportInstrumentTracks(string type, string difficulty)
+        {
+            switch(type.ToLower())
+            {
+                case "bass":
+                case "guitar":
+                    bool guitar = type.Equals("guitar", StringComparison.CurrentCultureIgnoreCase);
+                    return GetGuitarObjects(type, guitar);
+                case "master":
+                case "vocals":
+                default:
+                    // TODO: Implement, duh
+                    return new List<ZObject>();
+            }
+        }
     }
 }
