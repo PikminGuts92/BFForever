@@ -159,5 +159,27 @@ namespace BFForever.MIDI
                 BPM = (float)x.BPM
             }).ToList();
         }
+
+        public List<TimeSignatureEntry> ExportTimeSignatureEntries()
+        {
+            List<TimeSignatureEntry> tsEntries = new List<TimeSignatureEntry>();
+
+            foreach (TimeSignatureEvent ev in _midiFile.Events[0].Where(x => x is TimeSignatureEvent))
+            {
+                string[] number = ev.TimeSignature.Split('/'); // "4/4"
+
+                TimeSignatureEntry entry = new TimeSignatureEntry()
+                {
+                    Start = (float)GetRealTime(ev.AbsoluteTime),
+                    End = (float)GetRealTime(ev.AbsoluteTime),
+                    Beat = int.Parse(number[0]),
+                    Measure = int.Parse(number[1])
+                };
+
+                tsEntries.Add(entry);
+            }
+
+            return tsEntries;
+        }
     }
 }
