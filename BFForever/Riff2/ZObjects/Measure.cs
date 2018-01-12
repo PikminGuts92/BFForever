@@ -66,6 +66,6 @@ namespace BFForever.Riff2
 
     public class MeasureEntry : TimeEvent
     {
-        public float Beat { get; set; } = 1.0f; // 1.0f (Up) or 2.0f (Down)
+        public float Beat { get; set; } = 1.0f; // 1.0f (Down) or 2.0f (Up)
     }
 }

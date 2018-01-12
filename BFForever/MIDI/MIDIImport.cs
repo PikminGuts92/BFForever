@@ -124,5 +124,40 @@ namespace BFForever.MIDI
             
             return voxNotes;
         }
+
+        public List<MeasureEntry> ExportMeasureEntries()
+        {
+            const int BEAT_DOWN = 12;
+            const int BEAT_UP = 13;
+            
+            List<MeasureEntry> measures = new List<MeasureEntry>();
+            var beatTrack = _midiFile.Events.FirstOrDefault(x => x[0].ToString().Contains("BEAT"));
+
+            foreach (NoteOnEvent note in beatTrack.Where(x => x is NoteOnEvent).Select(x => x as NoteOnEvent))
+            {
+                if (note.NoteNumber != BEAT_UP && note.NoteNumber != BEAT_DOWN) continue;
+
+                MeasureEntry entry = new MeasureEntry()
+                {
+                    Start = (float)GetRealTime(note.AbsoluteTime),
+                    End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
+                    Beat = note.NoteNumber == BEAT_DOWN ? 1.0f : 2.0f
+                };
+
+                measures.Add(entry);
+            }
+
+            return measures;
+        }
+
+        public List<TempoEntry> ExportTempoEntries()
+        {
+            return _tempoIdx.Select(x => new TempoEntry()
+            {
+                Start = (float)x.RealTime,
+                End = (float)x.RealTime,
+                BPM = (float)x.BPM
+            }).ToList();
+        }
     }
 }
