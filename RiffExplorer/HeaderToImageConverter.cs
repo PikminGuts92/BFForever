@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using static System.IO.Path;
-using BFForever.Riff2;
+using BFForever.Riff;
 
 // What a nice guy! :)
 // http://www.codeproject.com/Articles/21248/A-Simple-WPF-Explorer-Tree 

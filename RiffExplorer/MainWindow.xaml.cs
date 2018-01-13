@@ -17,7 +17,7 @@ using System.ComponentModel; // SortDescription
 using IO = System.IO;
 using BFForever;
 using BFForever.Audio;
-using BFForever.Riff2;
+using BFForever.Riff;
 using BFForever.Texture;
 
 namespace RiffExplorer
