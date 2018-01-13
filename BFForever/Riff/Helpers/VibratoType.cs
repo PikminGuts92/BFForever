@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BFForever.Riff2
+namespace BFForever.Riff
 {
-    public enum TabBendType : int
+    public enum VibratoType : int
     {
         None,
-        Bend,
-        Release,
-        Prebend,
-        Holdbend
+        Regular,
+        Wide
     }
 }

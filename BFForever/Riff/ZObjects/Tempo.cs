@@ -4,62 +4,68 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * Tempo ZObject
+ * =============
+ * INT32 - Constant (1)
+ * INT32 - Event Size (12)
+ * INT32 - Count of Events
+ * INT32 - Events Offset
+ * Events[]
+ */
+
 namespace BFForever.Riff
 {
     public class Tempo : ZObject
     {
-        public Tempo(FString idx) : base(idx)
+        public Tempo(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            Entries = new List<TempoEntry>();
+            Events = new List<TempoEntry>();
         }
 
-        public List<TempoEntry> Entries { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) { }
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            ar.ReadInt32(); // Always 1
-            ar.ReadInt32(); // Size of each TimeEntry (12 bytes)
+            Events.Clear();
+            ar.BaseStream.Position += 8; // Skips constants
 
             int count = ar.ReadInt32();
-            ar.ReadInt32(); // Offset to entries (Always 4)
+            ar.BaseStream.Position += 4;
 
             for (int i = 0; i < count; i++)
             {
-                // Reads entry (12 bytes)
-                TempoEntry entry = new TempoEntry();
+                TempoEntry ev = new TempoEntry();
+                ev.Start = ar.ReadSingle();
+                ev.End = ar.ReadSingle();
+                ev.BPM = ar.ReadSingle();
 
-                entry.Start = ar.ReadSingle();
-                entry.End = ar.ReadSingle();
-                entry.BPM = ar.ReadSingle();
-
-                Entries.Add(entry);
+                Events.Add(ev);
             }
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)1);
+            aw.Write((int)12);
+            aw.Write((int)Events.Count);
+            aw.Write((int)4);
+
+            foreach (TempoEntry ev in Events)
+            {
+                aw.Write((float)ev.Start);
+                aw.Write((float)ev.End);
+                aw.Write((float)ev.BPM);
+            }
+        }
+        
+        public override HKey Type => Global.ZOBJ_Tempo;
+
+        public List<TempoEntry> Events { get; set; }
     }
 
-    public class TempoEntry : TimeEntry
+    public class TempoEntry : TimeEvent
     {
-        private float _bpm;
-
-        public TempoEntry()
-        {
-            _bpm = 120.0f;
-        }
-
-        /// <summary>
-        /// Gets or sets bpm
-        /// </summary>
-        public float BPM
-        {
-            get
-            {
-                return _bpm;
-            }
-            set
-            {
-                if (value >= 0.0f)
-                    _bpm = value;
-            }
-        }
+        public float BPM { get; set; }
     }
 }

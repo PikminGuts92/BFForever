@@ -4,39 +4,75 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * Description:
+ *  The index chunk lists internal path names and offsets of zobjects / string tables in a riff file.
+ * 
+ * INDEX CHUNK
+ * ===========
+ * INT32 - Count of Entries
+ * INT32 - Offset
+ * IndexEntry[] - Entries
+ * 
+ * IndexEntry (16 bytes)
+ * =====================
+ *  HKEY - File Path
+ * INT32 - Offset
+ * INT32 - Always 0
+ */
+
 namespace BFForever.Riff
 {
-    public class Index : Chunk
+    internal class Index
     {
-        public Index() : base(new FString(0))
+        public Index()
         {
             Entries = new List<IndexEntry>();
         }
 
-        protected override void ImportData(AwesomeReader ar)
+        internal Index(AwesomeReader ar) : this()
         {
-            int count = ar.ReadInt32();
-            ar.ReadInt32(); // Always 4
+            Entries = new List<IndexEntry>();
+            ReadData(ar);
+        }
 
-            // Reads all index entries
+        internal void ReadData(AwesomeReader ar)
+        {
+            Entries.Clear();
+
+            uint count = ar.ReadUInt32();
+            ar.BaseStream.Position += 4; // Always 4
+
             for (int i = 0; i < count; i++)
             {
                 IndexEntry entry = new IndexEntry();
-                entry.IndexKey = new FString(ar.ReadInt64());
-                entry.Offset = ar.ReadInt32();
+                entry.FilePath = new HKey(ar.ReadUInt64());
+                entry.Offset = ar.ReadUInt32();
 
-                ar.ReadInt32(); // Always 0?
-
+                ar.BaseStream.Position += 4; // Always 0?
                 Entries.Add(entry);
+            }
+        }
+
+        internal void WriteData(AwesomeWriter aw)
+        {
+            aw.Write((int)Entries.Count);
+            aw.Write((int)4);
+            
+            foreach(IndexEntry entry in Entries)
+            {
+                aw.Write((ulong)entry.FilePath);
+                aw.Write((uint)entry.Offset);
+                aw.BaseStream.Position += 4;
             }
         }
 
         public List<IndexEntry> Entries { get; set; }
     }
 
-    public class IndexEntry
+    internal class IndexEntry
     {
-        public FString IndexKey { get; set; }
-        public int Offset { get; set; }
+        public HKey FilePath { get; set; }
+        public uint Offset { get; set; }
     }
 }

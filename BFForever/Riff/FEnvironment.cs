@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace BFForever.Riff2
+namespace BFForever.Riff
 {
     // Package Manager?
     public class FEnvironment

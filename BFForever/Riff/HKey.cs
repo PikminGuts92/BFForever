@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BFForever.Riff2
+namespace BFForever.Riff
 {
     // Hierarchy Key - Globally unique
     public class HKey : FString

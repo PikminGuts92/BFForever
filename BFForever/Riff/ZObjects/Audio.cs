@@ -4,23 +4,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * Audio ZObject
+ * =============
+ * INT64 - Always 0
+ *  HKEY - Audio Path
+ * INT64 - Always 0
+ */
+
 namespace BFForever.Riff
 {
     public class Audio : ZObject
     {
-        public Audio(FString idx) : base(idx)
+        public Audio(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            
+
         }
 
-        public FString ExternalPath { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) => strings.Add(AudioPath);
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            // Reads audio path
             ar.BaseStream.Position += 8;
-            ExternalPath = ar.ReadInt64();
+            AudioPath = ar.ReadUInt64();
             ar.BaseStream.Position += 8;
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.BaseStream.Position += 8;
+            aw.Write((ulong)AudioPath);
+            aw.Write((ulong)0);
+        }
+        
+        public override HKey Type => Global.ZOBJ_Audio;
+
+        public HKey AudioPath { get; set; }
     }
 }

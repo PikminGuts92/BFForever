@@ -4,58 +4,71 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * TimeSignature ZObject
+ * =====================
+ * INT32 - Constant (0)
+ * INT32 - Event Size (16)
+ * INT32 - Count of Events
+ * INT32 - Events Offset
+ * Events[]
+ */
+
 namespace BFForever.Riff
 {
     public class TimeSignature : ZObject
     {
-        public TimeSignature(FString idx) : base(idx)
+        public TimeSignature(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            Entries = new List<TimeSignatureEntry>();
+            Events = new List<TimeSignatureEntry>();
         }
 
-        public List<TimeSignatureEntry> Entries { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) { }
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            ar.ReadInt32(); // Always 0
-            ar.ReadInt32(); // Size of each TimeEntry (16 bytes)
+            Events.Clear();
+            ar.BaseStream.Position += 8; // Skips constants
 
             int count = ar.ReadInt32();
-            ar.ReadInt32(); // Offset to entries (Always 4)
+            ar.BaseStream.Position += 4;
 
             for (int i = 0; i < count; i++)
             {
-                // Reads entry (16 bytes)
-                TimeSignatureEntry entry = new TimeSignatureEntry();
+                TimeSignatureEntry ev = new TimeSignatureEntry();
+                ev.Start = ar.ReadSingle();
+                ev.End = ar.ReadSingle();
+                ev.Beat = ar.ReadInt32();
+                ev.Measure = ar.ReadInt32();
 
-                entry.Start = ar.ReadSingle();
-                entry.End = ar.ReadSingle();
-                entry.Beat = ar.ReadInt32();
-                entry.Measure = ar.ReadInt32();
-
-                Entries.Add(entry);
+                Events.Add(ev);
             }
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)0);
+            aw.Write((int)16);
+            aw.Write((int)Events.Count);
+            aw.Write((int)4);
+
+            foreach (TimeSignatureEntry ev in Events)
+            {
+                aw.Write((float)ev.Start);
+                aw.Write((float)ev.End);
+                aw.Write((int)ev.Beat);
+                aw.Write((int)ev.Measure);
+            }
+        }
+
+        public override HKey Type => Global.ZOBJ_TimeSignature;
+
+        public List<TimeSignatureEntry> Events { get; set; }
     }
 
-    public class TimeSignatureEntry : TimeEntry
+    public class TimeSignatureEntry : TimeEvent
     {
-
-        public TimeSignatureEntry()
-        {
-            // 4/4 time signature
-            Beat = 4;
-            Measure = 4;
-        }
-        
-        /// <summary>
-        /// Gets or sets beat
-        /// </summary>
         public int Beat { get; set; }
-
-        /// <summary>
-        /// Gets or sets measure
-        /// </summary>
         public int Measure { get; set; }
     }
 }

@@ -4,35 +4,62 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * VoxPushPhrase ZObject
+ * =====================
+ * INT32 - Constant (10)
+ * INT32 - Event Size (8)
+ * INT32 - Count of Events
+ * INT32 - Events Offset
+ * Events[]
+ */
+
 namespace BFForever.Riff
 {
     public class VoxPushPhrase : ZObject
     {
-        public VoxPushPhrase(FString idx) : base(idx)
+        public VoxPushPhrase(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            Entries = new List<TimeEntry>();
+            Events = new List<TimeEvent>();
         }
 
-        public List<TimeEntry> Entries { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) { }
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            ar.ReadInt32(); // Always 10
-            ar.ReadInt32(); // Size of each TimeEntry (8 bytes)
+            Events.Clear();
+            ar.BaseStream.Position += 8; // Skips constants
 
             int count = ar.ReadInt32();
-            ar.ReadInt32(); // Offset to entries (Always 4)
+            ar.BaseStream.Position += 4;
 
             for (int i = 0; i < count; i++)
             {
-                // Reads voxpushphrase entry (8 bytes)
-                TimeEntry entry = new TimeEntry();
+                // Reads time entry (8 bytes)
+                TimeEvent ev = new TimeEvent();
+                ev.Start = ar.ReadSingle();
+                ev.End = ar.ReadSingle();
 
-                entry.Start = ar.ReadSingle();
-                entry.End = ar.ReadSingle();
-                
-                Entries.Add(entry);
+                Events.Add(ev);
             }
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)10);
+            aw.Write((int)8);
+            aw.Write((int)Events.Count);
+            aw.Write((int)4);
+
+            foreach (TimeEvent ev in Events)
+            {
+                aw.Write((float)ev.Start);
+                aw.Write((float)ev.End);
+            }
+        }
+
+        public override HKey Type => Global.ZOBJ_VoxPushPhrase;
+
+        public List<TimeEvent> Events { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BFForever.Riff2;
+using BFForever.Riff;
 using NAudio.Midi;
 
 namespace BFForever.MIDI

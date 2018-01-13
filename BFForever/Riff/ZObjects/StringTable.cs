@@ -27,7 +27,7 @@ using System.IO;
  * INT32 - Always 0
  */
 
-namespace BFForever.Riff2
+namespace BFForever.Riff
 {
     public class StringTable : ZObject
     {

@@ -4,37 +4,43 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * PackageDef ZObject
+ * ==================
+ * INT32 - Version
+ * STRNG - Package Name (256 bytes)
+ * INT32 - Count of Entries
+ * INT32 - Offset
+ * STRNG[] - Previous Package Names (256 bytes)
+ */
+
 namespace BFForever.Riff
 {
     public class PackageDef : ZObject
     {
-        public PackageDef(FString idx) : base(idx)
+        public PackageDef(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            Version = 1100024;
-            PackageName = "DLC0024";
             Entries = new List<string>();
         }
 
-        public int Version { get; set; }
-        public string PackageName { get; set; }
-        public List<string> Entries { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) { }
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            Version = ar.ReadInt32(); // 1100024
+            Entries.Clear();
+
+            Version = ar.ReadInt32();
 
             long nextString = ar.BaseStream.Position + 256;
-            PackageName = ar.ReadNullString(); // "DLC0024"
+            PackageName = ar.ReadNullString();
 
             ar.BaseStream.Position = nextString;
             int count = ar.ReadInt32(); // # of strings
 
             // Offset - Always 4
-            int offset = ar.ReadInt32();
-            nextString = ar.BaseStream.Position + (offset - 4);
-
-            Entries = new List<string>();
-
+            ar.BaseStream.Position += 4;
+            nextString = ar.BaseStream.Position;
+            
             for (int i = 0; i < count; i++)
             {
                 ar.BaseStream.Position = nextString;
@@ -44,5 +50,22 @@ namespace BFForever.Riff
                 nextString += 256;
             }
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)Version);
+            aw.WriteNullString(PackageName, 256);
+            aw.Write((int)Entries.Count);
+            aw.Write((int)4);
+            
+            foreach (string entry in Entries)
+                aw.WriteNullString(entry, 256);
+        }
+
+        public override HKey Type => Global.ZOBJ_PackageDef;
+        
+        public int Version { get; set; }
+        public string PackageName { get; set; }
+        public List<string> Entries { get; set; }
     }
 }

@@ -4,64 +4,68 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * Measure ZObject
+ * =============
+ * INT32 - Constant (4)
+ * INT32 - Event Size (12)
+ * INT32 - Count of Events
+ * INT32 - Events Offset
+ * Events[]
+ */
+
 namespace BFForever.Riff
 {
     public class Measure : ZObject
     {
-        public Measure(FString idx) : base(idx)
+        public Measure(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            Entries = new List<MeasureEntry>();
+            Events = new List<MeasureEntry>();
         }
 
-        public List<MeasureEntry> Entries { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) { }
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            ar.ReadInt32(); // Always 4
-            ar.ReadInt32(); // Size of each TimeEntry (12 bytes)
+            Events.Clear();
+            ar.BaseStream.Position += 8; // Skips constants
 
             int count = ar.ReadInt32();
-            ar.ReadInt32(); // Offset to entries (Always 4)
+            ar.BaseStream.Position += 4;
 
             for (int i = 0; i < count; i++)
             {
-                // Reads entry (12 bytes)
-                MeasureEntry entry = new MeasureEntry();
-
-                entry.Start = ar.ReadSingle();
-                entry.End = ar.ReadSingle();
-                entry.Beat = ar.ReadSingle();
-
-                Entries.Add(entry);
+                MeasureEntry ev = new MeasureEntry();
+                ev.Start = ar.ReadSingle();
+                ev.End = ar.ReadSingle();
+                ev.Beat = ar.ReadSingle();
+                
+                Events.Add(ev);
             }
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)4);
+            aw.Write((int)12);
+            aw.Write((int)Events.Count);
+            aw.Write((int)4);
+
+            foreach (MeasureEntry ev in Events)
+            {
+                aw.Write((float)ev.Start);
+                aw.Write((float)ev.End);
+                aw.Write((float)ev.Beat);
+            }
+        }
+
+        public override HKey Type => Global.ZOBJ_Measure;
+
+        public List<MeasureEntry> Events { get; set; }
     }
 
-    public class MeasureEntry : TimeEntry
+    public class MeasureEntry : TimeEvent
     {
-        private float _beat;
-
-        public MeasureEntry()
-        {
-            _beat = 1.0f;
-        }
-
-        /// <summary>
-        /// Gets or sets beat (1.0 = up, 2.0 = down)
-        /// </summary>
-        public float Beat
-        {
-            get
-            {
-                return _beat;
-            }
-            set
-            {
-                if (value == 1.0f)
-                    _beat = value;
-                else if (value == 2.0f)
-                    _beat = value;
-            }
-        }
+        public float Beat { get; set; } = 1.0f; // 1.0f (Down) or 2.0f (Up)
     }
 }

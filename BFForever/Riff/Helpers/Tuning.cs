@@ -22,7 +22,7 @@ using System.Threading.Tasks;
  * INT32 - String 8 /
  */
 
-namespace BFForever.Riff2
+namespace BFForever.Riff
 {
     public class Tuning
     {

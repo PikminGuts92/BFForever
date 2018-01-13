@@ -4,22 +4,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * Video ZObject
+ * =============
+ * INT64 - Always 0
+ *  HKEY - Video Path
+ */
+
 namespace BFForever.Riff
 {
     public class Video : ZObject
     {
-        public Video(FString idx) : base(idx)
+        public Video(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
 
         }
 
-        public FString InternalPath { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) => strings.Add(VideoPath);
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            // Reads video path
             ar.BaseStream.Position += 8;
-            InternalPath = ar.ReadInt64();
+            VideoPath = ar.ReadUInt64();
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.BaseStream.Position += 8;
+            aw.Write((ulong)VideoPath);
+        }
+
+        public override HKey Type => Global.ZOBJ_Video;
+
+        public HKey VideoPath { get; set; }
     }
 }

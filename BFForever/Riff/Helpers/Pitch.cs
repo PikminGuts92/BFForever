@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace BFForever.Riff2
+namespace BFForever.Riff
 {
     public struct Pitch
     {

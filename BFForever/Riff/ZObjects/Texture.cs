@@ -4,22 +4,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * Texture ZObject
+ * ===============
+ * INT64 - Always 0
+ *  HKEY - Texture Path
+ */
+
 namespace BFForever.Riff
 {
     public class Texture : ZObject
     {
-        public Texture(FString idx) : base(idx)
+        public Texture(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
 
         }
 
-        public FString InternalPath { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) => strings.Add(TexturePath);
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            // Reads texture path
             ar.BaseStream.Position += 8;
-            InternalPath = ar.ReadInt64();
+            TexturePath = ar.ReadUInt64();
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.BaseStream.Position += 8;
+            aw.Write((ulong)TexturePath);
+        }
+
+        public override HKey Type => Global.ZOBJ_Texture;
+
+        public HKey TexturePath { get; set; }
     }
 }

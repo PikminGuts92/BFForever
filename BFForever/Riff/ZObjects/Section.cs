@@ -4,36 +4,63 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * Section ZObject
+ * ===============
+ * INT32 - Constant (3)
+ * INT32 - Event Size (16)
+ * INT32 - Count of Events
+ * INT32 - Events Offset
+ * Events[]
+ */
+
 namespace BFForever.Riff
 {
     public class Section : ZObject
     {
-        public Section(FString idx) : base(idx)
+        public Section(HKey filePath, HKey directoryPath) : base(filePath, directoryPath)
         {
-            Entries = new List<TextEventEntry>();
+            Events = new List<TextEvent>();
         }
 
-        public List<TextEventEntry> Entries { get; set; }
+        protected override void AddMemberStrings(List<FString> strings) => strings.AddRange(Events.Select(x => x.EventName));
 
-        protected override void ImportData(AwesomeReader ar)
+        internal override void ReadData(AwesomeReader ar)
         {
-            ar.ReadInt32(); // Always 3
-            ar.ReadInt32(); // Size of each TimeEntry (16 bytes)
+            Events.Clear();
+            ar.BaseStream.Position += 8; // Skips constants
 
             int count = ar.ReadInt32();
-            ar.ReadInt32(); // Offset to entries (Always 4)
+            ar.BaseStream.Position += 4;
 
             for (int i = 0; i < count; i++)
             {
-                // Reads entry (16 bytes)
-                TextEventEntry entry = new TextEventEntry();
+                TextEvent ev = new TextEvent();
+                ev.Start = ar.ReadSingle();
+                ev.End = ar.ReadSingle();
+                ev.EventName = ar.ReadUInt64();
 
-                entry.Start = ar.ReadSingle();
-                entry.End = ar.ReadSingle();
-                entry.EventName = ar.ReadInt64();
-
-                Entries.Add(entry);
+                Events.Add(ev);
             }
         }
+
+        protected override void WriteObjectData(AwesomeWriter aw)
+        {
+            aw.Write((int)3);
+            aw.Write((int)16);
+            aw.Write((int)Events.Count);
+            aw.Write((int)4);
+
+            foreach (TextEvent ev in Events)
+            {
+                aw.Write((float)ev.Start);
+                aw.Write((float)ev.End);
+                aw.Write((ulong)ev.EventName);
+            }
+        }
+
+        public override HKey Type => Global.ZOBJ_Section;
+
+        public List<TextEvent> Events { get; set; }
     }
 }

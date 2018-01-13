@@ -9,103 +9,220 @@ namespace BFForever.Riff
 {
     public class RiffFile
     {
-        /// <summary>
-        /// Constructor for Riff file
-        /// </summary>
+        private const int MAGIC_RIFF = 0x46464952; // "RIFF"
+        private const int MAGIC_RIFF_R = 0x52494646;
+        private const int MAGIC_INDX = 0x58444E49;
+        private const int MAGIC_STBL = 0x6C625453;
+        private const int MAGIC_ZOBJ = 0x4A424F5A;
+
+        private readonly List<ZObject> _objects;
+
         public RiffFile()
         {
             BigEndian = true;
-            Objects = new List<ZObject>();
-            Tables = new List<StringTable>();
+            _objects = new List<ZObject>();
         }
 
-        public bool BigEndian { get; set; }
-        public List<ZObject> Objects { get; set; }
-        public List<StringTable> Tables { get; set; }
-        
-        /// <summary>
-        /// Imports objects from riff file.
-        /// </summary>
-        /// <param name="input">Riff file path</param>
-        public void Import(string input)
+        public static RiffFile FromFile(string input)
         {
-            if (!File.Exists(input)) return; // Returns if file doesn't exist
+            if (!File.Exists(input)) return null; // Returns if file doesn't exist
 
             using (FileStream fs = File.OpenRead(input))
             {
-                // Imports objects from file
-                ParseRiff(fs);
+                return FromStream(fs);
             }
         }
 
-        /// <summary>
-        /// Parse chunk data from riff file
-        /// </summary>
-        /// <param name="input">Riff stream</param>
-        private void ParseRiff(Stream input)
+        private static RiffFile FromStream(Stream stream)
         {
-            using (AwesomeReader ar = new AwesomeReader(input))
+            RiffFile riff = new RiffFile();
+            AwesomeReader ar = new AwesomeReader(stream);
+
+            // Checks for "RIFF" magic.
+            switch (ar.ReadInt32())
             {
-                // Checks for "RIFF" magic.
-                switch (ar.ReadInt32())
-                {
-                    case Constant.RIFF_R: // "FFIR"
-                        ar.BigEndian = true;
-                        break;
-                    case Constant.RIFF:
-                        // Reader is already little endian by default.
-                        break;
-                    default:
-                        throw new Exception("Invalid magic. Expected \"RIFF\"");
-                }
+                case MAGIC_RIFF:
+                    ar.BigEndian = false;
+                    break;
+                case MAGIC_RIFF_R:
+                    ar.BigEndian = true;
+                    break;
+                default:
+                    throw new Exception("Invalid magic. Expected \"RIFF\"");
+            }
 
-                BigEndian = ar.BigEndian; // Sets endianess
+            riff.BigEndian = ar.BigEndian; // Sets endianess
+            ar.BaseStream.Position += 4; // Skips total size
 
-                int size = ar.ReadInt32();
+            int chunkType = GetChunkType(ar);
 
-                Chunk headChunk = Chunk.FromStream(ar);
-                if (headChunk == null || !(headChunk is Index))
-                    throw new Exception("Could not find index chunk");
+            if (chunkType != MAGIC_INDX)
+                throw new Exception("First chunk was not an Index!");
+
+            Index index = new Index(ar);
+
+            foreach(IndexEntry entry in index.Entries)
+            {
+                ar.BaseStream.Position = entry.Offset; // Jumps to offset
+                chunkType = GetChunkType(ar);
+
+                if (chunkType != MAGIC_STBL && chunkType != MAGIC_ZOBJ) continue;
                 
-                foreach (IndexEntry entry in ((Index)headChunk).Entries)
+                // Reads header info
+                HKey filePath = new HKey(ar.ReadUInt64());
+                HKey directoryPath = new HKey(ar.ReadUInt64());
+                HKey type = new HKey(ar.ReadUInt64());
+                ar.BaseStream.Position += 8;
+                
+                if (chunkType == MAGIC_STBL)
                 {
-                    ar.BaseStream.Position = entry.Offset; // Goes to chunk offset
+                    // Gets localization
+                    if (!StringTable.IsValidLocalization(type)) continue;
 
-                    // Reads chunk
-                    // - If it was a string table then all values will be added to global strings
-                    Chunk chunk = Chunk.FromStream(ar);
+                    // Loads string table
+                    StringTable table = new StringTable(filePath, directoryPath, StringTable.GetLocalization(type));
+                    table.ReadData(ar);
+                }
+                else if (chunkType == MAGIC_ZOBJ)
+                {
+                    if (!Global.ZObjectTypes.ContainsKey(type)) continue; // Unsupported type
+                    ZObject obj = Activator.CreateInstance(Global.ZObjectTypes[type], new object[] { filePath, directoryPath }) as ZObject;
                     
-                    if (chunk != null && chunk is ZObject)
-                        // Adds object to riff collection
-                        Objects.Add(chunk as ZObject);
-                    else if (chunk != null && chunk is StringTable)
-                        // Adds table to riff collection
-                        Tables.Add(chunk as StringTable);
+                    // Loads zobject
+                    obj.ReadData(ar);
+                    riff._objects.Add(obj);
+                }
+                else
+                     // Unknown chunk
+                    continue;
+            }
+
+            return riff;
+        }
+
+        public void WriteToFile(string output)
+        {
+            using (FileStream fs = File.Create(output))
+            {
+                WriteToStream(fs);
+            }
+        }
+
+        private void WriteToStream(Stream stream)
+        {
+            // Creates string tables
+            List<ZObject> objects = _objects.Where(x => !(x is StringTable)).ToList();
+            objects.AddRange(CreateStringTables(_objects));
+
+            AwesomeWriter aw = new AwesomeWriter(stream, BigEndian);
+            long startOffset = aw.BaseStream.Position;
+            long offset = startOffset + 24 + (objects.Count * 16);
+            
+            var chunks = objects.Select(x => new
+            {
+                Path = x.FilePath,
+                Offset = offset,
+                Data = CreateChunk(x, BigEndian, ref offset),
+                IsStringTable = (x is StringTable)
+            }).ToArray();
+
+            aw.Write((int)MAGIC_RIFF);
+            aw.Write((uint)(offset - (startOffset + 8)));
+
+            Index index = new Index()
+            {
+                Entries = new List<IndexEntry>(chunks.Select(x => new IndexEntry()
+                {
+                    FilePath = x.Path,
+                    Offset = (uint)x.Offset}
+                ))
+            };
+
+            // Writes index chunk
+            aw.Write((int)MAGIC_INDX);
+            aw.Write((int)(8 + (index.Entries.Count * 16)));
+            index.WriteData(aw);
+
+            // Writes other zobjects and string tables
+            foreach (var chunk in chunks)
+            {
+                aw.Write((int)(chunk.IsStringTable ? MAGIC_STBL : MAGIC_ZOBJ));
+                aw.Write((int)chunk.Data.Length);
+                aw.Write(chunk.Data);
+            }
+        }
+
+        private List<StringTable> CreateStringTables(List<ZObject> zobjects)
+        {
+            List<StringTable> tables = new List<StringTable>();
+            var groups = zobjects.Where(x => !(x is StringTable)).GroupBy(x => x.DirectoryPath);
+
+            foreach (var group in groups)
+            {
+                if (group.Key.Key != 0)
+                {
+                    // Creates shared string tables
+                    foreach (HKey local in Global.StringTableLocalizationsOnDisc)
+                    {
+                        List<FString> strings = group.SelectMany(x => x.GetAllStrings()).ToList();
+
+                        HKey localGroupDirectory = group.Key.Extend("." + local);
+                        StringTable table = new StringTable(localGroupDirectory, group.Key.GetParentDirectory(), StringTable.GetLocalization(local));
+
+                        foreach (FString str in strings)
+                            table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
+
+                        tables.Add(table);
+                    }
+
+                    continue;
                 }
 
+                // Creates string table for singular zobject (Uses file path)
+                foreach (ZObject obj in group)
+                {
+                    List<FString> strings = obj.GetAllStrings();
+
+                    foreach (HKey local in Global.StringTableLocalizationsOnDisc)
+                    {
+                        HKey objectDirectory = obj.FilePath.Extend("." + local);
+                        StringTable table = new StringTable(objectDirectory, obj.FilePath.GetParentDirectory(), StringTable.GetLocalization(local));
+
+                        foreach (FString str in strings)
+                            table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
+                        
+                        tables.Add(table);
+                    }
+                }
             }
+
+            return tables;
         }
 
-        public void Export(string output)
+        private byte[] CreateChunk(ZObject obj, bool bigEndian, ref long offset)
         {
-            // Creates directory if it dkoesn't exist
-            if (!Directory.Exists(Path.GetDirectoryName(output)))
-                Directory.CreateDirectory(Path.GetDirectoryName(output));
-
-            using (FileStream fs = File.OpenWrite(output))
+            using (AwesomeWriter aw = new AwesomeWriter(new MemoryStream(), bigEndian))
             {
-                // Exports objects to file
-                WriteRiff(fs);
+                obj.WriteData(aw);
+
+                // Ensures chunk size is always divisible by 4
+                if (aw.BaseStream.Position % 4 != 0)
+                    aw.Write(new byte[4 - (aw.BaseStream.Position % 4)]);
+
+                offset += aw.BaseStream.Position + 8; // 8 = Chunk Magic + Size
+                return ((MemoryStream)aw.BaseStream).ToArray();
             }
         }
 
-        private void WriteRiff(Stream output)
+        private static int GetChunkType(AwesomeReader ar)
         {
-            // Writes riff data to stream
-            using (AwesomeWriter aw = new AwesomeWriter(output, this.BigEndian))
-            {
+            int type = ar.ReadInt32();
+            ar.BaseStream.Position += 4; // Skips size
 
-            }
+            return type;
         }
+
+        public bool BigEndian { get; set; }
+        public List<ZObject> Objects => _objects;
     }
 }
