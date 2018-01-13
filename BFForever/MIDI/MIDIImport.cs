@@ -302,5 +302,43 @@ namespace BFForever.MIDI
                     return new List<ZObject>();
             }
         }
+
+        public List<EventEntry> ExportMasterEventEntries()
+        {
+            List<EventEntry> entries = new List<EventEntry>();
+            var voxTrack = _midiFile.Events.FirstOrDefault(x => x[0].ToString().Contains("EVENTS"));
+            if (voxTrack == null) return entries;
+
+            foreach (var ev in  voxTrack.Where(x => x is MetaEvent && ((MetaEvent)x).MetaEventType == MetaEventType.TextEvent).Select(x => x as NAudio.Midi.TextEvent))
+            {
+                string text;
+
+                switch(ev.Text)
+                {
+                    case "[music_start]":
+                        text = "AudioStart";
+                        break;
+                    case "[music_end]":
+                        text = "AudioEnd";
+                        break;
+                    case "[end]":
+                        text = "SongEnd";
+                        break;
+                    default:
+                        continue;
+                }
+
+                EventEntry entry = new EventEntry()
+                {
+                    Start = (float)GetRealTime(ev.AbsoluteTime),
+                    End = (float)GetRealTime(ev.AbsoluteTime) + 150.0f, // TODO: Figure out exact length
+                    EventName = text
+                };
+
+                entries.Add(entry);
+            }
+
+            return entries;
+        }
     }
 }
