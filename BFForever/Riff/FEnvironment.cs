@@ -13,15 +13,15 @@ namespace BFForever.Riff
         private Dictionary<HKey, string> _packagePaths;
         private List<ZObject> _tempObjects;
         private Index2PackageEntry _tempObjectsPackageEntry;
+        private readonly List<ZObject> _pendingChanges;
 
         public FEnvironment()
         {
             _packagePaths = new Dictionary<HKey, string>();
             _tempObjects = new List<ZObject>();
+            _pendingChanges = new List<ZObject>();
         }
-
-        public ZObject this[string indexPath] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath.Value == indexPath));
-        public ZObject this[ulong indexKey] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath.Key == indexKey));
+        
         public ZObject this[HKey index] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath == index));
 
         public void LoadPackage(string rootPath)
@@ -120,7 +120,20 @@ namespace BFForever.Riff
             }
         }
 
-        
+        public void AddZObjectsAsPending(List<ZObject> objects)
+        {
+            _pendingChanges.AddRange(objects);
+        }
+
+        public void SavePendingChanges()
+        {
+
+            _pendingChanges.Clear();
+        }
+
+        public void UpdateIndexEntryAsPending(HKey filePath, HKey type, string physicalPath, HKey packageFilePath)
+        {
+        }
 
         public void ClearCache()
         {

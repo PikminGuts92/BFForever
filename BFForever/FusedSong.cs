@@ -37,5 +37,11 @@ namespace BFForever
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(path, json);
         }
+
+        public static FusedSong Import(string path)
+        {
+            string json = File.ReadAllText(path);
+            return JsonConvert.DeserializeObject<FusedSong>(json);
+        }
     }
 }
