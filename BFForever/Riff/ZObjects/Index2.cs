@@ -125,6 +125,11 @@ namespace BFForever.Riff
 
     public class Index2Entry
     {
+        public Index2Entry()
+        {
+            PackageEntries = new List<Index2PackageEntry>();
+        }
+
         public HKey FilePath { get; set; }
         public HKey Type { get; set; }
         public List<Index2PackageEntry> PackageEntries { get; set; }
