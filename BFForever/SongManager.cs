@@ -68,8 +68,8 @@ namespace BFForever
 
             AddFileToIndex(texture.FilePath, "texture", texture.DirectoryPath.Value.Replace(".", "/") + "/album.xpr");
 
-            // TODO: Add catalog2
-
+            // Adds song to catalog
+            AddToCatalog(song);
 
             string realPath = song.DirectoryPath.Value.Replace(".", "/");
             AddObjectsToIndex(songObjects, realPath + "/fused.rif");
@@ -84,22 +84,23 @@ namespace BFForever
             HKey songDirectory = "songs." + input.Identifier;
 
             // Create song object
-            Song song = new Song(songDirectory + ".song", songDirectory);
-            song.Title = input.Title;
-            song.Artist = input.Artist;
-            song.Description = input.Description;
-            song.Album = input.Description;
-            song.Year = input.Year;
+            Song song = new Song(songDirectory + ".song", songDirectory)
+            {
+                Title = input.Title,
+                Artist = input.Artist,
+                Description = input.Description,
+                Album = input.Description,
 
-            song.GuitarIntensity = input.GuitarIntensity;
-            song.BassIntensity = input.BassIntensity;
-            song.VoxIntensity = input.BassIntensity;
+                LegendTag = "Tags.Legends.NoLogend.Tag",
+                EraTag = "Tags.Eras.Timeless.Tag",
+                Year = input.Year,
 
-            song.SongLength = input.SongLength;
+                GuitarIntensity = input.GuitarIntensity,
+                BassIntensity = input.BassIntensity,
+                VoxIntensity = input.BassIntensity,
 
-            // TODO: Implement tags
-            song.LegendTag = "";
-            song.EraTag = "";
+                SongLength = input.SongLength
+            };
             
             // Imports note tracks
             // TODO: Check if RB import vs custom spec
@@ -118,7 +119,7 @@ namespace BFForever
                 instrument.InstrumentType = trackType == "vox" ? "vocals" : trackType;
                 instrument.Difficulty = difficulty;
                 instrument.Tuning = new Tuning(); // TODO: Set to E Standard
-                instrument.Tuning.Name = "Test";
+                instrument.Tuning.Name = $"Test Song ({trackType})";
 
                 // Adds instrument tracks
                 List<ZObject> instrumentTracks = mid.ExportInstrumentTracks(trackType, difficulty);
@@ -167,8 +168,79 @@ namespace BFForever
             // Create texture path
             song.TexturePath = songDirectory + ".texture";
 
+            // Adds tags
+            song.Labels.Add("BFForever");
+            song.GenreTags.Add("Tags.Genres.rock.Tag"); // TODO: Read from json input
+            song.MetadataTags = CreateMetadataTags(song);
+
             objects.Add(song);
             return objects;
+        }
+
+        private List<HKey> CreateMetadataTags(Song song)
+        {
+            List<HKey> tags = new List<HKey>()
+            {
+                "Tags.Sources.BFRLDisc.Tag",
+                "Tags.mediaType.song.Tag",
+                "Tags.Modes.NoCountIn.Tag" // TODO: Make this optional?
+            };
+
+            // Adds genre/legend tags
+            tags.AddRange(song.GenreTags);
+            tags.Add(song.LegendTag);
+
+            // Adds era tag
+            if (song.Year < 1950 || song.Year >= 2020)
+            {
+                tags.Add("Tags.Eras.Timeless.Tag");
+            }
+            else
+            {
+                if (song.Year >= 2010) tags.Add("Tags.Eras.2010s.Tag");
+                else if (song.Year >= 2000) tags.Add("Tags.Eras.2000s.Tag");
+                else if (song.Year >= 1990) tags.Add("Tags.Eras.1990s.Tag");
+                else if (song.Year >= 1980) tags.Add("Tags.Eras.1980s.Tag");
+                else if (song.Year >= 1970) tags.Add("Tags.Eras.1970s.Tag");
+                else if (song.Year >= 1960) tags.Add("Tags.Eras.1960s.Tag");
+                else tags.Add("Tags.Eras.1950s.Tag");
+            }
+
+            // Adds instrument tags
+            // TODO: Set dynamically based on tracks available in tabs
+            tags.Add("Tags.instruments.guitar.Tag");
+            tags.Add("Tags.instruments.bass.Tag");
+            tags.Add("Tags.instruments.vocals.Tag");
+            
+            tags.Add("Tags.instruments.guitar.jam.Tag");
+            tags.Add("Tags.instruments.guitar.novice.Tag");
+            tags.Add("Tags.instruments.guitar.beginner.Tag");
+            tags.Add("Tags.instruments.guitar.intermediate.Tag");
+            tags.Add("Tags.instruments.guitar.advanced.Tag");
+            tags.Add("Tags.instruments.guitar.rhythm.Tag");
+            
+            tags.Add("Tags.instruments.bass.jam.Tag");
+            tags.Add("Tags.instruments.bass.novice.Tag");
+            tags.Add("Tags.instruments.bass.beginner.Tag");
+            tags.Add("Tags.instruments.bass.intermediate.Tag");
+            tags.Add("Tags.instruments.bass.advanced.Tag");
+
+            // TODO: Set technique tags
+
+            // Sets tuning tags
+            // TODO: Again, set this dynamically
+            tags.Add("Tags.Instruments.Guitar.Tunings.EStandard.Tag");
+            tags.Add("Tags.Instruments.Bass.Tunings.EStandard.Tag");
+
+            // Sets challenge levels
+            string ChallengeLevelTag(string insName, int intensity) =>
+                (intensity < 0 || intensity > 5) ? "" : $"Tags.instruments.{insName}.ChallengeLevels.Level{intensity}.Tag";
+            
+            tags.Add(ChallengeLevelTag("guitar", (int)song.GuitarIntensity));
+            tags.Add(ChallengeLevelTag("bass", (int)song.BassIntensity));
+            tags.Add(ChallengeLevelTag("vocals", (int)song.VoxIntensity));
+
+            return tags;
         }
 
         private void AddFileToIndex(string filePath, string fileType, string physicalPath)
@@ -192,6 +264,60 @@ namespace BFForever
         private void AddToCatalog(Song song)
         {
             // Add song to catalog2 entries
+            Catalog2 catalog = _packageManager["catalog2"] as Catalog2;
+
+            Catalog2Entry entry = new Catalog2Entry()
+            {
+                Identifier = song.DirectoryPath + ".MediaEntry2",
+                SongType = 1,
+
+                Title = song.Title,
+                Artist = song.Artist,
+                Album = song.Album,
+                Description = song.Description,
+                LegendTag = song.LegendTag,
+
+                SongLength = song.SongLength,
+                GuitarIntensity = song.GuitarIntensity,
+                BassIntensity = song.BassIntensity,
+                VoxIntensity = song.VoxIntensity,
+
+                EraTag = song.EraTag,
+                Year = song.Year,
+
+                // TODO: Change to tuning from json input
+                LeadGuitarTuning = new Tuning() { Name = "Test Catalog (Lead)" },
+                RhythmGuitarTuning = new Tuning() { Name = "Test Catalog (Rhythm)" },
+                BassTuning = new Tuning() { Name = "Test Catalog (Bass)" },
+
+                Labels = song.Labels,
+                SongPath = song.FilePath,
+                TexturePath = song.TexturePath,
+                PreviewPath = song.PreviewPath,
+
+                MetadataTags = song.MetadataTags,
+                GenreTags = song.GenreTags
+            };
+            
+            // Removes previous entry and adds to pending change
+            catalog.Entries.RemoveAll(x => x.Identifier == entry.Identifier);
+            catalog.Entries.Add(entry);
+
+            // Sorts alphabetically and ensures "ShredUs" entries are first
+            catalog.Entries.Sort((x, y) =>
+            {
+                string a = x.Identifier, b = y.Identifier;
+                if (a.StartsWith("ShredUs", StringComparison.CurrentCultureIgnoreCase) && b.StartsWith("ShredUs", StringComparison.CurrentCultureIgnoreCase))
+                    return string.Compare(a, b);
+                else if (a.StartsWith("ShredUs", StringComparison.CurrentCultureIgnoreCase))
+                    return -1;
+                else if (b.StartsWith("ShredUs", StringComparison.CurrentCultureIgnoreCase))
+                    return 1;
+                else
+                    return string.Compare(a, b);
+            });
+
+            _packageManager.AddZObjectAsPending(catalog);
         }
     }
 }

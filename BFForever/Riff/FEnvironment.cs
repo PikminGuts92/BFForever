@@ -133,10 +133,9 @@ namespace BFForever.Riff
             }
         }
 
-        public void AddZObjectsAsPending(List<ZObject> objects)
-        {
-            _pendingChanges.AddRange(objects);
-        }
+        public void AddZObjectAsPending(ZObject obj) => _pendingChanges.Add(obj);
+
+        public void AddZObjectsAsPending(List<ZObject> objects) => _pendingChanges.AddRange(objects);
 
         public void SavePendingChanges()
         {
