@@ -32,7 +32,11 @@ namespace BFForever.Riff
 
         internal List<FString> GetAllStrings()
         {
-            List<FString> strings = new List<FString>() { Type }; // Only writes type, just like real BF data
+            List<FString> strings = new List<FString>();
+
+            // Only writes type, just like real BF data
+            if (!(this is StringTable)) strings.Add(Type);
+
             AddMemberStrings(strings);
             return strings.Distinct().ToList();
         }

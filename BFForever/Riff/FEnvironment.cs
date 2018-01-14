@@ -10,6 +10,7 @@ namespace BFForever.Riff
     // Package Manager?
     public class FEnvironment
     {
+        private List<PackageDef> _packageDefinitions;
         private Dictionary<HKey, string> _packagePaths;
         private List<ZObject> _tempObjects;
         private Index2PackageEntry _tempObjectsPackageEntry;
@@ -17,11 +18,12 @@ namespace BFForever.Riff
 
         public FEnvironment()
         {
+            _packageDefinitions = new List<PackageDef>();
             _packagePaths = new Dictionary<HKey, string>();
             _tempObjects = new List<ZObject>();
             _pendingChanges = new List<ZObject>();
         }
-        
+
         public ZObject this[HKey index] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath == index));
 
         public void LoadPackage(string rootPath)
@@ -31,7 +33,7 @@ namespace BFForever.Riff
 
             // Loads PackageDef
             if (!Directory.Exists(fullRootPath) || !Directory.Exists(defDirectory)) return;
-            
+
             string[] packageRifs = Directory.GetFiles(defDirectory, "*.rif", SearchOption.AllDirectories);
             if (packageRifs.Length <= 0) return;
 
@@ -46,10 +48,23 @@ namespace BFForever.Riff
                     _packagePaths.Remove(newPackage.FilePath);
                 _packagePaths.Add(newPackage.FilePath, fullRootPath);
 
-                // Updates packagedef object
-                PackageDef oldPackage = Definition;
-                if (oldPackage == null || newPackage.Version >= oldPackage.Version)
-                    Definition = newPackage;
+                // Creates paths for packagedef + index2
+                new HKey("PackageDefs." + newPackage.PackageName + ".PackageDef");
+                new HKey("PackageDefs." + newPackage.PackageName);
+                new HKey("packages." + newPackage.PackageName + ".index2");
+                new HKey("packages." + newPackage.PackageName);
+
+                foreach (string packageName in newPackage.Entries)
+                {
+                    new HKey("PackageDefs." + packageName + ".PackageDef");
+                    new HKey("PackageDefs." + packageName);
+                    new HKey("packages." + packageName + ".index2");
+                    new HKey("packages." + packageName);
+                }
+
+                // Adds package definition to collection
+                _packageDefinitions.RemoveAll(x => x.Version == newPackage.Version);
+                _packageDefinitions.Add(newPackage);
             }
 
             ReloadIndex(fullRootPath);
@@ -58,8 +73,8 @@ namespace BFForever.Riff
         private ZObject GetZObject(Index2Entry entry)
         {
             if (entry == null || !entry.IsZObject()) return null;
-            
-            foreach(Index2PackageEntry pkEntry in entry.PackageEntries)
+
+            foreach (Index2PackageEntry pkEntry in entry.PackageEntries)
             {
                 if (!_packagePaths.ContainsKey(pkEntry.Package)) continue;
                 string filePath = Path.Combine(_packagePaths[pkEntry.Package], pkEntry.ExternalFilePath);
@@ -77,7 +92,7 @@ namespace BFForever.Riff
                 if (LoadRiffFile(filePath, pkEntry))
                     return _tempObjects.SingleOrDefault(x => x.FilePath == entry.FilePath);
             }
-            
+
             return null;
         }
 
@@ -101,16 +116,14 @@ namespace BFForever.Riff
         private void ReloadIndex(string rootPath)
         {
             string indexPath = Path.Combine(rootPath, "index2.rif");
-            if (Definition == null || !File.Exists(indexPath)) return;
+            if (!File.Exists(indexPath)) return;
 
             RiffFile rif = RiffFile.FromFile(indexPath);
             Index2 newIndex = rif.Objects.FirstOrDefault(x => x is Index2) as Index2;
             if (newIndex == null) return;
 
             // Updates index2 object
-            Index2 oldIndex = Index;
-
-            if (oldIndex == null || newIndex.Version >= oldIndex.Version)
+            if (Index == null || newIndex.Version >= Index.Version)
             {
                 Index = newIndex;
 
@@ -127,12 +140,107 @@ namespace BFForever.Riff
 
         public void SavePendingChanges()
         {
+            if (!PendingChanges) return;
+
+            // Groups objects by package
+            var packages = _pendingChanges.Select(obj => new
+            {
+                ZObject = obj,
+                PackageEntry = Index.Entries.First(idx => idx.FilePath == obj.FilePath).PackageEntries.First()
+            }).OrderBy(x => x.PackageEntry.ExternalFilePath).GroupBy(x => x.PackageEntry.Package);
+
+            foreach (var package in packages)
+            {
+                HKey packagePath = package.Key;
+                string physicalPackagePath = _packagePaths[packagePath];
+
+                var fusedFiles = package.GroupBy(x => x.PackageEntry.ExternalFilePath);
+
+                foreach (var fusedFile in fusedFiles)
+                {
+                    string fusedFilePath = Path.Combine(physicalPackagePath, fusedFile.Key);
+                    RiffFile rif = null;
+
+                    // TODO: Find a better solution (Less ugly)
+                    if (File.Exists(fusedFilePath))
+                    {
+                        try
+                        {
+                            // Opens existing file to preserve zobjects
+                            rif = RiffFile.FromFile(fusedFilePath);
+                        }
+                        catch
+                        {
+
+                        }
+                        finally
+                        {
+                            if (rif == null) rif = new RiffFile();
+                        }
+                    }
+                    else
+                        rif = new RiffFile();
+
+                    foreach (var zobject in fusedFile.Select(x => x.ZObject))
+                    {
+                        // Removes existing zobject if present
+                        rif.Objects.RemoveAll(x => x.FilePath == zobject.FilePath);
+
+                        // Adds new zobject
+                        rif.Objects.Add(zobject);
+                    }
+
+                    // Saves new rif file
+                    rif.WriteToFile(fusedFilePath);
+                }
+            }
+
+            // Sorts index entries by file paths
+            Index.Entries.Sort((x, y) => string.Compare(x.FilePath, y.FilePath, true));
+            
+            // Saves index for current package only
+            RiffFile indexRif = new RiffFile();
+            indexRif.Objects.Add(Index);
+            indexRif.WriteToFile(Path.Combine(CurrentPackageDirectory, "index2.rif"));
 
             _pendingChanges.Clear();
         }
 
         public void UpdateIndexEntryAsPending(HKey filePath, HKey type, string physicalPath, HKey packageFilePath)
         {
+            Index2Entry indexEntry = Index.Entries.FirstOrDefault(x => x.FilePath == filePath);
+
+            if (indexEntry == null)
+            {
+                // Creates new entry
+                indexEntry = new Index2Entry()
+                {
+                    FilePath = filePath,
+                    Type = type
+                };
+
+                Index.Entries.Add(indexEntry);
+            }
+
+            Index2PackageEntry packageEntry = indexEntry.PackageEntries.FirstOrDefault(x => x.Package == packageFilePath);
+
+            if (packageEntry == null)
+            {
+                // Creates new entry
+                packageEntry = new Index2PackageEntry()
+                {
+                    Package = packageFilePath,
+                    ExternalFilePath = physicalPath
+                };
+
+                // Inserts at the front
+                indexEntry.PackageEntries.Insert(0, packageEntry);
+            }
+            else
+            {
+                // Updates external file path
+                packageEntry.ExternalFilePath = physicalPath;
+            }
         }
 
         public void ClearCache()
@@ -141,8 +249,21 @@ namespace BFForever.Riff
             _tempObjectsPackageEntry = null;
         }
 
-        public PackageDef Definition { get; set; }
+        public PackageDef Definition => Index == null ? null : _packageDefinitions.FirstOrDefault(x => x.PackageName == Index.DirectoryPath.GetLastText());
         public Index2 Index { get; set; }
+
+        public bool PendingChanges => _pendingChanges.Count > 0;
+
+        public string CurrentPackageDirectory
+        {
+            get
+            {
+                PackageDef def = Definition;
+                if (def == null || !_packagePaths.ContainsKey(def.FilePath)) return null;
+
+                return _packagePaths[def.FilePath];
+            }
+        }
         
         public static Localization Localization { get; set; } = Localization.English;
     }

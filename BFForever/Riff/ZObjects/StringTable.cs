@@ -66,7 +66,12 @@ namespace BFForever.Riff
         internal static Localization GetLocalization(HKey key) => LocalizationPair.Localizations.FirstOrDefault(x => x.HashValue == key).EnumValue;
         internal static HKey GetHKey(Localization loc) => LocalizationPair.Localizations.FirstOrDefault(x => x.EnumValue == loc).HashValue;
 
-        protected override void AddMemberStrings(List<FString> strings) { }
+        protected override void AddMemberStrings(List<FString> strings)
+        {
+            // It's not in English tables for whatever reason
+            if (Localization != Localization.English)
+                strings.Add(DirectoryPath);
+        }
 
         internal override void ReadData(AwesomeReader ar)
         {

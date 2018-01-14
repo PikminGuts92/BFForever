@@ -15,9 +15,10 @@ namespace BFForever
         private string _jsonDirectory;
         private FEnvironment _packageManager;
 
-        public SongManager()
+        public SongManager(string packageRoot)
         {
-
+            _packageManager = new FEnvironment();
+            _packageManager.LoadPackage(packageRoot);
         }
 
         private string GetFilePath(string path) => (Path.IsPathRooted(path)) ? path : Path.Combine(_jsonDirectory + path);
@@ -30,9 +31,7 @@ namespace BFForever
             // Create song objects
             List<ZObject> songObjects = CreateSongObjects(fusedSong);
             Song song = songObjects.First(x => x is Song) as Song;
-            //string realPath = song.DirectoryPath.Value.Replace(".", "\\");
-            //AddObjectsToIndex(songObjects, realPath);
-
+            
             // Create audio stem paths
             void CreateAudioPath(HKey path)
             {
@@ -65,12 +64,18 @@ namespace BFForever
             // Create texture path
             Riff.Texture texture = new Riff.Texture(song.TexturePath, song.TexturePath.GetParentDirectory());
             texture.TexturePath = texture.DirectoryPath + ".album.xpr";
-            songObjects.Add(texture); // Don't write to index
+            //songObjects.Add(texture); // Don't write to index
 
             AddFileToIndex(texture.FilePath, "texture", texture.DirectoryPath.Value.Replace(".", "/") + "/album.xpr");
 
-            RiffFile fusedRif = new RiffFile();
-            fusedRif.Objects.AddRange(songObjects);
+            // TODO: Add catalog2
+
+
+            string realPath = song.DirectoryPath.Value.Replace(".", "/");
+            AddObjectsToIndex(songObjects, realPath + "/fused.rif");
+
+            _packageManager.AddZObjectsAsPending(songObjects);
+            _packageManager.SavePendingChanges();
         }
 
         private List<ZObject> CreateSongObjects(FusedSong input)
@@ -91,6 +96,10 @@ namespace BFForever
             song.VoxIntensity = input.BassIntensity;
 
             song.SongLength = input.SongLength;
+
+            // TODO: Implement tags
+            song.LegendTag = "";
+            song.EraTag = "";
             
             // Imports note tracks
             // TODO: Check if RB import vs custom spec
@@ -100,11 +109,16 @@ namespace BFForever
             // Local function for creating/adding instrument zobject
             Instrument CreateInstrument(string trackType, string difficulty = "")
             {
+                string insDirectory = trackType;
+                if (trackType == "guitar" || trackType == "bass")
+                    insDirectory = (trackType == "guitar" ? "gtr_" : "bss_") + difficulty;
+
                 // Creates master instrument
-                Instrument instrument = new Instrument(songDirectory + "." + trackType + ".instrument", songDirectory + "." + trackType);
+                Instrument instrument = new Instrument(songDirectory + "." + insDirectory + ".instrument", songDirectory + "." + trackType);
                 instrument.InstrumentType = trackType == "vox" ? "vocals" : trackType;
                 instrument.Difficulty = difficulty;
                 instrument.Tuning = new Tuning(); // TODO: Set to E Standard
+                instrument.Tuning.Name = "Test";
 
                 // Adds instrument tracks
                 List<ZObject> instrumentTracks = mid.ExportInstrumentTracks(trackType, difficulty);
@@ -159,18 +173,20 @@ namespace BFForever
 
         private void AddFileToIndex(string filePath, string fileType, string physicalPath)
         {
-
+            _packageManager.UpdateIndexEntryAsPending(filePath, fileType, physicalPath, _packageManager.Definition.FilePath);
         }
 
         private void AddObjectToIndex(ZObject obj, string physicalPath)
         {
             if (obj is Riff.Texture) return; // Not written for some reason (at least for album art)
 
+            AddFileToIndex(obj.FilePath, obj.Type, physicalPath);
         }
 
         private void AddObjectsToIndex(List<ZObject> objects, string physicalPath)
         {
             // Add zobjects to index2 entries
+            objects.ForEach(x => AddObjectToIndex(x, physicalPath));
         }
 
         private void AddToCatalog(Song song)

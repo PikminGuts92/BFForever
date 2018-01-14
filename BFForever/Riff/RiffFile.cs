@@ -102,6 +102,9 @@ namespace BFForever.Riff
 
         public void WriteToFile(string output)
         {
+            if (!Directory.Exists(Path.GetDirectoryName(output)))
+                Directory.CreateDirectory(Path.GetDirectoryName(output));
+
             using (FileStream fs = File.Create(output))
             {
                 WriteToStream(fs);
@@ -164,13 +167,18 @@ namespace BFForever.Riff
                     // Creates shared string tables
                     foreach (HKey local in Global.StringTableLocalizationsOnDisc)
                     {
-                        List<FString> strings = group.SelectMany(x => x.GetAllStrings()).ToList();
+                        List<FString> strings = group.SelectMany(x => x.GetAllStrings()).Distinct().ToList();
 
                         HKey localGroupDirectory = group.Key.Extend("." + local);
                         StringTable table = new StringTable(localGroupDirectory, group.Key.GetParentDirectory(), StringTable.GetLocalization(local));
-
+                        
+                        // Adds strings from zobjects
                         foreach (FString str in strings)
                             table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
+
+                        // Adds strings from table (Directory string)
+                        foreach (FString str in table.GetAllStrings().Where(x => !table.Strings.ContainsKey(x)))
+                                table.Strings.Add(str, StringKey.GetValue(str.Key, table.Localization));
 
                         tables.Add(table);
                     }
@@ -188,9 +196,14 @@ namespace BFForever.Riff
                         HKey objectDirectory = obj.FilePath.Extend("." + local);
                         StringTable table = new StringTable(objectDirectory, obj.FilePath.GetParentDirectory(), StringTable.GetLocalization(local));
 
+                        // Adds strings from zobjects
                         foreach (FString str in strings)
                             table.Strings.Add(str.Key, StringKey.GetValue(str.Key, table.Localization));
-                        
+
+                        // Adds strings from table (Directory string)
+                        foreach (FString str in table.GetAllStrings().Where(x => !table.Strings.ContainsKey(x)))
+                            table.Strings.Add(str, StringKey.GetValue(str.Key, table.Localization));
+
                         tables.Add(table);
                     }
                 }
