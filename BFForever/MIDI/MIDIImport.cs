@@ -182,8 +182,9 @@ namespace BFForever.MIDI
             return tsEntries;
         }
 
-        private List<ZObject> GetGuitarObjects(string trackName, bool guitar)
+        private List<ZObject> GetGuitarObjects(string difficulty, bool guitar)
         {
+            HKey directory = SongDirectory + (guitar ? ".gtr_" : ".bss_") + difficulty;
             List<ZObject> objects = new List<ZObject>();
             List<TabEntry> tabEntries = new List<TabEntry>();
             //List<Riff2.TextEvent> chordEntries = new List<Riff2.TextEvent>();
@@ -191,7 +192,7 @@ namespace BFForever.MIDI
             int stringStart;
             var trackEvents = GetGuitarTrack(guitar);
 
-            switch (trackName)
+            switch (difficulty)
             {
                 case "jam":
                     // Easy
@@ -232,7 +233,7 @@ namespace BFForever.MIDI
                 tabEntries.Add(tabEntry);
             }
 
-            Tab tab = new Tab("", "");
+            Tab tab = new Tab(directory + ".tab", directory);
             tab.Events = tabEntries;
             objects.Add(tab);
 
@@ -287,16 +288,74 @@ namespace BFForever.MIDI
             }
         }
 
-        public List<ZObject> ExportInstrumentTracks(string type, string difficulty)
+        private List<ZObject> GetVoxObjects()
+        {
+            List<ZObject> objects = new List<ZObject>();
+            HKey directory = SongDirectory + ".vox";
+
+            // Creates vox track
+            Vox vox = new Vox(directory + ".vox", directory);
+            vox.Events = ExportVoxEntries();
+            objects.Add(vox);
+
+            // TODO: Implement this!
+            // Creates voxpushphrase track
+
+            // Creates voxspread track
+
+            return objects;
+        }
+
+        private List<ZObject> GetMasterObjects()
+        {
+            List<ZObject> objects = new List<ZObject>();
+            HKey directory = SongDirectory + ".master";
+
+            // Creates event track
+            Event ev = new Event(directory + ".event", directory);
+            ev.Events = ExportMasterEventEntries();
+            objects.Add(ev);
+
+            // Creates measure track (BEAT)
+            Measure measure = new Measure(directory + ".measure", directory);
+            measure.Events = ExportMeasureEntries();
+            objects.Add(measure);
+
+            // Creates section track
+            // TODO: Implement importing of sections
+            /*
+            Section section = new Section(directory + ".section", directory);
+            section.Events = ExportSectionEntries();
+            objects.Add(section);
+            */
+
+            // Creates tempo track
+            Tempo tempo = new Tempo(directory + ".tempo", directory);
+            tempo.Events = ExportTempoEntries();
+            objects.Add(tempo);
+
+            // Creates time signature track
+            TimeSignature ts = new TimeSignature(directory + ".timesignature", directory);
+            ts.Events = ExportTimeSignatureEntries();
+            objects.Add(ts);
+
+            return objects;
+        }
+
+        public List<ZObject> ExportInstrumentTracks(string type, string difficulty = "")
         {
             switch(type.ToLower())
             {
                 case "bass":
                 case "guitar":
                     bool guitar = type.Equals("guitar", StringComparison.CurrentCultureIgnoreCase);
-                    return GetGuitarObjects(type, guitar);
+                    return GetGuitarObjects(difficulty, guitar);
                 case "master":
-                case "vocals":
+                    // event, measure, section, tempo, timesignaturer
+                    return GetMasterObjects();
+                case "vox":
+                    // vox, voxpushphrase, voxspread
+                    return GetVoxObjects();
                 default:
                     // TODO: Implement, duh
                     return new List<ZObject>();
@@ -340,5 +399,10 @@ namespace BFForever.MIDI
 
             return entries;
         }
+
+        /// <summary>
+        /// Gets or sets song directory (Used for created zobjects)
+        /// </summary>
+        public string SongDirectory { get; set; } = "";
     }
 }
