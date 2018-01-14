@@ -37,25 +37,24 @@ namespace BFForever.Riff
 
         public ulong Key => _key;
         public virtual string Value => StringKey.GetValue(_key, Localization.English);
-
+        
         #region Overloaded Operators
-        public static implicit operator ulong(FString f) => f.Key;
-        public static implicit operator string(FString f) => f.Value;
+        public static implicit operator ulong(FString f) => (f != default(FString)) ? f.Key : 0;
+        public static implicit operator string(FString f) => f?.Value;
         public static implicit operator FString(string s) => new FString(s);
         public static implicit operator FString(ulong key) => new FString(key);
+        
+        public static bool operator ==(FString a, FString b)
+        {
+            if ((object)a == null && (object)b == null)
+                return true;
+            else if ((object)a == null || (object)b == null)
+                return false;
 
-        public static bool operator ==(FString a, FString b) => a.Key == b.Key;
+            return a.Equals(b);
+        }
+
         public static bool operator !=(FString a, FString b) => !(a == b);
-        public static bool operator ==(FString a, ulong b) => a.Key == b;
-        public static bool operator !=(FString a, ulong b) => !(a == b);
-        public static bool operator ==(ulong a, FString b) => a == b.Key;
-        public static bool operator !=(ulong a, FString b) => !(a == b);
-
-        public static bool operator ==(FString a, string b) => a.Value == b;
-        public static bool operator !=(FString a, string b) => !(a == b);
-
-        public static bool operator ==(string a, FString b) => a == b.Value;
-        public static bool operator !=(string a, FString b) => !(a == b);
 
         public override bool Equals(object obj) => (obj is FString) && ((FString)obj).Key == Key;
         public override int GetHashCode() => Key.GetHashCode();
