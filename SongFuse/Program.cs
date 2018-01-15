@@ -15,8 +15,8 @@ namespace SongFuse
         {
             if (args == null || args.Length < 2) return;
             
-            FEnvironment env = new FEnvironment();
-            env.LoadPackage(args[0]);
+            SongManager man = new SongManager(args[0]);
+            man.ImportSong(args[1]);
 
             // TODO: Implement cool interface
         }

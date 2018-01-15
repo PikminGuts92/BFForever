@@ -82,13 +82,14 @@ namespace BFForever.Riff
                     // Loads string table
                     StringTable table = new StringTable(filePath, directoryPath, StringTable.GetLocalization(type));
                     table.ReadData(ar);
+                    riff._objects.Add(table);
                 }
                 else if (chunkType == MAGIC_ZOBJ)
                 {
                     if (!Global.ZObjectTypes.ContainsKey(type)) continue; // Unsupported type
-                    ZObject obj = Activator.CreateInstance(Global.ZObjectTypes[type], new object[] { filePath, directoryPath }) as ZObject;
-                    
+
                     // Loads zobject
+                    ZObject obj = Activator.CreateInstance(Global.ZObjectTypes[type], new object[] { filePath, directoryPath }) as ZObject;
                     obj.ReadData(ar);
                     riff._objects.Add(obj);
                 }
@@ -111,17 +112,24 @@ namespace BFForever.Riff
             }
         }
 
+        private void ResetStringTables()
+        {
+            // Clears string tables
+            _objects.RemoveAll(x => x is StringTable);
+
+            // Generates new tables
+            _objects.AddRange(CreateStringTables(_objects));
+        }
+
         private void WriteToStream(Stream stream)
         {
-            // Creates string tables
-            List<ZObject> objects = _objects.Where(x => !(x is StringTable)).ToList();
-            objects.AddRange(CreateStringTables(_objects));
+            ResetStringTables();
 
             AwesomeWriter aw = new AwesomeWriter(stream, BigEndian);
             long startOffset = aw.BaseStream.Position;
-            long offset = startOffset + 24 + (objects.Count * 16);
+            long offset = startOffset + 24 + (_objects.Count * 16);
             
-            var chunks = objects.Select(x => new
+            var chunks = _objects.Select(x => new
             {
                 Path = x.FilePath,
                 Offset = offset,

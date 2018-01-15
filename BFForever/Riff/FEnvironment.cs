@@ -49,19 +49,20 @@ namespace BFForever.Riff
                 _packagePaths.Add(newPackage.FilePath, fullRootPath);
 
                 // Creates paths for packagedef + index2
-                new HKey("PackageDefs." + newPackage.PackageName + ".PackageDef");
-                new HKey("PackageDefs." + newPackage.PackageName);
-                new HKey("packages." + newPackage.PackageName + ".index2");
-                new HKey("packages." + newPackage.PackageName);
-
-                foreach (string packageName in newPackage.Entries)
+                void CreateHKeys(string name)
                 {
-                    new HKey("PackageDefs." + packageName + ".PackageDef");
-                    new HKey("PackageDefs." + packageName);
-                    new HKey("packages." + packageName + ".index2");
-                    new HKey("packages." + packageName);
+                    HKey packageFilePath = new HKey("PackageDefs." + name + ".PackageDef");
+                    HKey packageDirectory = packageFilePath.GetParentDirectory();
+                    CreateStringTablePaths(packageDirectory);
+
+                    HKey indexFilePath = new HKey("packages." + name + ".index2");
+                    HKey indexDirectory = indexFilePath.GetParentDirectory();
+                    CreateStringTablePaths(indexDirectory);
                 }
 
+                CreateHKeys(newPackage.PackageName);
+                newPackage.Entries.ForEach(x => CreateHKeys(x));
+                
                 // Adds package definition to collection
                 _packageDefinitions.RemoveAll(x => x.Version == newPackage.Version);
                 _packageDefinitions.Add(newPackage);
@@ -69,6 +70,9 @@ namespace BFForever.Riff
 
             ReloadIndex(fullRootPath);
         }
+
+        // Used mostly for debugging
+        private List<HKey> CreateStringTablePaths(HKey directory)=> Global.StringTableLocalizations.Select(x => (HKey)(directory.Value + "." + x.Value)).ToList();
 
         private ZObject GetZObject(Index2Entry entry)
         {
@@ -107,6 +111,7 @@ namespace BFForever.Riff
             // Loads all zobjects from riff file
             foreach (ZObject obj in rif.Objects.Where(x => !(x is StringTable)))
             {
+                CreateStringTablePaths(obj.DirectoryPath); // Creates string table path
                 _tempObjects.Add(obj);
             }
 

@@ -26,7 +26,7 @@ namespace BFForever.Riff
 {
     public class Tuning
     {
-        public FString Name { get; set; } = "E Standard";
+        public FString Name { get; set; } = 0x63d3970adb6267c7; // Hotfix for E Standard
 
         // Highest -> lowest pitch
         public Pitch String1 { get; set; } = 64; // E4
