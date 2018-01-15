@@ -89,7 +89,7 @@ namespace BFForever
                 Title = input.Title,
                 Artist = input.Artist,
                 Description = input.Description,
-                Album = input.Description,
+                Album = input.Album,
 
                 LegendTag = "Tags.Legends.NoLegend.Tag",
                 EraTag = "Tags.Eras.Timeless.Tag",
@@ -115,11 +115,10 @@ namespace BFForever
                     insDirectory = (trackType == "guitar" ? "gtr_" : "bss_") + difficulty;
 
                 // Creates master instrument
-                Instrument instrument = new Instrument(songDirectory + "." + insDirectory + ".instrument", songDirectory + "." + trackType);
+                Instrument instrument = new Instrument(songDirectory + "." + insDirectory + ".instrument", songDirectory + "." + insDirectory);
                 instrument.InstrumentType = trackType == "vox" ? "vocals" : trackType;
                 instrument.Difficulty = difficulty;
                 instrument.Tuning = new Tuning(); // TODO: Set to E Standard
-                instrument.Tuning.Name = $"Test Song ({trackType})";
 
                 // Adds instrument tracks
                 List<ZObject> instrumentTracks = mid.ExportInstrumentTracks(trackType, difficulty);
@@ -292,9 +291,9 @@ namespace BFForever
                 Year = song.Year,
 
                 // TODO: Change to tuning from json input
-                LeadGuitarTuning = new Tuning() { Name = "Test Catalog (Lead)" },
-                RhythmGuitarTuning = new Tuning() { Name = "Test Catalog (Rhythm)" },
-                BassTuning = new Tuning() { Name = "Test Catalog (Bass)" },
+                LeadGuitarTuning = new Tuning(),
+                RhythmGuitarTuning = new Tuning(),
+                BassTuning = new Tuning(),
 
                 Labels = song.Labels,
                 SongPath = song.FilePath,

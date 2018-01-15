@@ -69,6 +69,8 @@ namespace BFForever.Riff
             set => _directoryPath = value;
         }
 
-        public abstract HKey Type { get; } 
+        public abstract HKey Type { get; }
+
+        public override string ToString() => FilePath?.Value ?? base.ToString();
     }
 }

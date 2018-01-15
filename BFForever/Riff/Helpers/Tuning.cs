@@ -26,25 +26,27 @@ namespace BFForever.Riff
 {
     public class Tuning
     {
-        public FString Name { get; set; }
-        public Pitch String1 { get; set; } // Highest pitch
-        public Pitch String2 { get; set; }
-        public Pitch String3 { get; set; }
-        public Pitch String4 { get; set; }
-        public Pitch String5 { get; set; }
-        public Pitch String6 { get; set; }
-        public Pitch String7 { get; set; }
-        public Pitch String8 { get; set; }
+        public FString Name { get; set; } = "E Standard";
+
+        // Highest -> lowest pitch
+        public Pitch String1 { get; set; } = 64; // E4
+        public Pitch String2 { get; set; } = 59; // B3
+        public Pitch String3 { get; set; } = 55; // G3
+        public Pitch String4 { get; set; } = 50; // D3
+        public Pitch String5 { get; set; } = 45; // A2
+        public Pitch String6 { get; set; } = 40; // E2
+        public Pitch String7 { get; set; } = 0;
+        public Pitch String8 { get; set; } = 0;
 
         // I'm not exactly sure what this is but to be safe we'll preserve it
-        public Pitch String1Alt { get; set; } // Highest pitch
-        public Pitch String2Alt { get; set; }
-        public Pitch String3Alt { get; set; }
-        public Pitch String4Alt { get; set; }
-        public Pitch String5Alt { get; set; }
-        public Pitch String6Alt { get; set; }
-        public Pitch String7Alt { get; set; }
-        public Pitch String8Alt { get; set; }
+        public Pitch String1Alt { get; set; } = 64; // E4
+        public Pitch String2Alt { get; set; } = 48; // C3
+        public Pitch String3Alt { get; set; } = 48; // C3
+        public Pitch String4Alt { get; set; } = 48; // C3
+        public Pitch String5Alt { get; set; } = 32; // Ab1
+        public Pitch String6Alt { get; set; } = 32; // Ab1
+        public Pitch String7Alt { get; set; } = 0;
+        public Pitch String8Alt { get; set; } = 0;
 
         internal static Tuning ReadData(AwesomeReader ar)
         {
