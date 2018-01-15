@@ -8,6 +8,7 @@ namespace BFForever
 {
     public class AudioPaths
     {
+        public string Preview { get; set; }
         public string Backing { get; set; }
         public string Bass { get; set; }
         public string Drums { get; set; }
