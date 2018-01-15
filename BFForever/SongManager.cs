@@ -91,7 +91,7 @@ namespace BFForever
                 Description = input.Description,
                 Album = input.Description,
 
-                LegendTag = "Tags.Legends.NoLogend.Tag",
+                LegendTag = "Tags.Legends.NoLegend.Tag",
                 EraTag = "Tags.Eras.Timeless.Tag",
                 Year = input.Year,
 
@@ -225,7 +225,10 @@ namespace BFForever
             tags.Add("Tags.instruments.bass.intermediate.Tag");
             tags.Add("Tags.instruments.bass.advanced.Tag");
 
-            // TODO: Set technique tags
+            // Sets technique tags
+            // TODO: Set dynamically
+            tags.Add("Tags.Instruments.Guitar.Techniques.None.Tag");
+            tags.Add("Tags.Instruments.Bass.Techniques.None.Tag");
 
             // Sets tuning tags
             // TODO: Again, set this dynamically
@@ -233,12 +236,15 @@ namespace BFForever
             tags.Add("Tags.Instruments.Bass.Tunings.EStandard.Tag");
 
             // Sets challenge levels
-            string ChallengeLevelTag(string insName, int intensity) =>
-                (intensity < 0 || intensity > 5) ? "" : $"Tags.instruments.{insName}.ChallengeLevels.Level{intensity}.Tag";
+            void AddChallengeLevelTag(string insName, int intensity)
+            {
+                if (intensity < 0 || intensity > 5) return;
+                tags.Add($"Tags.instruments.{insName}.ChallengeLevels.Level{intensity}.Tag");
+            }
             
-            tags.Add(ChallengeLevelTag("guitar", (int)song.GuitarIntensity));
-            tags.Add(ChallengeLevelTag("bass", (int)song.BassIntensity));
-            tags.Add(ChallengeLevelTag("vocals", (int)song.VoxIntensity));
+            AddChallengeLevelTag("guitar", (int)song.GuitarIntensity);
+            AddChallengeLevelTag("bass", (int)song.BassIntensity);
+            AddChallengeLevelTag("vocals", (int)song.VoxIntensity);
 
             return tags;
         }
