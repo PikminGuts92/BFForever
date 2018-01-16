@@ -13,6 +13,21 @@ namespace BFForever.MIDI
         private MidiFile _midiFile;
         private List<TempoIndex> _tempoIdx;
 
+        private static readonly FString EventAudioStart;
+        private static readonly FString EventAudioEnd;
+        private static readonly FString EventSongEnd;
+
+        static MIDIImport()
+        {
+            StringKey.UpdateValue(0xd80b9a12e613a2dc, "AudioStart");
+            StringKey.UpdateValue(0x87c0360d9d948e2b, "AudioEnd");
+            StringKey.UpdateValue(0x00d80ba698c7cf65, "SongEnd");
+
+            EventAudioStart = 0xd80b9a12e613a2dc;
+            EventAudioEnd = 0x87c0360d9d948e2b;
+            EventSongEnd = 0x00d80ba698c7cf65;
+        }
+
         public MIDIImport(string input)
         {
             _midiFile = new MidiFile(input, false);
@@ -230,6 +245,9 @@ namespace BFForever.MIDI
                     // TODO: Implement bends, left hand mutes, etc.
                 };
 
+                if (note.Channel == 4) // Left-hand mute in protar
+                    tabEntry.NoteType = TabNoteType.Chukka;
+
                 tabEntries.Add(tabEntry);
             }
 
@@ -370,18 +388,18 @@ namespace BFForever.MIDI
 
             foreach (var ev in  voxTrack.Where(x => x is MetaEvent && ((MetaEvent)x).MetaEventType == MetaEventType.TextEvent).Select(x => x as NAudio.Midi.TextEvent))
             {
-                string text;
+                FString text;
 
                 switch(ev.Text)
                 {
                     case "[music_start]":
-                        text = "AudioStart";
+                        text = EventAudioStart;
                         break;
                     case "[music_end]":
-                        text = "AudioEnd";
+                        text = EventAudioEnd;
                         break;
                     case "[end]":
-                        text = "SongEnd";
+                        text = EventSongEnd;
                         break;
                     default:
                         continue;
