@@ -62,11 +62,14 @@ namespace BFForever
             AddFileToIndex(video.VideoPath, "bik", video.FilePath.Value.Replace(".", "/") + ".bik");
 
             // Create texture path
+            // TODO: Add texture conversion
+            /*
             Riff.Texture texture = new Riff.Texture(song.TexturePath, song.TexturePath.GetParentDirectory());
             texture.TexturePath = texture.DirectoryPath + ".album.xpr";
             //songObjects.Add(texture); // Don't write to index
 
             AddFileToIndex(texture.FilePath, "texture", texture.DirectoryPath.Value.Replace(".", "/") + "/album.xpr");
+            */
 
             // Adds song to catalog
             AddToCatalog(song);
@@ -91,7 +94,7 @@ namespace BFForever
                 File.Copy(input, outPath, true);
             }
 
-            CopyFile(GetFilePath(fusedSong.TexturePath), "album.xpr");
+            //CopyFile(GetFilePath(fusedSong.TexturePath), "album.xpr");
             CopyFile(GetFilePath(fusedSong.VideoPath), "musicvideo\\video.bik");
 
             if (fusedSong.AudioPaths == null) return;
@@ -191,7 +194,9 @@ namespace BFForever
             song.VideoPath = songDirectory + ".musicvideo.video";
 
             // Create texture path
-            song.TexturePath = songDirectory + ".texture";
+            // TODO: Add texture conversion
+            //song.TexturePath = songDirectory + ".texture";
+            song.TexturePath = "textures.albumart.bandfuse.originalcontent.texture";
 
             // Adds tags
             song.Labels.Add("BFForever");
