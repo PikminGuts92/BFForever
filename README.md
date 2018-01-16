@@ -1,57 +1,19 @@
 # BFForever [![Build status](https://ci.appveyor.com/api/projects/status/yt8eu333kn91fv2y?svg=true)](https://ci.appveyor.com/project/PikminGuts92/bfforever)
-BFForever is an open-source library for managing and creating game files from the short-lived BandFuse video game which released for PS3 and Xbox 360 consoles in November 2013.
+BFForever is an open-source library for managing and creating game files for the short-lived BandFuse video game which released for PS3 and Xbox 360 consoles in November 2013.
 
 # Planned Features
-* Full support for handling RIFF files
-* XPR2 texture conversion
+* Full support for creating/managing RIFF files
+* XPR2/GTF texture conversion
 * CLT (OPUS) audio conversion
 * MIDI <-> RIFF conversion
 
-# Currently Implemented
-* XRP2 (~50% WIP)
-* CELT
-  * Decoding
-* RIFF (Read Only)
-  * Audio
-  * AudioEffect
-  * Catalog2
-  * Chord
-  * Event
-  * Index
-  * Index2
-  * Instrument
-  * Measure
-  * PackageDef
-  * Section
-  * Song
-  * Tab
-  * Tempo
-  * Texture
-  * TRCPromptGroup
-  * StringTable
-  * UILocStrings
+# Custom Song Pipeline (WIP)
+Input will be a package that contains a json file which lists song metadata (title, artist, etc.) and instrument specific information such as tuning. It will also contain pre-converted non-RIFF song files like chart, audio stems, album art, and music video.
 
-# Not Implemented
+From that the song manager will import the package and interact with a game archive to generate the necessary RIFF files required for the song.
+
+# Currently Implemented
 * RIFF
-  * ABlock
-  * AchievementList
-  * AmpModel12
-  * AudioProcessorModel2
-  * Concert
-  * CreditsBlockList
-  * HKeyList
-  * LeaderBoardGroup
-  * Lick
-  * Movie
-  * MovieGroup
-  * PedalModel2
-  * ScoringConfig
-  * SoundBank
-  * Spread/VoxSpread
-  * StoreCategories
-  * Tag
-  * TagCategory
-  * TagDatabase
-  * Tour
-  * Tuning
-  * Whammy
+  * Full serialization of select zobjects
+* CELT
+  * Encoding/decoding
