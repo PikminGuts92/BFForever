@@ -76,6 +76,32 @@ namespace BFForever
 
             _packageManager.AddZObjectsAsPending(songObjects);
             _packageManager.SavePendingChanges();
+
+            // Copies files over to song directory
+            void CopyFile(string input, string output)
+            {
+                if (input == null || !File.Exists(input)) return;
+
+                string outPath = Path.Combine(_packageManager.CurrentPackageDirectory + "\\songs\\", fusedSong.Identifier.Replace(".", "\\") + "\\" + output);
+
+                // Creates directory
+                if (!Directory.Exists(Path.GetDirectoryName(outPath)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+
+                File.Copy(input, outPath, true);
+            }
+
+            CopyFile(GetFilePath(fusedSong.TexturePath), "album.xpr");
+            CopyFile(GetFilePath(fusedSong.VideoPath), "musicvideo\\video.bik");
+
+            if (fusedSong.AudioPaths == null) return;
+            CopyFile(GetFilePath(fusedSong.AudioPaths.Preview), "preview\\audio.clt");
+            CopyFile(GetFilePath(fusedSong.AudioPaths.Backing), "gamestems\\back\\audio.clt");
+            CopyFile(GetFilePath(fusedSong.AudioPaths.Bass), "gamestems\\bass\\audio.clt");
+            CopyFile(GetFilePath(fusedSong.AudioPaths.Drums), "gamestems\\drums\\audio.clt");
+            CopyFile(GetFilePath(fusedSong.AudioPaths.LeadGuitar), "gamestems\\gtr1\\audio.clt");
+            CopyFile(GetFilePath(fusedSong.AudioPaths.RhythmGuitar), "gamestems\\gtr\\audio.clt");
+            CopyFile(GetFilePath(fusedSong.AudioPaths.Vox), "gamestems\\vox\\audio.clt");
         }
 
         private List<ZObject> CreateSongObjects(FusedSong input)
