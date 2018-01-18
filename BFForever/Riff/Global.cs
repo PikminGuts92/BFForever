@@ -42,6 +42,8 @@ namespace BFForever.Riff
         public static readonly HKey ZOBJ_VoxPushPhrase = new HKey("VoxPushPhrase");
         public static readonly HKey ZOBJ_VoxSpread = new HKey("VoxSpread");
         public static readonly HKey ZOBJ_Whammy = new HKey("Whammy");
+        // Misc
+        public static readonly HKey ZOBJ_HKeyList = new HKey("HKeyList");
 
         public static readonly IReadOnlyDictionary<HKey, Type> ZObjectTypes = new Dictionary<HKey, Type>()
         {
@@ -62,12 +64,13 @@ namespace BFForever.Riff
             { ZOBJ_Tempo, typeof(Tempo) },
             { ZOBJ_Texture, typeof(Texture) },
             { ZOBJ_TimeSignature, typeof(TimeSignature) },
-            //{ ZOBJ_Tone2, typeof(Tone2) },
+            { ZOBJ_Tone2, typeof(Tone2) },
             { ZOBJ_Video, typeof(Video) },
             { ZOBJ_Vox, typeof(Vox) },
             { ZOBJ_VoxPushPhrase, typeof(VoxPushPhrase) },
             //{ ZOBJ_VoxSpread, typeof(VoxSpread) },
-            //{ ZOBJ_Whammy, typeof(Whammy) }
+            //{ ZOBJ_Whammy, typeof(Whammy) },
+            { ZOBJ_HKeyList, typeof(HKeyList) }
         };
 
         public static readonly HKey[] StringTableLocalizations = new HKey[]

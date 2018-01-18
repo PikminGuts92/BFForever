@@ -65,6 +65,8 @@
     <Compile Include="Riff\FString.cs" />
     <Compile Include="Riff\FEnvironment.cs" />
     <Compile Include="Riff\Global.cs" />
+    <Compile Include="Riff\Helpers\AudioProcessor.cs" />
+    <Compile Include="Riff\Helpers\Pedal.cs" />
     <Compile Include="Riff\Helpers\Pitch.cs" />
     <Compile Include="Riff\Helpers\TabBassType.cs" />
     <Compile Include="Riff\Helpers\TabBendType.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Riff\ZObjects\Catalog2.cs" />
     <Compile Include="Riff\ZObjects\Chord.cs" />
     <Compile Include="Riff\ZObjects\Event.cs" />
+    <Compile Include="Riff\ZObjects\HKeyList.cs" />
     <Compile Include="Riff\ZObjects\Index2.cs" />
     <Compile Include="Riff\ZObjects\Instrument.cs" />
     <Compile Include="Riff\ZObjects\Measure.cs" />
@@ -97,6 +100,7 @@
     <Compile Include="Riff\ZObjects\Tempo.cs" />
     <Compile Include="Riff\ZObjects\Texture.cs" />
     <Compile Include="Riff\ZObjects\TimeSignature.cs" />
+    <Compile Include="Riff\ZObjects\Tone2.cs" />
     <Compile Include="Riff\ZObjects\Video.cs" />
     <Compile Include="Riff\ZObjects\Vox.cs" />
     <Compile Include="Riff\ZObjects\VoxPushPhrase.cs" />
