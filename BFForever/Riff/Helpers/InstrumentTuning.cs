@@ -24,33 +24,33 @@ using System.Threading.Tasks;
 
 namespace BFForever.Riff
 {
-    public class Tuning
+    public struct InstrumentTuning
     {
-        public FString Name { get; set; } = 0x63d3970adb6267c7; // Hotfix for E Standard
+        public FString Name { get; set; }
 
         // Highest -> lowest pitch
-        public Pitch String1 { get; set; } = 64; // E4
-        public Pitch String2 { get; set; } = 59; // B3
-        public Pitch String3 { get; set; } = 55; // G3
-        public Pitch String4 { get; set; } = 50; // D3
-        public Pitch String5 { get; set; } = 45; // A2
-        public Pitch String6 { get; set; } = 40; // E2
-        public Pitch String7 { get; set; } = 0;
-        public Pitch String8 { get; set; } = 0;
+        public Pitch String1 { get; set; }
+        public Pitch String2 { get; set; }
+        public Pitch String3 { get; set; }
+        public Pitch String4 { get; set; }
+        public Pitch String5 { get; set; }
+        public Pitch String6 { get; set; }
+        public Pitch String7 { get; set; }
+        public Pitch String8 { get; set; }       
 
         // I'm not exactly sure what this is but to be safe we'll preserve it
-        public Pitch String1Alt { get; set; } = 64; // E4
-        public Pitch String2Alt { get; set; } = 48; // C3
-        public Pitch String3Alt { get; set; } = 48; // C3
-        public Pitch String4Alt { get; set; } = 48; // C3
-        public Pitch String5Alt { get; set; } = 32; // Ab1
-        public Pitch String6Alt { get; set; } = 32; // Ab1
-        public Pitch String7Alt { get; set; } = 0;
-        public Pitch String8Alt { get; set; } = 0;
+        public Pitch String1Alt { get; set; }
+        public Pitch String2Alt { get; set; }
+        public Pitch String3Alt { get; set; }
+        public Pitch String4Alt { get; set; }
+        public Pitch String5Alt { get; set; }
+        public Pitch String6Alt { get; set; }
+        public Pitch String7Alt { get; set; }
+        public Pitch String8Alt { get; set; }        
 
-        internal static Tuning ReadData(AwesomeReader ar)
+        internal static InstrumentTuning ReadData(AwesomeReader ar)
         {
-            Tuning tuning = new Tuning();
+            InstrumentTuning tuning = new InstrumentTuning();
 
             // 40 bytes
             tuning.Name = ar.ReadUInt64();
@@ -82,7 +82,7 @@ namespace BFForever.Riff
             return tuning;
         }
 
-        internal static void WriteData(AwesomeWriter aw, Tuning tuning)
+        internal static void WriteData(AwesomeWriter aw, InstrumentTuning tuning)
         {
             // 40 bytes
             aw.Write((ulong)tuning.Name);
@@ -95,5 +95,28 @@ namespace BFForever.Riff
             aw.Write((int)(tuning.String7 << 8 | tuning.String7Alt));
             aw.Write((int)(tuning.String8 << 8 | tuning.String8Alt));
         }
+
+        // Available Tunings
+        public static InstrumentTuning Guitar_EStandard => new InstrumentTuning()
+        {
+            Name = 0x63d3970adb6267c7, // E Standard
+            String1 = 64, // E4
+            String2 = 59, // B3
+            String3 = 55, // G3
+            String4 = 50, // D3
+            String5 = 45, // A2
+            String6 = 40, // E2
+            String7 = 0,
+            String8 = 0,
+
+            String1Alt = 64, // E4
+            String2Alt = 48, // C3
+            String3Alt = 48, // C3
+            String4Alt = 48, // C3
+            String5Alt = 32, // Ab1
+            String6Alt = 32, // Ab1
+            String7Alt = 0,
+            String8Alt = 0
+    };
     }
 }

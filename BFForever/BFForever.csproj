@@ -75,7 +75,7 @@
     <Compile Include="Riff\Helpers\VibratoType.cs" />
     <Compile Include="Riff\Helpers\TextEvent.cs" />
     <Compile Include="Riff\Helpers\TimeEvent.cs" />
-    <Compile Include="Riff\Helpers\Tuning.cs" />
+    <Compile Include="Riff\Helpers\InstrumentTuning.cs" />
     <Compile Include="Riff\Helpers\VoxNoteType.cs" />
     <Compile Include="Riff\HKey.cs" />
     <Compile Include="Riff\Index.cs" />

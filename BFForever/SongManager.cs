@@ -147,7 +147,7 @@ namespace BFForever
                 Instrument instrument = new Instrument(songDirectory + "." + insDirectory + ".instrument", songDirectory + "." + insDirectory);
                 instrument.InstrumentType = trackType == "vox" ? "vocals" : trackType;
                 instrument.Difficulty = difficulty;
-                instrument.Tuning = new Tuning(); // TODO: Set to E Standard
+                instrument.Tuning = new InstrumentTuning(); // TODO: Set to E Standard
 
                 // Adds instrument tracks
                 List<ZObject> instrumentTracks = mid.ExportInstrumentTracks(trackType, difficulty);
@@ -322,9 +322,9 @@ namespace BFForever
                 Year = song.Year,
 
                 // TODO: Change to tuning from json input
-                LeadGuitarTuning = new Tuning(),
-                RhythmGuitarTuning = new Tuning(),
-                BassTuning = new Tuning(),
+                LeadGuitarTuning = new InstrumentTuning(),
+                RhythmGuitarTuning = new InstrumentTuning(),
+                BassTuning = new InstrumentTuning(),
 
                 Labels = song.Labels,
                 SongPath = song.FilePath,

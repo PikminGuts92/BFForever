@@ -119,9 +119,9 @@ namespace BFForever.Riff
                 entry.Year = ar.ReadInt32();
                 ar.BaseStream.Position += 4; // Should be 0
 
-                entry.LeadGuitarTuning = Tuning.ReadData(ar);
-                entry.RhythmGuitarTuning = Tuning.ReadData(ar);
-                entry.BassTuning = Tuning.ReadData(ar);
+                entry.LeadGuitarTuning = InstrumentTuning.ReadData(ar);
+                entry.RhythmGuitarTuning = InstrumentTuning.ReadData(ar);
+                entry.BassTuning = InstrumentTuning.ReadData(ar);
 
                 // Reads labels
                 int count = ar.ReadInt32();
@@ -210,9 +210,9 @@ namespace BFForever.Riff
                 aw.Write((int)0);
 
                 // Tunings
-                Tuning.WriteData(aw, entry.LeadGuitarTuning);
-                Tuning.WriteData(aw, entry.RhythmGuitarTuning);
-                Tuning.WriteData(aw, entry.BassTuning);
+                InstrumentTuning.WriteData(aw, entry.LeadGuitarTuning);
+                InstrumentTuning.WriteData(aw, entry.RhythmGuitarTuning);
+                InstrumentTuning.WriteData(aw, entry.BassTuning);
 
                 // Labels
                 aw.Write((int)entry.Labels.Count);
@@ -279,9 +279,9 @@ namespace BFForever.Riff
         public HKey EraTag { get; set; }
         public int Year { get; set; }
 
-        public Tuning LeadGuitarTuning { get; set; }
-        public Tuning RhythmGuitarTuning { get; set; }
-        public Tuning BassTuning { get; set; }
+        public InstrumentTuning LeadGuitarTuning { get; set; }
+        public InstrumentTuning RhythmGuitarTuning { get; set; }
+        public InstrumentTuning BassTuning { get; set; }
 
         public List<FString> Labels { get; set; }
         public HKey SongPath { get; set; }

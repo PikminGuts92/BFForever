@@ -42,7 +42,7 @@ namespace BFForever.Riff
             ar.BaseStream.Position += 8; // Should be zero'd
 
             // Reads tuning info
-            Tuning = Tuning.ReadData(ar);
+            Tuning = InstrumentTuning.ReadData(ar);
 
             // Reads track paths
             int count = ar.ReadInt32();
@@ -60,7 +60,7 @@ namespace BFForever.Riff
             aw.Write((ulong)Difficulty);
             aw.BaseStream.Position += 8; // Should be zero'd
 
-            Tuning.WriteData(aw, Tuning);
+            InstrumentTuning.WriteData(aw, Tuning);
             aw.Write((int)TrackPaths.Count);
             aw.Write((int)4);
 
@@ -72,7 +72,7 @@ namespace BFForever.Riff
 
         public HKey InstrumentType { get; set; }
         public HKey Difficulty { get; set; }
-        public Tuning Tuning { get; set; }
+        public InstrumentTuning Tuning { get; set; }
         public List<HKey> TrackPaths { get; set; }
     }
 }
