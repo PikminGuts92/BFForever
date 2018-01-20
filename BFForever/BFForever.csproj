@@ -101,6 +101,7 @@
     <Compile Include="Riff\ZObjects\Texture.cs" />
     <Compile Include="Riff\ZObjects\TimeSignature.cs" />
     <Compile Include="Riff\ZObjects\Tone2.cs" />
+    <Compile Include="Riff\ZObjects\Tuning.cs" />
     <Compile Include="Riff\ZObjects\Video.cs" />
     <Compile Include="Riff\ZObjects\Vox.cs" />
     <Compile Include="Riff\ZObjects\VoxPushPhrase.cs" />

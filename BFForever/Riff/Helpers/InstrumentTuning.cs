@@ -99,7 +99,7 @@ namespace BFForever.Riff
         // Available Tunings
         public static InstrumentTuning Guitar_EStandard => new InstrumentTuning()
         {
-            Name = 0x63d3970adb6267c7, // E Standard
+            Name = Global.Tuning_Guitar_EStandard,
             String1 = 64, // E4
             String2 = 59, // B3
             String3 = 55, // G3

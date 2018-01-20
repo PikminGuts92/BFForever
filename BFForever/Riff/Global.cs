@@ -44,6 +44,10 @@ namespace BFForever.Riff
         public static readonly HKey ZOBJ_Whammy = new HKey("Whammy");
         // Misc
         public static readonly HKey ZOBJ_HKeyList = new HKey("HKeyList");
+        public static readonly HKey ZOBJ_Tuning = new HKey("Tuning");
+
+        // Tuning Names
+        public static readonly FString Tuning_Guitar_EStandard = StringKey.UpdateValue(0x63d3970adb6267c7, "E Standard");
 
         public static readonly IReadOnlyDictionary<HKey, Type> ZObjectTypes = new Dictionary<HKey, Type>()
         {
@@ -70,7 +74,8 @@ namespace BFForever.Riff
             { ZOBJ_VoxPushPhrase, typeof(VoxPushPhrase) },
             //{ ZOBJ_VoxSpread, typeof(VoxSpread) },
             //{ ZOBJ_Whammy, typeof(Whammy) },
-            { ZOBJ_HKeyList, typeof(HKeyList) }
+            { ZOBJ_HKeyList, typeof(HKeyList) },
+            { ZOBJ_Tuning, typeof(Tuning) },
         };
 
         public static readonly HKey[] StringTableLocalizations = new HKey[]

@@ -53,7 +53,7 @@ namespace BFForever.Riff
         // String management
         internal static string GetValue(ulong key, Localization localization) => _globalStrings.ContainsKey(key) ? _globalStrings[key][localization] : null;
 
-        internal static bool UpdateValue(ulong key, string value)
+        internal static ulong UpdateValue(ulong key, string value)
         {
             // Updates all values
             if (!_globalStrings.ContainsKey(key))
@@ -61,17 +61,17 @@ namespace BFForever.Riff
 
             StringKey sk = _globalStrings[key];
             sk.UpdateAllValues(value);
-            return true;
+            return key;
         }
 
-        internal static bool UpdateValue(ulong key, string value, Localization localization)
+        internal static ulong UpdateValue(ulong key, string value, Localization localization)
         {
             // Updates only specified localization
             if (!_globalStrings.ContainsKey(key))
                 _globalStrings.Add(key, new StringKey(key));
 
             _globalStrings[key][localization] = value;
-            return true;
+            return key;
         }
         
         internal static bool ContainsStringKey(ulong key) => _globalStrings.ContainsKey(key);
