@@ -60,8 +60,25 @@ namespace BFForever.Riff
             string pitchName = s.Substring(0, matchNumber.Index).Replace('b', '♭');
 
             int pitchIdx = 0;
-            string[] pitches = pitchName.Contains('♭') ? _pitchesSharp : _pitchesFlat;
-
+            string[] pitches = pitchName.Contains('♭') ? _pitchesFlat : _pitchesSharp;
+            
+            // Corrects non-existent pitches
+            switch (pitchName)
+            {
+                case "B#":
+                    pitchName = "C";
+                    break;
+                case "Cb":
+                    pitchName = "B";
+                    break;
+                case "E#":
+                    pitchName = "F";
+                    break;
+                case "F♭":
+                    pitchName = "E";
+                    break;
+            }
+            
             // Gets pitch index
             foreach(string pitch in pitches)
             {
