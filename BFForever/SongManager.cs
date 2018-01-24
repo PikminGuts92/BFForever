@@ -134,53 +134,16 @@ namespace BFForever
             // Imports note tracks
             // TODO: Check if RB import vs custom spec
             MIDIImport mid = new MIDIImport(GetFilePath(input.TabPath));
-            mid.SongDirectory = songDirectory;
-            
-            // Local function for creating/adding instrument zobject
-            Instrument CreateInstrument(string trackType, string difficulty = "")
-            {
-                string insDirectory = trackType;
-                if (trackType == "guitar" || trackType == "bass")
-                    insDirectory = (trackType == "guitar" ? "gtr_" : "bss_") + difficulty;
 
-                // Creates master instrument
-                Instrument instrument = new Instrument(songDirectory + "." + insDirectory + ".instrument", songDirectory + "." + insDirectory);
-                instrument.InstrumentType = trackType == "vox" ? "vocals" : trackType;
-                instrument.Difficulty = difficulty;
-                instrument.Tuning = InstrumentTuning.Guitar_EStandard; // TODO: Set to E Standard
+            // TODO: Implement tuning import from FusedSong
+            var tracks = mid.ExportZObjects(songDirectory, InstrumentTuning.Guitar_EStandard, InstrumentTuning.Guitar_EStandard, InstrumentTuning.Guitar_EStandard);
 
-                // Adds instrument tracks
-                List<ZObject> instrumentTracks = mid.ExportInstrumentTracks(trackType, difficulty);
-                instrument.TrackPaths = instrumentTracks.Select(x => x.FilePath).ToList();
-
-                // Adds instrument to song
+            // Adds instrument file paths
+            foreach (ZObject instrument in tracks.Where(x => x is Instrument))
                 song.InstrumentPaths.Add(instrument.FilePath);
 
-                // Adds objects to collection
-                objects.AddRange(instrumentTracks);
-                objects.Add(instrument);
-
-                return instrument;
-            }
-
-            CreateInstrument("master");
-            CreateInstrument("vox");
-
-            // Guitar tracks
-            CreateInstrument("guitar", "jam");
-            CreateInstrument("guitar", "nov");
-            CreateInstrument("guitar", "beg");
-            CreateInstrument("guitar", "int");
-            CreateInstrument("guitar", "rhy");
-            CreateInstrument("guitar", "adv");
-
-            // Bass tracks
-            CreateInstrument("bass", "jam");
-            CreateInstrument("bass", "nov");
-            CreateInstrument("bass", "beg");
-            CreateInstrument("bass", "int");
-            CreateInstrument("bass", "adv");
-
+            objects.AddRange(tracks);
+            
             // Adds audio paths
             song.PreviewPath = songDirectory + ".preview.audio";
             song.BackingAudioPath = songDirectory + ".gamestems.back.audio";

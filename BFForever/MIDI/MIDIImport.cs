@@ -8,26 +8,11 @@ using NAudio.Midi;
 
 namespace BFForever.MIDI
 {
-    public class MIDIImport
+    public class MIDIImport : ChartImport
     {
         private MidiFile _midiFile;
         private List<TempoIndex> _tempoIdx;
-
-        private static readonly FString EventAudioStart;
-        private static readonly FString EventAudioEnd;
-        private static readonly FString EventSongEnd;
-
-        static MIDIImport()
-        {
-            StringKey.UpdateValue(0xd80b9a12e613a2dc, "AudioStart");
-            StringKey.UpdateValue(0x87c0360d9d948e2b, "AudioEnd");
-            StringKey.UpdateValue(0x00d80ba698c7cf65, "SongEnd");
-
-            EventAudioStart = 0xd80b9a12e613a2dc;
-            EventAudioEnd = 0x87c0360d9d948e2b;
-            EventSongEnd = 0x00d80ba698c7cf65;
-        }
-
+        
         public MIDIImport(string input)
         {
             _midiFile = new MidiFile(input, false);
@@ -100,7 +85,7 @@ namespace BFForever.MIDI
             return previous.RealTime + ((double)relativeDelta / _midiFile.DeltaTicksPerQuarterNote) * (60000.0 / previous.BPM);
         }
 
-        public List<VoxEntry> ExportVoxEntries()
+        private List<VoxEntry> ExportVoxEntries()
         {
             const int VOX_PHRASE = 105;
             const int VOX_MAX_PITCH = 84;
@@ -140,7 +125,7 @@ namespace BFForever.MIDI
             return voxNotes;
         }
 
-        public List<MeasureEntry> ExportMeasureEntries()
+        private List<MeasureEntry> ExportMeasureEntries()
         {
             const int BEAT_DOWN = 12;
             const int BEAT_UP = 13;
@@ -165,7 +150,7 @@ namespace BFForever.MIDI
             return measures;
         }
 
-        public List<TempoEntry> ExportTempoEntries()
+        private List<TempoEntry> ExportTempoEntries()
         {
             return _tempoIdx.Select(x => new TempoEntry()
             {
@@ -175,7 +160,7 @@ namespace BFForever.MIDI
             }).ToList();
         }
 
-        public List<TimeSignatureEntry> ExportTimeSignatureEntries()
+        private List<TimeSignatureEntry> ExportTimeSignatureEntries()
         {
             List<TimeSignatureEntry> tsEntries = new List<TimeSignatureEntry>();
 
@@ -195,69 +180,6 @@ namespace BFForever.MIDI
             }
 
             return tsEntries;
-        }
-
-        private List<ZObject> GetGuitarObjects(string difficulty, bool guitar)
-        {
-            HKey directory = SongDirectory + (guitar ? ".gtr_" : ".bss_") + difficulty;
-            List<ZObject> objects = new List<ZObject>();
-            List<TabEntry> tabEntries = new List<TabEntry>();
-            //List<Riff2.TextEvent> chordEntries = new List<Riff2.TextEvent>();
-
-            int stringStart;
-            var trackEvents = GetGuitarTrack(guitar);
-
-            switch (difficulty)
-            {
-                case "jam":
-                    // Easy
-                    stringStart = 24;
-                    break;
-                case "nov":
-                    // Medium
-                    stringStart = 48;
-                    break;
-                case "beg":
-                    // Hard
-                    stringStart = 70;
-                    break;
-                case "int":
-                case "rhy":
-                case "adv": // Lead
-                default:
-                    // Expert
-                    stringStart = 96;
-                    break;
-            }
-
-            foreach (NoteOnEvent note in trackEvents.Where(x => x is NoteOnEvent).Select(x => x as NoteOnEvent))
-            {
-                if (note.NoteNumber < stringStart || note.NoteNumber >= (stringStart + 6) || note.Velocity < 100) continue;
-                int stringNumber = 6 - (note.NoteNumber - stringStart); // 1-6
-
-                TabEntry tabEntry = new TabEntry()
-                {
-                    Start = (float)GetRealTime(note.AbsoluteTime),
-                    End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
-                    FretNumber = note.Velocity - 100,
-                    StringNumber = stringNumber,
-                    Finger = GetRBStringColor(stringNumber)
-                    // TODO: Implement bends, left hand mutes, etc.
-                };
-
-                if (note.Channel == 4) // Left-hand mute in protar
-                    tabEntry.NoteType = TabNoteType.Chukka;
-
-                tabEntries.Add(tabEntry);
-            }
-
-            Tab tab = new Tab(directory + ".tab", directory);
-            tab.Events = tabEntries;
-            objects.Add(tab);
-
-            // TODO: Implement chord events
-
-            return objects;
         }
 
         private TabFinger GetRBStringColor(int idx)
@@ -306,81 +228,7 @@ namespace BFForever.MIDI
             }
         }
 
-        private List<ZObject> GetVoxObjects()
-        {
-            List<ZObject> objects = new List<ZObject>();
-            HKey directory = SongDirectory + ".vox";
-
-            // Creates vox track
-            Vox vox = new Vox(directory + ".vox", directory);
-            vox.Events = ExportVoxEntries();
-            objects.Add(vox);
-
-            // TODO: Implement this!
-            // Creates voxpushphrase track
-
-            // Creates voxspread track
-
-            return objects;
-        }
-
-        private List<ZObject> GetMasterObjects()
-        {
-            List<ZObject> objects = new List<ZObject>();
-            HKey directory = SongDirectory + ".master";
-
-            // Creates event track
-            Event ev = new Event(directory + ".event", directory);
-            ev.Events = ExportMasterEventEntries();
-            objects.Add(ev);
-
-            // Creates measure track (BEAT)
-            Measure measure = new Measure(directory + ".measure", directory);
-            measure.Events = ExportMeasureEntries();
-            objects.Add(measure);
-
-            // Creates section track
-            // TODO: Implement importing of sections
-            /*
-            Section section = new Section(directory + ".section", directory);
-            section.Events = ExportSectionEntries();
-            objects.Add(section);
-            */
-
-            // Creates tempo track
-            Tempo tempo = new Tempo(directory + ".tempo", directory);
-            tempo.Events = ExportTempoEntries();
-            objects.Add(tempo);
-
-            // Creates time signature track
-            TimeSignature ts = new TimeSignature(directory + ".timesignature", directory);
-            ts.Events = ExportTimeSignatureEntries();
-            objects.Add(ts);
-
-            return objects;
-        }
-
-        public List<ZObject> ExportInstrumentTracks(string type, string difficulty = "")
-        {
-            switch(type.ToLower())
-            {
-                case "bass":
-                case "guitar":
-                    bool guitar = type.Equals("guitar", StringComparison.CurrentCultureIgnoreCase);
-                    return GetGuitarObjects(difficulty, guitar);
-                case "master":
-                    // event, measure, section, tempo, timesignaturer
-                    return GetMasterObjects();
-                case "vox":
-                    // vox, voxpushphrase, voxspread
-                    return GetVoxObjects();
-                default:
-                    // TODO: Implement, duh
-                    return new List<ZObject>();
-            }
-        }
-
-        public List<EventEntry> ExportMasterEventEntries()
+        private List<EventEntry> ExportMasterEventEntries()
         {
             List<EventEntry> entries = new List<EventEntry>();
             var voxTrack = _midiFile.Events.FirstOrDefault(x => x[0].ToString().Contains("EVENTS"));
@@ -417,10 +265,124 @@ namespace BFForever.MIDI
 
             return entries;
         }
+        
+        protected override List<ZObject> GetMasterObjects(HKey directoryPath)
+        {
+            List<ZObject> objects = new List<ZObject>();
+            HKey directory = directoryPath + ".master";
 
-        /// <summary>
-        /// Gets or sets song directory (Used for created zobjects)
-        /// </summary>
-        public string SongDirectory { get; set; } = "";
+            // Creates event track
+            Event ev = new Event(directory + ".event", directory);
+            ev.Events = ExportMasterEventEntries();
+            objects.Add(ev);
+
+            // Creates measure track (BEAT)
+            Measure measure = new Measure(directory + ".measure", directory);
+            measure.Events = ExportMeasureEntries();
+            objects.Add(measure);
+
+            // Creates section track
+            // TODO: Implement importing of sections
+            /*
+            Section section = new Section(directory + ".section", directory);
+            section.Events = ExportSectionEntries();
+            objects.Add(section);
+            */
+
+            // Creates tempo track
+            Tempo tempo = new Tempo(directory + ".tempo", directory);
+            tempo.Events = ExportTempoEntries();
+            objects.Add(tempo);
+
+            // Creates time signature track
+            TimeSignature ts = new TimeSignature(directory + ".timesignature", directory);
+            ts.Events = ExportTimeSignatureEntries();
+            objects.Add(ts);
+
+            return objects;
+        }
+
+        protected override List<ZObject> GetVoxObjects(HKey directoryPath)
+        {
+            List<ZObject> objects = new List<ZObject>();
+            HKey directory = directoryPath + ".vox";
+
+            // Creates vox track
+            Vox vox = new Vox(directory + ".vox", directory);
+            vox.Events = ExportVoxEntries();
+            objects.Add(vox);
+
+            // TODO: Implement this!
+            // Creates voxpushphrase track
+
+            // Creates voxspread track
+
+            return objects;
+        }
+
+        protected override List<ZObject> GetGuitarObjects(HKey directoryPath)
+        {
+            string[] current = directoryPath.GetLastText().Value.Split('_'); // instrument_difficulty
+            bool guitar = current[0].Equals("gtr", StringComparison.CurrentCultureIgnoreCase);
+
+            List<ZObject> objects = new List<ZObject>();
+            List<TabEntry> tabEntries = new List<TabEntry>();
+            //List<Riff2.TextEvent> chordEntries = new List<Riff2.TextEvent>();
+
+            int stringStart;
+            var trackEvents = GetGuitarTrack(guitar);
+
+            switch (current[1])
+            {
+                case "jam":
+                    // Easy
+                    stringStart = 24;
+                    break;
+                case "nov":
+                    // Medium
+                    stringStart = 48;
+                    break;
+                case "beg":
+                    // Hard
+                    stringStart = 70;
+                    break;
+                case "int":
+                case "rhy":
+                case "adv": // Lead
+                default:
+                    // Expert
+                    stringStart = 96;
+                    break;
+            }
+
+            foreach (NoteOnEvent note in trackEvents.Where(x => x is NoteOnEvent).Select(x => x as NoteOnEvent))
+            {
+                if (note.NoteNumber < stringStart || note.NoteNumber >= (stringStart + 6) || note.Velocity < 100) continue;
+                int stringNumber = 6 - (note.NoteNumber - stringStart); // 1-6
+
+                TabEntry tabEntry = new TabEntry()
+                {
+                    Start = (float)GetRealTime(note.AbsoluteTime),
+                    End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
+                    FretNumber = note.Velocity - 100,
+                    StringNumber = stringNumber,
+                    Finger = GetRBStringColor(stringNumber)
+                    // TODO: Implement bends, left hand mutes, etc.
+                };
+
+                if (note.Channel == 4) // Left-hand mute in protar
+                    tabEntry.NoteType = TabNoteType.Chukka;
+
+                tabEntries.Add(tabEntry);
+            }
+
+            Tab tab = new Tab(directoryPath + ".tab", directoryPath);
+            tab.Events = tabEntries;
+            objects.Add(tab);
+
+            // TODO: Implement chord events
+
+            return objects;
+        }
     }
 }
