@@ -43,7 +43,7 @@ namespace BFForever.Riff
         public Pitch(int value)
         {
             // Ensures value remains in range
-            _value = (byte)(Math.Abs(value) % 0x80);
+            _value = GetByteValue(value);
         }
 
         public Pitch(string s)
@@ -87,10 +87,10 @@ namespace BFForever.Riff
             }
 
             int value = 12 + (number * 12) + pitchIdx;
-            _value = (byte)(Math.Abs(value) % 0x80); // Sanitizes value
+            _value = GetByteValue(value); // Sanitizes value
         }
 
-        private int GetValue(int value) => Math.Abs(value) % 0x80;
+        private byte GetByteValue(int value) => (byte)(Math.Abs(value) % 0x80);
 
         public int Value => _value;
 
