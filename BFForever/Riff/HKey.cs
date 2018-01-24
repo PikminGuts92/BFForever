@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BFForever.Riff
 {
     // Hierarchy Key - Globally unique
+    [JsonConverter(typeof(FStringConverter))]
     public class HKey : FString
     {
         public HKey(ulong key) : base(key) { }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using BFForever.Riff;
 
 namespace BFForever
 {
@@ -24,6 +25,11 @@ namespace BFForever
         public float VoxIntensity { get; set; }
         
         public int Year { get; set; }
+
+        // Tunings
+        public InstrumentTuning LeadGuitarTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
+        public InstrumentTuning RhythmGuitarTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
+        public InstrumentTuning BassTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
 
         // External Files
         public string TabPath { get; set; }

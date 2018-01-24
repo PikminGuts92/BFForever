@@ -3,9 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BFForever.Riff
 {
+    public class FStringConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType) => objectType == typeof(FString);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            string value = (string)reader.Value;
+
+            if (objectType == typeof(HKey))
+                return new HKey(value);
+            else if (objectType == typeof(FString))
+                return new FString(value);
+            else
+                return new HKey("");
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (value == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+
+            serializer.Serialize(writer, ((FString)value).Value);
+        }
+    }
+
+    [JsonConverter(typeof(FStringConverter))]
     public class FString
     {
         protected static readonly CRC64 _crc = new CRC64();
