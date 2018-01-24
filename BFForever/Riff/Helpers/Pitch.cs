@@ -90,7 +90,7 @@ namespace BFForever.Riff
             _value = GetByteValue(value); // Sanitizes value
         }
 
-        private byte GetByteValue(int value) => (byte)(Math.Abs(value) % 0x80);
+        private static byte GetByteValue(int value) => (byte)(Math.Abs(value) % 0x80);
 
         public int Value => _value;
 
