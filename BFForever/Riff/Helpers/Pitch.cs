@@ -69,7 +69,7 @@ namespace BFForever.Riff
                 pitchIdx++;
             }
 
-            int value = (12 - (number * 12) + pitchIdx);
+            int value = 12 + (number * 12) + pitchIdx;
             _value = (byte)(Math.Abs(value) % 0x80); // Sanitizes value
         }
 
@@ -84,7 +84,6 @@ namespace BFForever.Riff
         public static implicit operator string(Pitch p) => p.Name;
         public static implicit operator Pitch(int i) => new Pitch(i);
         public static implicit operator Pitch(string s) => new Pitch(s);
-        
         #endregion
 
         public override bool Equals(object obj) => (obj is Pitch && ((Pitch)obj)._value == _value);
