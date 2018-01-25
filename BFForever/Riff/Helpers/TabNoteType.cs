@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace BFForever.Riff
 {
-    // Note: Bends and 'Harmonic' are deprecated it seems
+    // Note: Bends are deprecated
     public enum TabNoteType : int
     {
         Note,
-        Chukka, // Palm mute
+        Chukka, // Left-hand mute
         Slide,
         SlideUpFromNowhere,
         SlideDownToNowhere,
