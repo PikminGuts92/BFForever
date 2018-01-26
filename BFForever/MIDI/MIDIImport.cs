@@ -84,47 +84,7 @@ namespace BFForever.MIDI
             double relativeDelta = absoluteTime - previous.AbsoluteTime;
             return previous.RealTime + ((double)relativeDelta / _midiFile.DeltaTicksPerQuarterNote) * (60000.0 / previous.BPM);
         }
-
-        private List<VoxEntry> ExportVoxEntries()
-        {
-            const int VOX_PHRASE = 105;
-            const int VOX_MAX_PITCH = 84;
-            const int VOX_MIN_PITCH = 36;
-
-            List<VoxEntry> voxNotes = new List<VoxEntry>();
-            var voxTrack = _midiFile.Events.FirstOrDefault(x => x[0].ToString().Contains("PART VOCALS"));
-            if (voxTrack == null) return voxNotes;
-            
-            var phrases = voxTrack.Where(x => x is NoteOnEvent && ((NoteOnEvent)x).NoteNumber == VOX_PHRASE && ((NoteOnEvent)x).Velocity > 0).Select(x => x as NoteOnEvent).ToList();
-            var lyrics = voxTrack.Where(x => x is MetaEvent && ((MetaEvent)x).MetaEventType == MetaEventType.Lyric).Select(x => x as NAudio.Midi.TextEvent).ToDictionary(key => key.AbsoluteTime, value => value.Text);
-
-            foreach (NoteOnEvent note in voxTrack.Where(x => x is NoteOnEvent).Select(x => x as NoteOnEvent))
-            {
-                if (note.NoteNumber < VOX_MIN_PITCH || note.NoteNumber > VOX_MAX_PITCH || note.Velocity <= 0) continue;
-                
-                VoxEntry entry = new VoxEntry()
-                {
-                    Start = (float)GetRealTime(note.AbsoluteTime),
-                    End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
-                    Lyric = lyrics.ContainsKey(note.AbsoluteTime) ? lyrics[note.AbsoluteTime] : "",
-                    Pitch = note.NoteNumber,
-                    PitchAlt = note.NoteNumber // Not sure
-                };
-
-                if (entry.Lyric.Value.Contains('#'))
-                    entry.NoteType = VoxNote.NonPitched;
-                else
-                    entry.NoteType = VoxNote.Regular;
-
-                if (entry.Lyric.Value.Contains('+') && voxNotes.Count > 0)
-                    voxNotes.Last().NoteType = VoxNote.Extended;
-
-                voxNotes.Add(entry);
-            }
-            
-            return voxNotes;
-        }
-
+        
         private List<MeasureEntry> ExportMeasureEntries()
         {
             const int BEAT_DOWN = 12;
@@ -284,18 +244,82 @@ namespace BFForever.MIDI
 
         protected override List<ZObject> GetVoxObjects(HKey directoryPath)
         {
+            const int VOX_PHRASE = 105; // TODO: Read in phrases on 106 as well
+            const int VOX_MAX_PITCH = 84;
+            const int VOX_MIN_PITCH = 36;
+
             List<ZObject> objects = new List<ZObject>();
             HKey directory = directoryPath + ".vox";
+            
+            var voxTrack = _midiFile.Events.FirstOrDefault(x => x[0].ToString().Contains("PART VOCALS"));
+            if (voxTrack == null) return objects;
+
+            var phrases = voxTrack.Where(x => x is NoteOnEvent && ((NoteOnEvent)x).NoteNumber == VOX_PHRASE && ((NoteOnEvent)x).Velocity > 0).Select(x => x as NoteOnEvent).ToList();
+            var lyrics = voxTrack.Where(x => x is MetaEvent && ((MetaEvent)x).MetaEventType == MetaEventType.Lyric).Select(x => x as NAudio.Midi.TextEvent).ToDictionary(key => key.AbsoluteTime, value => value.Text);
 
             // Creates vox track
             Vox vox = new Vox(directory + ".vox", directory);
-            vox.Events = ExportVoxEntries();
             objects.Add(vox);
 
-            // TODO: Implement this!
-            // Creates voxpushphrase track
+            foreach (NoteOnEvent note in voxTrack.Where(x => x is NoteOnEvent).Select(x => x as NoteOnEvent))
+            {
+                if (note.NoteNumber < VOX_MIN_PITCH || note.NoteNumber > VOX_MAX_PITCH || note.Velocity <= 0) continue;
 
-            // Creates voxspread track
+                VoxEntry entry = new VoxEntry()
+                {
+                    Start = (float)GetRealTime(note.AbsoluteTime),
+                    End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
+                    Lyric = lyrics.ContainsKey(note.AbsoluteTime) ? lyrics[note.AbsoluteTime] : "",
+                    Pitch = note.NoteNumber,
+                    PitchAlt = note.NoteNumber // Not sure
+                };
+
+                if (entry.Lyric.Value.Contains('#'))
+                    entry.NoteType = VoxNote.NonPitched;
+                else
+                    entry.NoteType = VoxNote.Regular;
+
+                if (entry.Lyric.Value.Contains('+') && vox.Events.Count > 0)
+                    vox.Events.Last().NoteType = VoxNote.Extended;
+
+                vox.Events.Add(entry);
+            }
+
+            // Creates voxpushphrase track
+            if (phrases.Count > 0)
+            {
+                VoxPushPhrase pushPhrase = new VoxPushPhrase(directory + ".voxpushphrase", directory);
+                objects.Add(pushPhrase);
+
+                long firstAbsTime = phrases.First().AbsoluteTime;
+                int sixteenth = _midiFile.DeltaTicksPerQuarterNote >> 2; // 1/16 note
+
+                long firstPushTime = firstAbsTime - (_midiFile.DeltaTicksPerQuarterNote << 2);
+                if (firstPushTime < 0) firstPushTime = 0;
+                
+                // Adds push event that starts one measure before first phrase
+                pushPhrase.Events.Add(new TimeEvent()
+                {
+                    Start = (float)GetRealTime(firstPushTime),
+                    End = (float)GetRealTime(firstPushTime + sixteenth)
+                });
+
+                // Adds push event for start of first phrase
+                pushPhrase.Events.Add(new TimeEvent()
+                {
+                    Start = (float)GetRealTime(firstAbsTime),
+                    End = (float)GetRealTime(firstAbsTime + sixteenth)
+                });
+
+                // Adds push event for end of each phrase
+                pushPhrase.Events.AddRange(phrases.Select(x => new TimeEvent()
+                {
+                    Start = (float)GetRealTime(x.AbsoluteTime + x.NoteLength),
+                    End = (float)GetRealTime(x.AbsoluteTime + x.NoteLength + sixteenth)
+                }));
+            }
+
+            // TODO: Creates voxspread track
 
             return objects;
         }
