@@ -182,32 +182,12 @@ namespace BFForever.MIDI
             return tsEntries;
         }
 
-        private TabFinger GetRBStringColor(int idx)
+        private TabFinger GetStringColor(int idx)
         {
-            // Purple
-            // Yellow
-            // Blue
-            // Orange
-            // Green
-            // Red
+            if (idx < 1 || idx > 6)
+                return TabFinger.Tap; // Black
 
-            switch(idx)
-            {
-                case 1:
-                    return TabFinger.Open;
-                case 2:
-                    return TabFinger.Three;
-                case 3:
-                    return TabFinger.Four;
-                case 4:
-                    return TabFinger.Five;
-                case 5:
-                    return TabFinger.One;
-                case 6:
-                    return TabFinger.Two;
-                default:
-                    return TabFinger.Tap; // Black
-            }
+            return RB3Colors[--idx];
         }
 
         private IList<MidiEvent> GetGuitarTrack(bool guitar)
@@ -344,7 +324,7 @@ namespace BFForever.MIDI
                     break;
                 case "beg":
                     // Hard
-                    stringStart = 70;
+                    stringStart = 72;
                     break;
                 case "int":
                 case "rhy":
@@ -366,9 +346,12 @@ namespace BFForever.MIDI
                     End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
                     FretNumber = note.Velocity - 100,
                     StringNumber = stringNumber,
-                    Finger = GetRBStringColor(stringNumber)
+                    Finger = GetStringColor(stringNumber)
                     // TODO: Implement bends, left hand mutes, etc.
                 };
+
+                if (!guitar)
+                    tabEntry.StringNumber -= 2; // Hotfix for bass
 
                 if (note.Channel == 4) // Left-hand mute in protar
                     tabEntry.NoteType = TabNoteType.Chukka;

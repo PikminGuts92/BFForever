@@ -12,7 +12,13 @@ namespace BFForever.MIDI
         protected static readonly FString EventAudioStart = StringKey.UpdateValue(0xd80b9a12e613a2dc, "AudioStart");
         protected static readonly FString EventAudioEnd = StringKey.UpdateValue(0x87c0360d9d948e2b, "AudioEnd");
         protected static readonly FString EventSongEnd = StringKey.UpdateValue(0x00d80ba698c7cf65, "SongEnd");
-        
+
+        // Purple, yellow, blue, orange, green, red
+        protected readonly TabFinger[] RB3Colors = { TabFinger.Open, TabFinger.Three, TabFinger.Four, TabFinger.Five, TabFinger.One, TabFinger.Two };
+
+        // Purple, green, orange, blue, yellow, red
+        protected readonly TabFinger[] RSColors = { TabFinger.Open, TabFinger.One, TabFinger.Five, TabFinger.Four, TabFinger.Three, TabFinger.Two };
+
         protected abstract List<ZObject> GetMasterObjects(HKey directoryPath);
         protected abstract List<ZObject> GetVoxObjects(HKey directoryPath);
         protected abstract List<ZObject> GetGuitarObjects(HKey directoryPath);
