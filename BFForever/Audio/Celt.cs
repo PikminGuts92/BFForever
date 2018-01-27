@@ -282,7 +282,8 @@ namespace BFForever.Audio
             byte[] packet = new byte[MAX_PACKET_SIZE];
             
             byte[] packetSize = new byte[2];
-            int packetCount = 0;
+            bool skipMode = true;
+            List<int> recks = new List<int>() { 0 };
 
             MemoryStream ms = new MemoryStream();
 
@@ -292,36 +293,89 @@ namespace BFForever.Audio
                 int bufferLength = afr.Read(buffer, 0, buffer.Length);
                 int packetLength = encoder.Encode(buffer, 0, celt.FrameSize, packet, 0, packet.Length);
 
+                // Tracks reckoning counts
+                if (packetLength <= 3) // Checks if packet is empty
+                {
+                    if (!skipMode)
+                    {
+                        recks.Add(0);
+                        skipMode = !skipMode;
+                    }
+
+                    recks[recks.Count - 1] += 1;
+                    continue;
+                }
+                else
+                {
+                    if (skipMode)
+                    {
+                        recks.Add(0);
+                        skipMode = !skipMode;
+                    }
+
+                    recks[recks.Count - 1] += 1;
+                }
+
                 // Encodes 15-bit packet size
                 packetSize[0] = (byte)(0x80 | (0xFF & (packetLength >> 8)));
                 packetSize[1] = (byte)(0xFF & packetLength);
 
                 ms.Write(packetSize, 0, packetSize.Length);
                 ms.Write(packet, 0, packetLength);
+            }
 
-                packetCount++;
+            int packetCount = recks.Sum();
+
+            int hdEncodeSize;
+            byte[] hdBytes;
+
+            // Writes packet offsets
+            using (MemoryStream hdStream = new MemoryStream())
+            {
+                byte[] hdBuff = new byte[2];
+
+                foreach (int count in recks)
+                {
+                    if (count > 127)
+                    {
+                        // Encodes as two bytes
+                        hdBuff[0] = (byte)(0x80 | (0xFF & (count >> 8)));
+                        hdBuff[1] = (byte)(0xFF & count);
+                        hdStream.Write(hdBuff, 0, 2);
+                    }
+                    else
+                    {
+                        // Encodes as one byte
+                        hdBuff[0] = (byte)count;
+                        hdStream.Write(hdBuff, 0, 1);
+                    }
+                }
+
+                hdEncodeSize = (int)hdStream.Length;
+
+                // Adds remaining bytes
+                if (hdEncodeSize % 4 != 0)
+                {
+                    int difference = 4 - (hdEncodeSize % 4);
+                    hdStream.Write(new byte[difference], 0, difference);
+                }
+
+                hdBytes = hdStream.ToArray();
             }
             
-            // Writes packet offsets (finish later)
-            byte[] header = new byte[4];
-            header[0] = 0;
-            header[1] = (byte)(0x80 | (0xFF & (packetCount >> 8)));
-            header[2] = (byte)(0xFF & packetCount);
-            header[3] = 0;
-
             celt.TotalSamples = (uint)(packetCount * celt.FrameSize);
 
-            celt.Reckoning = header;
+            celt.Reckoning = hdBytes;
             celt.ReckoningOffset = 40;
-            celt.ReckoningSize = 3;
+            celt.ReckoningSize = (uint)hdEncodeSize;
 
-            celt.PacketStreamOffset = 44;
+            celt.PacketStreamOffset = (uint)(40 + hdBytes.Length);
             celt.PacketStreamSize = (uint)ms.Length;
 
             // Adds remaining bytes
-            if ((ms.Length + header.Length) % 16 != 0)
+            if ((ms.Length + hdBytes.Length) % 16 != 0)
             {
-                int difference = 16 - ((int)(ms.Length + header.Length) % 16);
+                int difference = 16 - ((int)(ms.Length + hdBytes.Length) % 16);
                 ms.Write(new byte[difference], 0, difference);
             }
 
