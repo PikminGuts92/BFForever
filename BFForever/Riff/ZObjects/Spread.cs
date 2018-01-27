@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*
+ * Description:
+ *  Spread entries set the scroll speed of instrument tracks (hyperspeed). It does not seem to affect the vox track.
+ * 
  * Spread ZObject
  * ==============
  * INT32 - Constant (2)
@@ -38,7 +41,7 @@ namespace BFForever.Riff
                 SpreadEntry ev = new SpreadEntry();
                 ev.Start = ar.ReadSingle();
                 ev.End = ar.ReadSingle();
-                ev.Value = ar.ReadSingle();
+                ev.Speed = ar.ReadSingle();
 
                 Events.Add(ev);
             }
@@ -55,7 +58,7 @@ namespace BFForever.Riff
             {
                 aw.Write((float)ev.Start);
                 aw.Write((float)ev.End);
-                aw.Write((float)ev.Value);
+                aw.Write((float)ev.Speed);
             }
         }
         
@@ -66,6 +69,6 @@ namespace BFForever.Riff
 
     public class SpreadEntry : TimeEvent
     {
-        public float Value { get; set; }
+        public float Speed { get; set; }
     }
 }
