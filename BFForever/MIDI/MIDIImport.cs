@@ -244,7 +244,8 @@ namespace BFForever.MIDI
 
         protected override List<ZObject> GetVoxObjects(HKey directoryPath)
         {
-            const int VOX_PHRASE = 105; // TODO: Read in phrases on 106 as well
+            const int VOX_PHRASE_SECONDARY = 106; // Used for legacy competitive game modes
+            const int VOX_PHRASE_PRIMARY = 105;
             const int VOX_MAX_PITCH = 84;
             const int VOX_MIN_PITCH = 36;
 
@@ -253,8 +254,7 @@ namespace BFForever.MIDI
             
             var voxTrack = _midiFile.Events.FirstOrDefault(x => x[0].ToString().Contains("PART VOCALS"));
             if (voxTrack == null) return objects;
-
-            var phrases = voxTrack.Where(x => x is NoteOnEvent && ((NoteOnEvent)x).NoteNumber == VOX_PHRASE && ((NoteOnEvent)x).Velocity > 0).Select(x => x as NoteOnEvent).ToList();
+            
             var lyrics = voxTrack.Where(x => x is MetaEvent && ((MetaEvent)x).MetaEventType == MetaEventType.Lyric).Select(x => x as NAudio.Midi.TextEvent).ToDictionary(key => key.AbsoluteTime, value => value.Text);
 
             // Creates vox track
@@ -285,6 +285,11 @@ namespace BFForever.MIDI
                 vox.Events.Add(entry);
             }
 
+            // Gets phrase markers and orders by absolute time, notes at same time are then sorted by length (longest first)
+            var phrases = voxTrack.Where(x => x is NoteOnEvent
+                && (((NoteOnEvent)x).NoteNumber == VOX_PHRASE_PRIMARY  || ((NoteOnEvent)x).NoteNumber == VOX_PHRASE_SECONDARY)
+                && ((NoteOnEvent)x).Velocity > 0).Select(x => x as NoteOnEvent).OrderBy(x => x.AbsoluteTime).ThenBy(x => x.NoteLength * -1).ToList();
+
             // Creates voxpushphrase track
             if (phrases.Count > 0)
             {
@@ -312,11 +317,20 @@ namespace BFForever.MIDI
                 });
 
                 // Adds push event for end of each phrase
-                pushPhrase.Events.AddRange(phrases.Select(x => new TimeEvent()
+                long previousAbs = -1;
+                foreach(NoteOnEvent phrase in phrases)
                 {
-                    Start = (float)GetRealTime(x.AbsoluteTime + x.NoteLength),
-                    End = (float)GetRealTime(x.AbsoluteTime + x.NoteLength + sixteenth)
-                }));
+                    if (previousAbs == phrase.AbsoluteTime)
+                        continue;
+
+                    pushPhrase.Events.Add(new TimeEvent()
+                    {
+                        Start = (float)GetRealTime(phrase.AbsoluteTime + phrase.NoteLength),
+                        End = (float)GetRealTime(phrase.AbsoluteTime + phrase.NoteLength + sixteenth)
+                    });
+
+                    previousAbs = phrase.AbsoluteTime;
+                }
             }
 
             // TODO: Creates voxspread track
