@@ -16,14 +16,14 @@ using NAudio.Wave;
  * CELT HEADER (40 bytes)
  * ======================
  * BYTE[4] - "BFAD"
- *   INT16 - Num Channels?
+ *   INT16 - Version?
  *   INT16 - Encryption Flag
  *            0: Non-encrypted
  *            1: Encrypted
  *   INT32 - Total Samples
- *   INT32 - Bitrate
+ *   INT32 - Bitrate (Always 96000)
  *   INT16 - Uncompressed Frame Size? (Always 960)
- *   INT16 - Unknown (Always 312)
+ *   INT16 - Lookahead (Always 312)
  *   INT16 - Sample Rate (Always 48000)
  *   INT16 - Unknown (Always 1)
  *   INT32 - Reckoning Offset
@@ -51,6 +51,7 @@ namespace BFForever.Audio
         private const int MAGIC = 0x44414642; // "BFAD"
         private const int MAGIC_R = 0x42464144;
         private const int MAX_PACKET_SIZE = 1275;
+        private const int NUM_CHANNELS = 2;
 
         private static readonly byte[] AesKey =
         {
@@ -60,15 +61,15 @@ namespace BFForever.Audio
             0x14, 0x37, 0xde, 0x7f, 0x31, 0x1c, 0xd2, 0x45
         };
 
-        public uint Channels { get; set; } = 2;
+        public uint Version { get; set; } = 2;
         public bool Encrypted { get; set; } = false;
         public uint TotalSamples { get; set; }
         public uint Bitrate { get; set; } = 96000;
 
         public ushort FrameSize { get; set; } = 960;
-        public ushort Unknown1 { get; set; } = 312;
+        public ushort Lookahead { get; set; } = 312;
         public ushort SampleRate { get; set; } = 48000;
-        public ushort Unknown2 { get; set; } = 1;
+        public ushort Unknown { get; set; } = 1;
 
         public uint ReckoningOffset { get; set; } // Thing that counts
         public uint ReckoningSize { get; set; }
@@ -111,15 +112,15 @@ namespace BFForever.Audio
                 celt.BigEndian = ar.BigEndian; // Sets endianess
 
                 // Parses header information
-                celt.Channels = ar.ReadUInt16();
+                celt.Version = ar.ReadUInt16();
                 celt.Encrypted = Convert.ToBoolean(ar.ReadInt16());
                 celt.TotalSamples = ar.ReadUInt32();
                 celt.Bitrate = ar.ReadUInt32();
 
                 celt.FrameSize = ar.ReadUInt16();
-                celt.Unknown1 = ar.ReadUInt16();
+                celt.Lookahead = ar.ReadUInt16();
                 celt.SampleRate = ar.ReadUInt16();
-                celt.Unknown2 = ar.ReadUInt16();
+                celt.Unknown = ar.ReadUInt16();
 
                 celt.ReckoningOffset = ar.ReadUInt32();
                 celt.ReckoningSize = ar.ReadUInt32();
@@ -195,15 +196,15 @@ namespace BFForever.Audio
             {
                 aw.BigEndian = BigEndian;
                 aw.Write((int)MAGIC);
-                aw.Write((ushort)Channels);
+                aw.Write((ushort)Version);
                 aw.Write(Convert.ToUInt16(Encrypted));
                 aw.Write((uint)TotalSamples);
                 aw.Write((uint)Bitrate);
 
                 aw.Write((ushort)FrameSize);
-                aw.Write((ushort)Unknown1);
+                aw.Write((ushort)Lookahead);
                 aw.Write((ushort)SampleRate);
-                aw.Write((ushort)Unknown2);
+                aw.Write((ushort)Unknown);
 
                 aw.Write((uint)ReckoningOffset);
                 aw.Write((uint)ReckoningSize);
@@ -221,9 +222,9 @@ namespace BFForever.Audio
 
             bool skipMode = true;
             int audioOffset = 0, reckonOffset = 0;
-            OpusDecoder decoder = OpusDecoder.Create(SampleRate, (int)Channels);
+            OpusDecoder decoder = OpusDecoder.Create(SampleRate, NUM_CHANNELS);
 
-            using (WaveFileWriter writer = new WaveFileWriter(outputPath, new WaveFormat(SampleRate, 16, (int)Channels))) // 16-bit PCM
+            using (WaveFileWriter writer = new WaveFileWriter(outputPath, new WaveFormat(SampleRate, 16, NUM_CHANNELS))) // 16-bit PCM
             {
                 while (reckonOffset < ReckoningSize)
                 {
@@ -235,13 +236,13 @@ namespace BFForever.Audio
                     
                     if (skipMode)
                     {
-                        short[] outputShorts = new short[numPackets * FrameSize * Channels];
+                        short[] outputShorts = new short[numPackets * FrameSize * NUM_CHANNELS];
                         writer.WriteSamples(outputShorts, 0, outputShorts.Length);
                     }
                     else
                     {
                         int packetOffset = 0;
-                        short[] outputShorts = new short[FrameSize * Channels];
+                        short[] outputShorts = new short[FrameSize * NUM_CHANNELS];
 
                         // Decoding loop
                         while (packetOffset++ < numPackets && audioOffset < PacketStreamSize)
@@ -269,15 +270,15 @@ namespace BFForever.Audio
             AudioFileReader afr = new AudioFileReader(path);
             Celt celt = new Celt()
             {
-                SampleRate = (ushort)afr.WaveFormat.SampleRate,
-                Channels = (ushort)afr.WaveFormat.Channels
+                SampleRate = (ushort)afr.WaveFormat.SampleRate
             };
 
-            OpusEncoder encoder = OpusEncoder.Create(celt.SampleRate, (int)celt.Channels, OpusApplication.OPUS_APPLICATION_AUDIO);
+            OpusEncoder encoder = OpusEncoder.Create(celt.SampleRate, NUM_CHANNELS, OpusApplication.OPUS_APPLICATION_AUDIO);
             encoder.Bitrate = (int)celt.Bitrate;
             encoder.ForceMode = OpusMode.MODE_CELT_ONLY;
+            encoder.SignalType = OpusSignal.OPUS_SIGNAL_MUSIC;
 
-            float[] buffer = new float[celt.FrameSize * celt.Channels];
+            float[] buffer = new float[celt.FrameSize * NUM_CHANNELS];
             byte[] packet = new byte[MAX_PACKET_SIZE];
             
             byte[] packetSize = new byte[2];
@@ -300,13 +301,15 @@ namespace BFForever.Audio
 
                 packetCount++;
             }
-
+            
             // Writes packet offsets (finish later)
             byte[] header = new byte[4];
             header[0] = 0;
             header[1] = (byte)(0x80 | (0xFF & (packetCount >> 8)));
             header[2] = (byte)(0xFF & packetCount);
             header[3] = 0;
+
+            celt.TotalSamples = (uint)(packetCount * celt.FrameSize);
 
             celt.Reckoning = header;
             celt.ReckoningOffset = 40;
