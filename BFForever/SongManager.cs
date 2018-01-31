@@ -40,8 +40,8 @@ namespace BFForever
                         return InstrumentTuning.Guitar_EStandard;
                     case "drop d":
                         return InstrumentTuning.Guitar_DropD;
-                    case "E♭ standard":
-                    case "Eb standard":
+                    case "e♭ standard":
+                    case "eb standard":
                         return InstrumentTuning.Guitar_EbStandard;
                 }
             }
@@ -110,7 +110,7 @@ namespace BFForever
             */
 
             // Adds song to catalog
-            AddToCatalog(song);
+            AddToCatalog(song, fusedSong.LeadGuitarTuning, fusedSong.RhythmGuitarTuning, fusedSong.BassTuning);
 
             string realPath = song.DirectoryPath.Value.Replace(".", "/");
             AddObjectsToIndex(songObjects, realPath + "/fused.rif");
@@ -172,9 +172,7 @@ namespace BFForever
             // Imports note tracks
             // TODO: Check if RB import vs custom spec
             MIDIImport mid = new MIDIImport(GetFilePath(input.TabPath));
-
-            // TODO: Implement tuning import from FusedSong
-            var tracks = mid.ExportZObjects(songDirectory, InstrumentTuning.Guitar_EStandard, InstrumentTuning.Guitar_EStandard, InstrumentTuning.Guitar_EStandard);
+            var tracks = mid.ExportZObjects(songDirectory, input.LeadGuitarTuning, input.RhythmGuitarTuning, input.BassTuning);
 
             // Adds instrument file paths
             foreach (ZObject instrument in tracks.Where(x => x is Instrument))
@@ -298,7 +296,7 @@ namespace BFForever
             objects.ForEach(x => AddObjectToIndex(x, physicalPath));
         }
 
-        private void AddToCatalog(Song song)
+        private void AddToCatalog(Song song, InstrumentTuning leadGtr, InstrumentTuning rhythmGtr, InstrumentTuning bass)
         {
             // Add song to catalog2 entries
             Catalog2 catalog = _packageManager["catalog2"] as Catalog2;
@@ -321,11 +319,10 @@ namespace BFForever
 
                 EraTag = song.EraTag,
                 Year = song.Year,
-
-                // TODO: Change to tuning from json input
-                LeadGuitarTuning = InstrumentTuning.Guitar_EStandard,
-                RhythmGuitarTuning = InstrumentTuning.Guitar_EStandard,
-                BassTuning = InstrumentTuning.Guitar_EStandard,
+                
+                LeadGuitarTuning = leadGtr,
+                RhythmGuitarTuning = rhythmGtr,
+                BassTuning = bass,
 
                 Labels = song.Labels,
                 SongPath = song.FilePath,

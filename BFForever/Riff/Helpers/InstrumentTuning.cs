@@ -105,7 +105,7 @@ namespace BFForever.Riff
             String3 = 55, // G3
             String4 = 50, // D3
             String5 = 45, // A2
-            String6 = 38, // D2
+            String6 = 40, // E2
             String7 = 0,
             String8 = 0,
 
@@ -127,7 +127,7 @@ namespace BFForever.Riff
             String3 = 55, // G3
             String4 = 50, // D3
             String5 = 45, // A2
-            String6 = 40, // E2
+            String6 = 38, // D2
             String7 = 0,
             String8 = 0,
 
