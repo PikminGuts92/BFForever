@@ -29,7 +29,7 @@ namespace BFForever
         // Tunings
         public InstrumentTuning LeadGuitarTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
         public InstrumentTuning RhythmGuitarTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
-        public InstrumentTuning BassTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
+        public InstrumentTuning BassTuning { get; set; } = InstrumentTuning.Bass_EStandard;
 
         // External Files
         public string TabPath { get; set; }
