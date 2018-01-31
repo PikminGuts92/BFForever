@@ -30,7 +30,7 @@ namespace BFForever.Riff
             InstrumentTuning.WriteData(aw, InstrumentTuning);
         }
 
-        InstrumentTuning InstrumentTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
+        public InstrumentTuning InstrumentTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
 
         public override HKey Type => Global.ZOBJ_Tuning;
     }

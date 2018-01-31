@@ -105,6 +105,28 @@ namespace BFForever.Riff
             String3 = 55, // G3
             String4 = 50, // D3
             String5 = 45, // A2
+            String6 = 38, // D2
+            String7 = 0,
+            String8 = 0,
+
+            String1Alt = 64, // E4
+            String2Alt = 48, // C3
+            String3Alt = 48, // C3
+            String4Alt = 48, // C3
+            String5Alt = 32, // Ab1
+            String6Alt = 32, // Ab1
+            String7Alt = 0,
+            String8Alt = 0
+        };
+
+        public static InstrumentTuning Guitar_DropD => new InstrumentTuning()
+        {
+            Name = Global.Tuning_Guitar_DropD,
+            String1 = 64, // E4
+            String2 = 59, // B3
+            String3 = 55, // G3
+            String4 = 50, // D3
+            String5 = 45, // A2
             String6 = 40, // E2
             String7 = 0,
             String8 = 0,
@@ -117,6 +139,51 @@ namespace BFForever.Riff
             String6Alt = 32, // Ab1
             String7Alt = 0,
             String8Alt = 0
-    };
+        };
+
+        public static InstrumentTuning Guitar_EbStandard => new InstrumentTuning()
+        {
+            Name = Global.Tuning_Guitar_EbStandard,
+            String1 = 63, // Eb4
+            String2 = 58, // Bb3
+            String3 = 54, // Gb3
+            String4 = 49, // Db3
+            String5 = 44, // Ab2
+            String6 = 39, // Eb2
+            String7 = 0,
+            String8 = 0,
+
+            String1Alt = 66, // Gb4
+            String2Alt = 50, // D3
+            String3Alt = 50, // D3
+            String4Alt = 50, // D3
+            String5Alt = 34, // Bb1
+            String6Alt = 34, // Bb1
+            String7Alt = 0,
+            String8Alt = 0
+        };
+
+        // Available Tunings
+        public static InstrumentTuning Bass_EStandard => new InstrumentTuning()
+        {
+            Name = Global.Tuning_Bass_EStandard,
+            String1 = 43, // G2
+            String2 = 38, // D3
+            String3 = 33, // A1
+            String4 = 28, // E1
+            String5 = 0,
+            String6 = 0,
+            String7 = 0,
+            String8 = 0,
+            
+            String1Alt = 32, // Ab1
+            String2Alt = 32, // Ab1
+            String3Alt = 16, // E0
+            String4Alt = 16, // E0
+            String5Alt = 0,
+            String6Alt = 0,
+            String7Alt = 0,
+            String8Alt = 0
+        };
     }
 }

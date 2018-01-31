@@ -23,10 +23,48 @@ namespace BFForever
 
         private string GetFilePath(string path) => (Path.IsPathRooted(path)) ? path : Path.Combine(_jsonDirectory + path);
 
+        private InstrumentTuning UpdateTuning(InstrumentTuning tuning, bool guitar)
+        {
+            if (string.IsNullOrEmpty(tuning.Name))
+            {
+                // Return default guitar/bass tuning
+                return guitar ? InstrumentTuning.Guitar_EStandard : InstrumentTuning.Bass_EStandard;
+            }
+
+            if (guitar)
+            {
+                switch (tuning.Name.Value.ToLower())
+                {
+                    default:
+                    case "e standard":
+                        return InstrumentTuning.Guitar_EStandard;
+                    case "drop d":
+                        return InstrumentTuning.Guitar_DropD;
+                    case "E♭ standard":
+                    case "Eb standard":
+                        return InstrumentTuning.Guitar_EbStandard;
+                }
+            }
+            else // Bass
+            {
+                switch (tuning.Name.Value.ToLower())
+                {
+                    default:
+                    case "e standard":
+                        return InstrumentTuning.Bass_EStandard;
+                }
+            }
+        }
+
         public void ImportSong(string jsonPath)
         {
             _jsonDirectory = Path.GetDirectoryName(jsonPath) + "\\";
             FusedSong fusedSong = FusedSong.Import(jsonPath);
+
+            // Updates tuning info
+            fusedSong.LeadGuitarTuning = UpdateTuning(fusedSong.LeadGuitarTuning, true);
+            fusedSong.RhythmGuitarTuning = UpdateTuning(fusedSong.RhythmGuitarTuning, true);
+            fusedSong.BassTuning = UpdateTuning(fusedSong.BassTuning, false);
 
             // Create song objects
             List<ZObject> songObjects = CreateSongObjects(fusedSong);
