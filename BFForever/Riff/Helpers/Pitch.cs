@@ -68,7 +68,7 @@ namespace BFForever.Riff
                 case "B#":
                     pitchName = "C";
                     break;
-                case "Cb":
+                case "C♭":
                     pitchName = "B";
                     break;
                 case "E#":

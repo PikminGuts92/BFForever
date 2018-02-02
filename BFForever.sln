@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Celt2Wav", "Celt2Wav\Celt2W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiffExplorer", "RiffExplorer\RiffExplorer.csproj", "{D6B53786-A717-468D-8102-B1E5C8319962}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFForever.Tests", "BFForever.Tests\BFForever.Tests.csproj", "{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D6B53786-A717-468D-8102-B1E5C8319962}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6B53786-A717-468D-8102-B1E5C8319962}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6B53786-A717-468D-8102-B1E5C8319962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
