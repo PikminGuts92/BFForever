@@ -52,6 +52,10 @@ namespace BFForever.MIDI
             var vox = GetInstrumentTracks("vocals", "");
             mid.AddTrack(CreateVoxTrack(vox));
 
+            // Guitar tracks
+
+            // Bass tracks
+
             MidiFile.Export(path, mid);
         }
 
@@ -182,20 +186,62 @@ namespace BFForever.MIDI
 
         private List<MidiEvent> CreateVoxTrack(List<ZObject> voxTracks)
         {
+            const int VOX_SPREAD = 108;
+            const int VOX_PUSH_PHRASE = 107;
+            
             List<MidiEvent> track = new List<MidiEvent>();
             track.Add(new NAudio.Midi.TextEvent("PART VOCALS", MetaEventType.SequenceTrackName, 0));
 
+            // Vox
             Vox vox = voxTracks.FirstOrDefault(x => x is Vox) as Vox;
             if (vox != null)
             {
+                foreach(VoxEntry entry in vox.Events)
+                {
+                    long start = GetAbsoluteTime(entry.Start);
+                    long end = GetAbsoluteTime(entry.End);
 
+                    track.Add(new NAudio.Midi.TextEvent(entry.Lyric, MetaEventType.Lyric, start));
+                    track.Add(new NoteEvent(start, 1, MidiCommandCode.NoteOn, entry.Pitch, 100));
+                    track.Add(new NoteEvent(end, 1, MidiCommandCode.NoteOff, entry.Pitch, 100));
+                }
             }
 
+            // VoxPushPhrase
             VoxPushPhrase pushPhrase = voxTracks.FirstOrDefault(x => x is VoxPushPhrase) as VoxPushPhrase;
             if (pushPhrase != null)
             {
-
+                foreach (TimeEvent entry in pushPhrase.Events)
+                {
+                    long start = GetAbsoluteTime(entry.Start);
+                    long end = GetAbsoluteTime(entry.End);
+                    
+                    track.Add(new NoteEvent(start, 1, MidiCommandCode.NoteOn, VOX_PUSH_PHRASE, 100));
+                    track.Add(new NoteEvent(end, 1, MidiCommandCode.NoteOff, VOX_PUSH_PHRASE, 100));
+                }
             }
+
+            // VoxSpread
+            VoxSpread spread = voxTracks.FirstOrDefault(x => x is VoxSpread) as VoxSpread;
+            if (spread != null)
+            {
+                foreach (SpreadEntry entry in spread.Events)
+                {
+                    long start = GetAbsoluteTime(entry.Start);
+                    long end = GetAbsoluteTime(entry.End);
+
+                    // Should be increments of 0.25f
+                    int value = (int)((entry.Speed - 1.0f) / 0.25f);
+                    
+                    track.Add(new NoteEvent(start, 1, MidiCommandCode.NoteOn, VOX_SPREAD, 100 + value));
+                    track.Add(new NoteEvent(end, 1, MidiCommandCode.NoteOff, VOX_SPREAD, 100 + value));
+                }
+            }
+
+            // Sort by absolute time (And ensure track name is first event)
+            track.Sort((x, y) => (int)(x is NAudio.Midi.TextEvent
+                                       && ((NAudio.Midi.TextEvent)x).MetaEventType == MetaEventType.SequenceTrackName
+                                       ? int.MinValue : x.AbsoluteTime - y.AbsoluteTime));
 
             // Adds end track
             track.Add(new MetaEvent(MetaEventType.EndTrack, 0, track.Last().AbsoluteTime));
