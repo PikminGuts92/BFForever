@@ -94,7 +94,7 @@ namespace BFForever.Riff
             { ZOBJ_Vox, typeof(Vox) },
             { ZOBJ_VoxPushPhrase, typeof(VoxPushPhrase) },
             { ZOBJ_VoxSpread, typeof(VoxSpread) },
-            //{ ZOBJ_Whammy, typeof(Whammy) },
+            { ZOBJ_Whammy, typeof(Whammy) },
             { ZOBJ_HKeyList, typeof(HKeyList) },
             { ZOBJ_Tuning, typeof(Tuning) },
         };

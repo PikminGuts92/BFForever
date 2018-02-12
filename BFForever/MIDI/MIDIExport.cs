@@ -428,6 +428,19 @@ namespace BFForever.MIDI
                 }
             }
 
+            Whammy whammy = tabTracks.FirstOrDefault(x => x is Whammy) as Whammy;
+            if (whammy != null)
+            {
+                foreach (WhammyEntry entry in whammy.Events)
+                {
+                    long start = GetAbsoluteTime(entry.Start);
+                    long end = GetAbsoluteTime(entry.End);
+                    
+                    track.Add(new NoteEvent(start, 1, MidiCommandCode.NoteOn, WHAMMY, 100));
+                    track.Add(new NoteEvent(end, 1, MidiCommandCode.NoteOff, WHAMMY, 100));
+                }
+            }
+
             // Sort by absolute time (And ensure track name is first event)
             track.Sort((x, y) => (int)(x is NAudio.Midi.TextEvent
                                        && ((NAudio.Midi.TextEvent)x).MetaEventType == MetaEventType.SequenceTrackName
