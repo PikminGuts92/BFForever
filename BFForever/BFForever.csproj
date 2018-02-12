@@ -61,6 +61,7 @@
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
     <Compile Include="MIDI\ChartImport.cs" />
+    <Compile Include="MIDI\MIDIExport.cs" />
     <Compile Include="MIDI\MIDIImport.cs" />
     <Compile Include="MIDI\TempoIndex.cs" />
     <Compile Include="Riff\FString.cs" />

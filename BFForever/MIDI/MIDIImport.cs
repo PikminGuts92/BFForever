@@ -2622,7 +2622,7 @@ namespace BFForever.MIDI
                 {
                     Start = (float)GetRealTime(note.AbsoluteTime),
                     End = (float)GetRealTime(note.AbsoluteTime + note.NoteLength),
-                    Beat = note.NoteNumber == BEAT_DOWN ? 1.0f : 2.0f
+                    Beat = note.NoteNumber == BEAT_UP ? 1.0f : 2.0f // 1.0 = Up (Default), 2.0 = Down
                 };
 
                 measures.Add(entry);

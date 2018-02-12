@@ -11,5 +11,13 @@ namespace BFForever.MIDI
         public long AbsoluteTime;
         public double RealTime;
         public double BPM;
+        public int MicroPerQuarter => (int)(60000000 / BPM);
+
+        public TempoIndex(long absTime, double realTime, double bpm)
+        {
+            AbsoluteTime = absTime;
+            RealTime = realTime;
+            BPM = bpm;
+        }
     }
 }
