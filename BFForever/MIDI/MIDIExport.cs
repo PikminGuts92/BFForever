@@ -37,41 +37,44 @@ namespace BFForever.MIDI
             var master = GetInstrumentTracks("master", "");
             var tempo = master.First(x => x is Tempo) as Tempo;
             var ts = master.First(x => x is TimeSignature) as TimeSignature;
+            var ev = master.First(x => x is Event) as Event;
+            var section = master.First(x => x is Section) as Section;
 
             // Tempo track
             mid.AddTrack(CreateTempoTrack(tempo, ts));
             
             // Bass tracks
             var track = CreateTabTrack(GetInstrumentTracks("bass", "jam"), "PART BASS_E");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("bass", "nov"), "PART BASS_M");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("bass", "beg"), "PART BASS_H");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("bass", "int"), "PART BASS_X");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("bass", "adv"), "PART BASS_R");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
 
             // Guitar tracks
             track = CreateTabTrack(GetInstrumentTracks("guitar", "jam"), "PART GUITAR_E");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("guitar", "nov"), "PART GUITAR_M");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("guitar", "beg"), "PART GUITAR_H");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("guitar", "int"), "PART GUITAR_X");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("guitar", "adv"), "PART GUITAR_R");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
             track = CreateTabTrack(GetInstrumentTracks("guitar", "rhy"), "PART GUITAR_R_RHYTHM");
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
 
             // Vox track
             track = CreateVoxTrack(GetInstrumentTracks("vocals", ""));
-            if (track.Count > 1) mid.AddTrack(track);
+            if (track.Count > 2) mid.AddTrack(track);
 
-            // TODO: Add section/event track
+            // Events track
+            mid.AddTrack(CreateEventsTrack(ev, section));
 
             // Beat track
             var measure = master.First(x => x is Measure) as Measure;
@@ -186,6 +189,50 @@ namespace BFForever.MIDI
             return track;
         }
 
+        private List<MidiEvent> CreateEventsTrack(Event ev, Section section)
+        {
+            const int SECTION = 126;
+            const int EVENT_PHRASE = 125; // Event/phrase
+
+            List<MidiEvent> track = new List<MidiEvent>();
+            track.Add(new NAudio.Midi.TextEvent("EVENTS", MetaEventType.SequenceTrackName, 0));
+            
+            if (ev != null)
+            {
+                foreach (var entry in ev.Events)
+                {
+                    long start = GetAbsoluteTime(entry.Start);
+                    long end = GetAbsoluteTime(entry.End);
+
+                    track.Add(new NAudio.Midi.TextEvent($"e \"{entry.EventName}\"", MetaEventType.TextEvent, start));
+                    track.Add(new NoteEvent(start, 1, MidiCommandCode.NoteOn, EVENT_PHRASE, 100));
+                    track.Add(new NoteEvent(end, 1, MidiCommandCode.NoteOff, EVENT_PHRASE, 100));
+                }
+            }
+
+            if (section != null)
+            {
+                foreach (var entry in section.Events)
+                {
+                    long start = GetAbsoluteTime(entry.Start);
+                    long end = GetAbsoluteTime(entry.End);
+
+                    track.Add(new NAudio.Midi.TextEvent($"s \"{entry.EventName}\"", MetaEventType.TextEvent, start));
+                    track.Add(new NoteEvent(start, 1, MidiCommandCode.NoteOn, SECTION, 100));
+                    track.Add(new NoteEvent(end, 1, MidiCommandCode.NoteOff, SECTION, 100));
+                }
+            }
+
+            // Sort by absolute time (And ensure track name is first event)
+            track.Sort((x, y) => (int)(x is NAudio.Midi.TextEvent
+                                       && ((NAudio.Midi.TextEvent)x).MetaEventType == MetaEventType.SequenceTrackName
+                                       ? int.MinValue : x.AbsoluteTime - y.AbsoluteTime));
+
+            // Adds end track
+            track.Add(new MetaEvent(MetaEventType.EndTrack, 0, track.Last().AbsoluteTime));
+            return track;
+        }
+
         private List<MidiEvent> CreateBeatTrack(Measure measure)
         {
             List<MidiEvent> track = new List<MidiEvent>();
@@ -208,7 +255,7 @@ namespace BFForever.MIDI
 
         private List<MidiEvent> CreateVoxTrack(List<ZObject> voxTracks)
         {
-            const int VOX_SPREAD = 108;
+            const int VOX_SPREAD = 124;
             const int VOX_PUSH_PHRASE = 107;
             
             List<MidiEvent> track = new List<MidiEvent>();

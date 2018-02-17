@@ -12,6 +12,8 @@ namespace BFForever.MIDI
         protected static readonly FString EventAudioStart = StringKey.UpdateValue(0xd80b9a12e613a2dc, "AudioStart");
         protected static readonly FString EventAudioEnd = StringKey.UpdateValue(0x87c0360d9d948e2b, "AudioEnd");
         protected static readonly FString EventSongEnd = StringKey.UpdateValue(0x00d80ba698c7cf65, "SongEnd");
+        protected static readonly FString EventDisplayImage = StringKey.UpdateValue(0xf44df7abe21c201f, "DisplayImage");
+        protected static readonly FString EventPhrase = StringKey.UpdateValue(0x2a2922839fdc88b7, "Phrase");
 
         // Purple, yellow, blue, orange, green, red
         protected readonly TabFinger[] RB3Colors = { TabFinger.Open, TabFinger.Three, TabFinger.Four, TabFinger.Five, TabFinger.One, TabFinger.Two };
