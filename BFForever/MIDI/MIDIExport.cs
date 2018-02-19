@@ -179,7 +179,13 @@ namespace BFForever.MIDI
                 }
             }
 
-            // TODO: Add time signature changes
+            // Adds time signature changes
+            foreach (var time in ts.Events)
+            {
+                int den = (int)Math.Log(time.Measure, 2);
+
+                track.Add(new TimeSignatureEvent(this.GetAbsoluteTime(time.Start), time.Beat, den, 24, 8));
+            }
 
             // Sort by absolute time (And ensure track name is first event)
             track.Sort((x, y) => (int)(x is NAudio.Midi.TextEvent ? int.MinValue : x.AbsoluteTime - y.AbsoluteTime));
@@ -326,7 +332,7 @@ namespace BFForever.MIDI
             const int WHAMMY = 123;
 
             const int TAB_BASS_START = 79;
-            const int TAB_RESERVED_START = 71;
+            //const int TAB_RESERVED_START = 71;
             const int TAB_TREMELO_START = 63;
             const int TAB_PALM_MUTE_START = 55;
             const int TAB_EXTENDED_START = 47;
