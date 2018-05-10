@@ -23,8 +23,8 @@ namespace BFForever
         public float GuitarIntensity { get; set; }
         public float BassIntensity { get; set; }
         public float VoxIntensity { get; set; }
-        
-        public int Year { get; set; }
+
+        public int Year { get; set; } = DateTime.Now.Year;
 
         // Tunings
         public InstrumentTuning LeadGuitarTuning { get; set; } = InstrumentTuning.Guitar_EStandard;
