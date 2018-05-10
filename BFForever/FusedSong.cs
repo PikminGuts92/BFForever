@@ -11,13 +11,13 @@ namespace BFForever
 {
     public class FusedSong
     {
-        public string Identifier { get; set; }
-        public string Author { get; set; }
+        public string Identifier { get; set; } = "";
+        public string Author { get; set; } = "";
 
-        public string Title { get; set; }
-        public string Artist { get; set; }
-        public string Album { get; set; }
-        public string Description { get; set; }
+        public string Title { get; set; } = "";
+        public string Artist { get; set; } = "";
+        public string Album { get; set; } = "";
+        public string Description { get; set; } = "";
 
         public float SongLength { get; set; }
         public float GuitarIntensity { get; set; }
@@ -32,15 +32,21 @@ namespace BFForever
         public InstrumentTuning BassTuning { get; set; } = InstrumentTuning.Bass_EStandard;
 
         // External Files
-        public string TabPath { get; set; }
-        public string TexturePath { get; set; }
-        public string VideoPath { get; set; }
+        public string TabPath { get; set; } = "";
+        public string TexturePath { get; set; } = "";
+        public string VideoPath { get; set; } = "";
 
         public AudioPaths AudioPaths { get; set; } = new AudioPaths();
 
         public void Export(string path)
         {
-            string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            };
+            
+            string json = JsonConvert.SerializeObject(this, settings);
             File.WriteAllText(path, json);
         }
 

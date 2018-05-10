@@ -8,9 +8,9 @@ using CommandLine;
 namespace SongFuse
 {
     [Verb("new", HelpText = "Create new song directory")]
-    public class NewOptions
+    internal class NewOptions
     {
-        [Value(0, Required = true, HelpText = "Directory path to create project")]
+        [Value(0, Required = true, MetaName = "Project Path", MetaValue = "STRING", HelpText = "Directory path to create project")]
         public string ProjectPath { get; set; }
     }
 }

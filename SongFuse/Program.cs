@@ -14,15 +14,28 @@ namespace SongFuse
 {
     class Program
     {
+        /* Folder structure
+         * ================
+         * package/
+         * hashes.json
+         * song.json
+         */
+
+        /* Song creation steps
+         * ===================
+         * 1) New    - Creates project files
+         * 2) Build  - Translates chart/audio files to RIFF archive format
+         * 3) Deploy - Sends 'package' files to BF archive
+         */
+
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<AudioEncoderOptions, NewOptions>(args)
+            Parser.Default.ParseArguments<AudioEncoderOptions, BuildOptions, NewOptions>(args)
                 .WithParsed<AudioEncoderOptions>(ae => AudioEncoder(ae))
+                .WithParsed<BuildOptions>(b => BuildSong(b))
                 .WithParsed<NewOptions>(n => NewProject(n))
                 .WithNotParsed(err => NotParsed(err));
-
-
-
+            
             return;
             if (args == null || args.Length < 2) return;
             
@@ -65,6 +78,32 @@ namespace SongFuse
             Console.WriteLine($"Saved {o}");
         }
 
+        static void BuildSong(BuildOptions options)
+        {
+            string currentDir = Directory.GetCurrentDirectory();
+            string packagePath = Path.Combine(currentDir, "package");
+            string songPath = Path.Combine(currentDir, "song.json");
+
+            if (!File.Exists(songPath))
+            {
+                Console.WriteLine($"Can't find \"song.json\" file in {currentDir}");
+                return;
+            }
+
+            if (!Directory.Exists(packagePath))
+            {
+                Console.WriteLine($"Can't find {packagePath}");
+                return;
+            }
+            
+            FEnvironment env = new FEnvironment();
+            env.LoadPackage(Path.Combine(currentDir, "package"));
+
+            //FusedSong song = FusedSong.Import(songPath);
+
+            // TODO: Calculate audio file checksums to determine if re-encoding is needed
+        }
+
         static void NewProject(NewOptions options)
         {
             // Deletes directory and creates a new one
@@ -72,6 +111,7 @@ namespace SongFuse
                 Directory.Delete(options.ProjectPath, true);
 
             Directory.CreateDirectory(options.ProjectPath);
+            Directory.CreateDirectory(Path.Combine(options.ProjectPath, "package"));
 
             FusedSong song = new FusedSong();
             song.Export(Path.Combine(options.ProjectPath, "song.json"));

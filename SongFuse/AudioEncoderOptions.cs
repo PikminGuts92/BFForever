@@ -9,12 +9,12 @@ using CommandLine;
 namespace SongFuse
 {
     [Verb("audio", HelpText = "Encode/decode celt audio files")]
-    public class AudioEncoderOptions
+    internal class AudioEncoderOptions
     {
-        [Value(0, Required = true,  HelpText = "Path to input audio file")]
+        [Value(0, Required = true, MetaName = "Input Path", MetaValue = "STRING", HelpText = "Path to input audio file")]
         public string InputPath { get; set; }
 
-        [Value(1, Required = true, HelpText = "Path to output audio file")]
+        [Value(1, Required = true, MetaName = "Output Path", MetaValue = "STRING", HelpText = "Path to output audio file")]
         public string OutputPath { get; set; }
     }
 }
