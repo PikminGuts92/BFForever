@@ -98,7 +98,10 @@ namespace SongFuse
 
             var env = FEnvironment.New(packagePath, "bfforever", 2517);
             env.SavePendingChanges();
-            
+
+
+            SongManager man = new SongManager(env);
+            man.ImportSong(songPath);
 
             //FusedSong song = FusedSong.Import(songPath);
 

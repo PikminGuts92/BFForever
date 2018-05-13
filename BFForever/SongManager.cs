@@ -21,6 +21,11 @@ namespace BFForever
             _packageManager.LoadPackage(packageRoot);
         }
 
+        public SongManager(FEnvironment env)
+        {
+            _packageManager = env;
+        }
+
         private string GetFilePath(string path) => (Path.IsPathRooted(path)) ? path : Path.Combine(_jsonDirectory + path);
 
         private InstrumentTuning UpdateTuning(InstrumentTuning tuning, bool guitar)
