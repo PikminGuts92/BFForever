@@ -24,6 +24,39 @@ namespace BFForever.Riff
             _pendingChanges = new List<ZObject>();
         }
 
+        public static FEnvironment New(string directory, string packageName, int version)
+        {
+            FEnvironment env = new FEnvironment();
+
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            if (string.IsNullOrEmpty(packageName))
+                packageName = "bfforever";
+
+            Index2 index = new Index2($"packages.{packageName}.index2", $"packages.{packageName}")
+            {
+                Version = version
+            };
+
+            PackageDef def = new PackageDef($"PackageDefs.{packageName}.PackageDef", $"PackageDefs.{packageName}")
+            {
+                PackageName = packageName,
+                Version = version
+            };
+
+            Catalog2 cat = new Catalog2("catalog2", "catalog2");
+            
+            env.Index = index;
+            env._packageDefinitions.Add(def);
+            env._packagePaths.Add(def.FilePath, Path.GetFullPath(directory));
+
+            env.AddZObjectAsPending(cat);
+            env.UpdateIndexEntryAsPending(cat.FilePath, cat.Type, "catalog2.rif", env.Definition.FilePath);
+
+            return env;
+        }
+
         public ZObject this[HKey index] => GetZObject(Index?.Entries.SingleOrDefault(x => x.FilePath == index));
 
         public void LoadPackage(string rootPath)
@@ -47,19 +80,7 @@ namespace BFForever.Riff
                 if (_packagePaths.ContainsKey(newPackage.FilePath))
                     _packagePaths.Remove(newPackage.FilePath);
                 _packagePaths.Add(newPackage.FilePath, fullRootPath);
-
-                // Creates paths for packagedef + index2
-                void CreateHKeys(string name)
-                {
-                    HKey packageFilePath = new HKey("PackageDefs." + name + ".PackageDef");
-                    HKey packageDirectory = packageFilePath.GetParentDirectory();
-                    CreateStringTablePaths(packageDirectory);
-
-                    HKey indexFilePath = new HKey("packages." + name + ".index2");
-                    HKey indexDirectory = indexFilePath.GetParentDirectory();
-                    CreateStringTablePaths(indexDirectory);
-                }
-
+                
                 CreateHKeys(newPackage.PackageName);
                 newPackage.Entries.ForEach(x => CreateHKeys(x));
                 
@@ -71,8 +92,20 @@ namespace BFForever.Riff
             ReloadIndex(fullRootPath);
         }
 
+        private static void CreateHKeys(string name)
+        {
+            // Creates paths for packagedef + index2
+            HKey packageFilePath = new HKey("PackageDefs." + name + ".PackageDef");
+            HKey packageDirectory = packageFilePath.GetParentDirectory();
+            CreateStringTablePaths(packageDirectory);
+
+            HKey indexFilePath = new HKey("packages." + name + ".index2");
+            HKey indexDirectory = indexFilePath.GetParentDirectory();
+            CreateStringTablePaths(indexDirectory);
+        }
+
         // Used mostly for debugging
-        private List<HKey> CreateStringTablePaths(HKey directory)=> Global.StringTableLocalizations.Select(x => (HKey)(directory.Value + "." + x.Value)).ToList();
+        private static List<HKey> CreateStringTablePaths(HKey directory)=> Global.StringTableLocalizations.Select(x => (HKey)(directory.Value + "." + x.Value)).ToList();
 
         private ZObject GetZObject(Index2Entry entry)
         {

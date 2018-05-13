@@ -95,9 +95,10 @@ namespace SongFuse
                 Console.WriteLine($"Can't find {packagePath}");
                 return;
             }
+
+            var env = FEnvironment.New(packagePath, "bfforever", 2517);
+            env.SavePendingChanges();
             
-            FEnvironment env = new FEnvironment();
-            env.LoadPackage(Path.Combine(currentDir, "package"));
 
             //FusedSong song = FusedSong.Import(songPath);
 
