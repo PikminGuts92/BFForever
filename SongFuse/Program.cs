@@ -18,6 +18,7 @@ namespace SongFuse
          * ================
          * package/
          * hashes.json
+         * settings.json?
          * song.json
          */
 
@@ -30,9 +31,10 @@ namespace SongFuse
 
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<AudioEncoderOptions, BuildOptions, NewOptions>(args)
+            Parser.Default.ParseArguments<AudioEncoderOptions, BuildOptions, DeployOptions, NewOptions>(args)
                 .WithParsed<AudioEncoderOptions>(ae => AudioEncoder(ae))
                 .WithParsed<BuildOptions>(b => BuildSong(b))
+                .WithParsed<DeployOptions>(b => DeploySong(b))
                 .WithParsed<NewOptions>(n => NewProject(n))
                 .WithNotParsed(err => NotParsed(err));
             
@@ -106,6 +108,11 @@ namespace SongFuse
             //FusedSong song = FusedSong.Import(songPath);
 
             // TODO: Calculate audio file checksums to determine if re-encoding is needed
+        }
+
+        static void DeploySong(DeployOptions options)
+        {
+
         }
 
         static void NewProject(NewOptions options)
