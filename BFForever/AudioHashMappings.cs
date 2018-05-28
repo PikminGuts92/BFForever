@@ -18,6 +18,14 @@ namespace BFForever
         public HashMapping RhythmGuitar { get; set; }
         public HashMapping Vox { get; set; }
 
+        public bool ShouldSerializePreview() => Preview.Input != 0 && Preview.Output != 0;
+        public bool ShouldSerializeBacking() => Backing.Input != 0 && Backing.Output != 0;
+        public bool ShouldSerializeBass() => Bass.Input != 0 && Bass.Output != 0;
+        public bool ShouldSerializeDrums() => Drums.Input != 0 && Drums.Output != 0;
+        public bool ShouldSerializeLeadGuitar() => LeadGuitar.Input != 0 && LeadGuitar.Output != 0;
+        public bool ShouldSerializeRhythmGuitar() => RhythmGuitar.Input != 0 && RhythmGuitar.Output != 0;
+        public bool ShouldSerializeVox() => Vox.Input != 0 && Vox.Output != 0;
+
         public void Export(string path)
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
@@ -30,10 +38,10 @@ namespace BFForever
             File.WriteAllText(path, json);
         }
 
-        public static HashMapping Import(string path)
+        public static AudioHashMappings Import(string path)
         {
             string json = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<HashMapping>(json);
+            return JsonConvert.DeserializeObject<AudioHashMappings>(json);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BFForever
 {
-    public class HashMapping
+    public struct HashMapping
     {
         private static CRC64 _crc = new CRC64();
 

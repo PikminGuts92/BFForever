@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using BFForever.Riff;
+using BFForever.Audio;
 using BFForever.MIDI;
+using BFForever.Riff;
 using Newtonsoft.Json;
 
 namespace BFForever
@@ -139,15 +140,72 @@ namespace BFForever
 
             //CopyFile(GetFilePath(fusedSong.TexturePath), "album.xpr");
             CopyFile(GetFilePath(fusedSong.VideoPath), "musicvideo\\video.bik");
-
+            
             if (fusedSong.AudioPaths == null) return;
-            CopyFile(GetFilePath(fusedSong.AudioPaths.Preview), "preview\\audio.clt");
-            CopyFile(GetFilePath(fusedSong.AudioPaths.Backing), "gamestems\\back\\audio.clt");
-            CopyFile(GetFilePath(fusedSong.AudioPaths.Bass), "gamestems\\bass\\audio.clt");
-            CopyFile(GetFilePath(fusedSong.AudioPaths.Drums), "gamestems\\drums\\audio.clt");
-            CopyFile(GetFilePath(fusedSong.AudioPaths.LeadGuitar), "gamestems\\gtr1\\audio.clt");
-            CopyFile(GetFilePath(fusedSong.AudioPaths.RhythmGuitar), "gamestems\\gtr\\audio.clt");
-            CopyFile(GetFilePath(fusedSong.AudioPaths.Vox), "gamestems\\vox\\audio.clt");
+
+            EncodeAudio(fusedSong);
+        }
+
+        private void EncodeAudio(FusedSong song)
+        {
+            string mapPath = GetFilePath("hashes.json");
+
+            // Imports existing mappings if found
+            AudioHashMappings audioMap = File.Exists(mapPath)
+                ? AudioHashMappings.Import(mapPath)
+                : new AudioHashMappings();
+            
+            string GetPackageFilePath(string relativePath) =>
+                Path.Combine(_packageManager.CurrentPackageDirectory + "\\songs\\", song.Identifier.Replace(".", "\\") + "\\" + relativePath);
+
+            bool IsCeltFile(string path)
+            {
+                string ext = Path.GetExtension(path);
+                return ext.Equals(".clt", StringComparison.CurrentCultureIgnoreCase);
+            }
+
+            HashMapping EncodeAudio(string input, string output, HashMapping oldMap)
+            {
+                if (!File.Exists(input))
+                {
+                    // Delete if no input
+                    if (File.Exists(output)) File.Delete(output);
+
+                    return oldMap;
+                }
+                else if (!File.Exists(output))
+                {
+                    // Encodes audio (Import from celt supported)
+                    Celt celt = IsCeltFile(input) ? Celt.FromFile(input) : Celt.FromAudio(input);
+                    celt.Export(output);
+
+                    // Updates hashes
+                    return HashMapping.CreateMapping(input, output);
+                }
+
+                HashMapping newMap = HashMapping.CreateMapping(input, output);
+
+                if (newMap.Input != oldMap.Input || newMap.Output != oldMap.Output)
+                {
+                    // Encodes audio
+                    Celt celt = IsCeltFile(input) ? Celt.FromFile(input) : Celt.FromAudio(input);
+                    celt.Export(output);
+                }
+                // Else means they're equal, no need to re-encode
+
+                // Returns new hashes
+                return newMap;
+            }
+
+            audioMap.Preview = EncodeAudio(GetFilePath(song.AudioPaths.Preview), GetPackageFilePath("preview\\audio.clt"), audioMap.Preview);
+            audioMap.Backing = EncodeAudio(GetFilePath(song.AudioPaths.Backing), GetPackageFilePath("gamestems\\back\\audio.clt"), audioMap.Backing);
+            audioMap.Bass = EncodeAudio(GetFilePath(song.AudioPaths.Bass), GetPackageFilePath("gamestems\\bass\\audio.clt"), audioMap.Bass);
+            audioMap.Drums = EncodeAudio(GetFilePath(song.AudioPaths.Drums), GetPackageFilePath("gamestems\\drums\\audio.clt"), audioMap.Drums);
+            audioMap.LeadGuitar = EncodeAudio(GetFilePath(song.AudioPaths.LeadGuitar), GetPackageFilePath("gamestems\\gtr1\\audio.clt"), audioMap.LeadGuitar);
+            audioMap.RhythmGuitar = EncodeAudio(GetFilePath(song.AudioPaths.RhythmGuitar), GetPackageFilePath("gamestems\\gtr2\\audio.clt"), audioMap.RhythmGuitar);
+            audioMap.Vox = EncodeAudio(GetFilePath(song.AudioPaths.Vox), GetPackageFilePath("gamestems\\vox\\audio.clt"), audioMap.Vox);
+
+            audioMap.Export(mapPath);
         }
 
         private List<ZObject> CreateSongObjects(FusedSong input)
