@@ -94,8 +94,8 @@ namespace SongFuse
 
             if (!Directory.Exists(packagePath))
             {
-                Console.WriteLine($"Can't find {packagePath}");
-                return;
+                // Create package directory
+                Directory.CreateDirectory(packagePath);
             }
 
             var env = FEnvironment.New(packagePath, "bfforever", 2517);

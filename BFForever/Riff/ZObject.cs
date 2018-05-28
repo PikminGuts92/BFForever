@@ -35,7 +35,11 @@ namespace BFForever.Riff
             List<FString> strings = new List<FString>();
 
             // Only writes type, just like real BF data
-            if (!(this is StringTable)) strings.Add(Type);
+            // if (!(this is StringTable)) strings.Add(Type);
+
+            strings.Add(FilePath);
+            strings.Add(DirectoryPath);
+            strings.Add(Type);
 
             AddMemberStrings(strings);
             return strings.Distinct().ToList();

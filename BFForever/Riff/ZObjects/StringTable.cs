@@ -69,8 +69,8 @@ namespace BFForever.Riff
         protected override void AddMemberStrings(List<FString> strings)
         {
             // It's not in English tables for whatever reason
-            if (Localization != Localization.English)
-                strings.Add(DirectoryPath);
+            // if (Localization != Localization.English)
+            //    strings.Add(DirectoryPath);
         }
 
         internal override void ReadData(AwesomeReader ar)
