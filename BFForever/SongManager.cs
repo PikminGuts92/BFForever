@@ -190,6 +190,9 @@ namespace BFForever
                     // Encodes audio
                     Celt celt = IsCeltFile(input) ? Celt.FromFile(input) : Celt.FromAudio(input);
                     celt.Export(output);
+
+                    // Updates output hash
+                    newMap.Output = HashMapping.ComputeHashFromFile(output);
                 }
                 // Else means they're equal, no need to re-encode
 
