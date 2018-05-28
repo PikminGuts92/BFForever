@@ -55,11 +55,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioHashMappings.cs" />
     <Compile Include="AudioPaths.cs" />
     <Compile Include="Audio\Celt.cs" />
     <Compile Include="AwesomeReader.cs" />
     <Compile Include="AwesomeWriter.cs" />
     <Compile Include="CRC64.cs" />
+    <Compile Include="HashMapping.cs" />
     <Compile Include="MIDI\ChartImport.cs" />
     <Compile Include="MIDI\MIDIExport.cs" />
     <Compile Include="MIDI\MIDIImport.cs" />
