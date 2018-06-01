@@ -1,5 +1,7 @@
 The following third-party libraries are re-distributed with their respected licenses.
 
+CommandLineParser (MIT) https://github.com/commandlineparser/commandline/blob/master/License.md
 Concentus https://github.com/lostromb/concentus/blob/master/LICENSE
-NAudio (MS-PL) https://github.com/naudio/NAudio/blob/master/license.txt
 JSON.NET (MIT) https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
+Magick.NET (Apache 2.0) https://github.com/dlemstra/Magick.NET/blob/master/License.txt
+NAudio (MS-PL) https://github.com/naudio/NAudio/blob/master/license.txt
