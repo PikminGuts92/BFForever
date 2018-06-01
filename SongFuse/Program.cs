@@ -133,8 +133,23 @@ namespace SongFuse
 
         static void ConvertTexture(TextureOptions options)
         {
-            XPR2 xpr = XPR2.FromFile(options.InputPath);
-            xpr.WriteToPNG(options.OutputPath);
+            bool IsXprFile(string path)
+            {
+                string ext = Path.GetExtension(path);
+                return ext.Equals(".xpr", StringComparison.CurrentCultureIgnoreCase);
+            }
+
+            // Imports xpr file
+            XPR2 xpr = IsXprFile(options.InputPath) ? XPR2.FromFile(options.InputPath) : XPR2.FromImage(options.InputPath);
+            Console.WriteLine($"Opened {options.InputPath}");
+
+            // Exports output texture file
+            if (IsXprFile(options.OutputPath))
+                xpr.Export(options.OutputPath);
+            else
+                xpr.WriteToImage(options.OutputPath);
+
+            Console.WriteLine($"Saved {options.OutputPath}");
         }
 
         static void NotParsed(IEnumerable<Error> error)

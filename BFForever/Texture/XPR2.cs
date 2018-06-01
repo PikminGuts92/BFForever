@@ -15,7 +15,8 @@ namespace BFForever.Texture
         private const int MAGIC_XPR2 = 1481658930;
         private const int MAGIC_TX2D = 1415066180;
 
-        private MagickImage[] images;
+        private MagickImage _image;
+        private string _name;
 
         private XPR2()
         {
@@ -35,9 +36,10 @@ namespace BFForever.Texture
                 ar.ReadInt32(); // Always 2048?
 
                 int texSize = ar.ReadInt32();
-                xpr.images = new MagickImage[ar.ReadInt32()];
+                int imageCount = ar.ReadInt32();
+                xpr._image = new MagickImage();
 
-                for (int i = 0; i < xpr.images.Length; i++)
+                for (int i = 0; i < imageCount; i++)
                 {
                     // TX2D Header
                     if (ar.ReadInt32() != MAGIC_TX2D) continue;
@@ -71,15 +73,19 @@ namespace BFForever.Texture
                             compression = "DXT1";
                             break;
                         case 0x53: // DXT3
+                            continue;
                         case 0x54: // DXT5
+                            compression = "DXT5";
+                            break;
                         case 0x71: // DXT5 - Packed normal map
                         case 0x7C: // DXT1 - Packed normal map
-                        case 0x86: // Raw
+                        case 0x86: // Raw (a8r8g8b8)
                             continue;
                     }
 
+                    // TODO: Better implementation for alternate compressions
                     SwapBytes(data);
-                    byte[] outData = UntileCompressedXbox360Texture(data, width, height, width, height, 4, 4, 8);
+                    byte[] outData = UntileCompressedXbox360Texture(data, width, height, width, height, 4, 4, compression == "DXT1" ? 8 : 16);
                     byte[] dds = new byte[128 + outData.Length];
                     
                     // Writes DDS file
@@ -90,20 +96,98 @@ namespace BFForever.Texture
                     }
 
                     // Converts to bitmap
-                    xpr.images[i] = new MagickImage(dds);
+                    xpr._image = new MagickImage(dds);
+                    xpr._name = name;
                 }
             }
 
             return xpr;
         }
 
-        public void WriteToPNG(string path)
+        public void Export(string path)
+        {
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            using (FileStream fs = File.OpenWrite(path))
+            {
+                WriteToStream(fs);
+            }
+        }
+
+        private void WriteToStream(Stream stream)
+        {
+            MagickImage image = new MagickImage(_image);
+            image.Format = MagickFormat.Dxt1;
+            
+            byte[] data = new byte[(image.Height * image.Width) / 2];
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Writes DDS to stream
+                image.Write(ms);
+
+                // Copies raw DXT data
+                ms.Seek(128, SeekOrigin.Begin); // Skips header
+                ms.Read(data, 0, data.Length);
+            }
+
+            data = TileCompressedXbox360Texture(data, image.Width, image.Width, image.Height, image.Height, 4, 4, 8);
+            SwapBytes(data);
+
+            // Writes raw tiled DXT1 bytes for now
+            using (AwesomeWriter aw = new AwesomeWriter(stream, true))
+            {
+                aw.Write(data);
+
+                /*
+                aw.Write((int)MAGIC_XPR2);
+                aw.Write((int)2048);
+                aw.Write((int)tiledSize);
+                aw.Write((int)1); // Only supporting 1 texture at the moment
+                */
+                
+
+                /*
+                aw.Write(Convert.ToUInt16(Encrypted));
+                aw.Write((uint)TotalSamples);
+                aw.Write((uint)Bitrate);
+
+                aw.Write((ushort)FrameSize);
+                aw.Write((ushort)Lookahead);
+                aw.Write((ushort)SampleRate);
+                aw.Write((ushort)Unknown);
+
+                aw.Write((uint)ReckoningOffset);
+                aw.Write((uint)ReckoningSize);
+                aw.Write((uint)PacketStreamOffset);
+                aw.Write((uint)PacketStreamSize);
+
+                aw.Write(Reckoning);
+                aw.Write(PacketStream);
+                */
+            }
+        }
+
+        public static XPR2 FromImage(string path)
+        {
+            if (!File.Exists(path)) return null;
+            
+            XPR2 xpr = new XPR2();
+
+            xpr._image = new MagickImage(path);
+            xpr._name = Path.GetFileNameWithoutExtension(path);
+            
+            return xpr;
+        }
+
+        public void WriteToImage(string path)
         {
             // Creates directory if needed
             if (!Directory.Exists(Path.GetDirectoryName(path)))
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-            images[0].Write(path);
+            _image.Write(path);
         }
         
         private static void SwapBytes(byte[] data)
@@ -231,6 +315,45 @@ namespace BFForever.Texture
                     int dstOffset = (dy * originalBlockWidth + dx) * bytesPerBlock;
                     int srcOffset = (sy * tiledBlockWidth + sx) * bytesPerBlock;
                     Array.Copy(src, srcOffset, dst, dstOffset, bytesPerBlock);
+                }
+            }
+
+            return dst;
+        }
+
+        private static byte[] TileCompressedXbox360Texture(byte[] src, int tiledWidth, int originalWidth, int tiledHeight, int originalHeight, int blockSizeX, int blockSizeY, int bytesPerBlock)
+        {
+            // Thanks to UModel: https://github.com/gildor2/UModel/blob/master/Unreal/UnTexture.cpp
+            int dstSize = (int)Math.Pow(2, Math.Ceiling(Math.Log(tiledWidth, 2)))
+                        * (int)Math.Pow(2, Math.Ceiling(Math.Log(tiledHeight, 2)));
+
+            if (bytesPerBlock == 8)
+                dstSize <<= 1; // Note: DXT1 is doubled
+
+            byte[] dst = new byte[dstSize];
+
+            int tiledBlockWidth = tiledWidth / blockSizeX;          // Width of image in blocks
+            int originalBlockWidth = originalWidth / blockSizeX;    // Width of image in blocks
+            int tiledBlockHeight = tiledHeight / blockSizeY;        // Height of image in blocks
+            int originalBlockHeight = originalHeight / blockSizeY;  // Height of image in blocks
+            int logBpp = (int)Math.Log(bytesPerBlock, 2);
+
+            int sxOffset = 0;
+            if ((tiledBlockWidth >= originalBlockWidth * 2) && (originalWidth == 16))
+                sxOffset = originalBlockWidth;
+
+            // Iterate image blocks
+            for (int dy = 0; dy < originalBlockHeight; dy++)
+            {
+                for (int dx = 0; dx < originalBlockWidth; dx++)
+                {
+                    int swzAddr = (int)GetTiledOffset(dx + sxOffset, dy, tiledBlockWidth, logBpp);  // Do once for whole block
+                    int sy = swzAddr / tiledBlockWidth;
+                    int sx = swzAddr % tiledBlockWidth;
+
+                    int dstOffset = (dy * originalBlockWidth + dx) * bytesPerBlock;
+                    int srcOffset = (sy * tiledBlockWidth + sx) * bytesPerBlock;
+                    Array.Copy(src, dstOffset, dst, srcOffset, bytesPerBlock);
                 }
             }
 
