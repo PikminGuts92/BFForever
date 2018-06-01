@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
-using S16.Drawing;
 
 // Helpful resource - http://forum.xentax.com/viewtopic.php?p=65649
 

@@ -113,7 +113,6 @@
     <Compile Include="FusedSong.cs" />
     <Compile Include="Riff\ZObjects\VoxSpread.cs" />
     <Compile Include="Riff\ZObjects\Whammy.cs" />
-    <Compile Include="Texture\DDSImageParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SongManager.cs" />
     <Compile Include="Texture\XPR2.cs" />
