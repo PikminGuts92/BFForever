@@ -134,7 +134,7 @@ namespace SongFuse
         static void ConvertTexture(TextureOptions options)
         {
             XPR2 xpr = XPR2.FromFile(options.InputPath);
-            xpr.WriteToDDS(options.OutputPath);
+            xpr.WriteToPNG(options.OutputPath);
         }
 
         static void NotParsed(IEnumerable<Error> error)

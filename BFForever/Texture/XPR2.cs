@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
-using System.IO;
+using ImageMagick;
 
 // Helpful resource - http://forum.xentax.com/viewtopic.php?p=65649
 
@@ -15,7 +15,7 @@ namespace BFForever.Texture
         private const int MAGIC_XPR2 = 1481658930;
         private const int MAGIC_TX2D = 1415066180;
 
-        private Bitmap[] images;
+        private MagickImage[] images;
 
         private XPR2()
         {
@@ -35,7 +35,7 @@ namespace BFForever.Texture
                 ar.ReadInt32(); // Always 2048?
 
                 int texSize = ar.ReadInt32();
-                xpr.images = new Bitmap[ar.ReadInt32()];
+                xpr.images = new MagickImage[ar.ReadInt32()];
 
                 for (int i = 0; i < xpr.images.Length; i++)
                 {
@@ -88,18 +88,22 @@ namespace BFForever.Texture
                         ms.Write(BuildDDSHeader(compression, width, height, width * 4, 0), 0, 128);
                         ms.Write(outData, 0, outData.Length);
                     }
+
+                    // Converts to bitmap
+                    xpr.images[i] = new MagickImage(dds);
                 }
             }
 
             return xpr;
         }
 
-        public void WriteToDDS(string path)
+        public void WriteToPNG(string path)
         {
             // Creates directory if needed
             if (!Directory.Exists(Path.GetDirectoryName(path)))
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
-            
+
+            images[0].Write(path);
         }
         
         private static void SwapBytes(byte[] data)
