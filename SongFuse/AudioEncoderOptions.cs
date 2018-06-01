@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-
 namespace SongFuse
 {
     [Verb("audio", HelpText = "Encode/decode celt audio files")]

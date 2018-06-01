@@ -31,11 +31,12 @@ namespace SongFuse
 
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<AudioEncoderOptions, BuildOptions, DeployOptions, NewOptions>(args)
+            Parser.Default.ParseArguments<AudioEncoderOptions, BuildOptions, DeployOptions, NewOptions, TextureOptions>(args)
                 .WithParsed<AudioEncoderOptions>(ae => AudioEncoder(ae))
                 .WithParsed<BuildOptions>(b => BuildSong(b))
-                .WithParsed<DeployOptions>(b => DeploySong(b))
+                .WithParsed<DeployOptions>(d => DeploySong(d))
                 .WithParsed<NewOptions>(n => NewProject(n))
+                .WithParsed<TextureOptions>(t => ConvertTexture(t))
                 .WithNotParsed(err => NotParsed(err));
             
             return;
@@ -128,6 +129,12 @@ namespace SongFuse
             song.Export(Path.Combine(options.ProjectPath, "song.json"));
 
             Console.WriteLine($"Created project in {options.ProjectPath}");
+        }
+
+        static void ConvertTexture(TextureOptions options)
+        {
+            XPR2 xpr = XPR2.FromFile(options.InputPath);
+            xpr.WriteToDDS(options.OutputPath);
         }
 
         static void NotParsed(IEnumerable<Error> error)

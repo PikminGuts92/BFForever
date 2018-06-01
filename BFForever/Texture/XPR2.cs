@@ -64,7 +64,7 @@ namespace BFForever.Texture
                     // Reads raw image data
                     ar.BaseStream.Position = bytesOffset;
                     byte[] data = ar.ReadBytes(size);
-
+                    
                     string compression = "";
                     switch(compressionType)
                     {
@@ -74,33 +74,35 @@ namespace BFForever.Texture
                         case 0x53: // DXT3
                         case 0x54: // DXT5
                         case 0x71: // DXT5 - Packed normal map
-                        case 0x7C: // DXT1 - PAcked normal map
-                        case 0x86: // raw
+                        case 0x7C: // DXT1 - Packed normal map
+                        case 0x86: // Raw
                             continue;
                     }
 
-                    byte[] dds = new byte[128 + data.Length];
                     SwapBytes(data);
-
+                    byte[] outData = UntileCompressedXbox360Texture(data, width, height, width, height, 4, 4, 8);
+                    byte[] dds = new byte[128 + outData.Length];
+                    
+                    // Writes DDS file
                     using (MemoryStream ms = new MemoryStream(dds))
                     {
-                        ms.Write(BuildDDSHeader(compression, width, height, data.Length, 0), 0, 128);
-                        ms.Write(data, 0, data.Length);
-                        ms.Seek(0, SeekOrigin.Begin);
-
-                        DDSImage image = new DDSImage(ms);
-                        xpr.images[i] = image.BitmapImage;
-                        //xpr.images[i].Save("converted.png");
+                        ms.Write(BuildDDSHeader(compression, width, height, width * 4, 0), 0, 128);
+                        ms.Write(outData, 0, outData.Length);
                     }
-                    //File.WriteAllBytes("test.dds", dds);
-
-                    continue; // Not ready for multiple images yet
                 }
             }
 
             return xpr;
         }
 
+        public void WriteToDDS(string path)
+        {
+            // Creates directory if needed
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            
+        }
+        
         private static void SwapBytes(byte[] data)
         {
             for (int i = 0; i < data.Length; i += 2)
@@ -116,7 +118,7 @@ namespace BFForever.Texture
         {
             byte[] dds = new byte[] //512x512 DXT5  -- 128 Bytes
                 {//|-D-----D-----S---------|--Header Size (124)----|-------Flags-----------|-------Height--------|
-                    0x44, 0x44, 0x53, 0x20, 0x7C, 0x00, 0x00, 0x00, 0x07, 0x10, 0x0A, 0x00, 0x00, 0x02, 0x00, 0x00,
+                    0x44, 0x44, 0x53, 0x20, 0x7C, 0x00, 0x00, 0x00, 0x07, 0x10, 0x08, 0x00, 0x00, 0x02, 0x00, 0x00,
                  //|--------Width----------|-----Size or Pitch-----|                       |-------Mip Maps------|
                     0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -173,6 +175,63 @@ namespace BFForever.Texture
             }
 
             return dds;
+        }
+        
+        private static uint GetTiledOffset(int x, int y, int width, int logBpb)
+        {
+            // Width <= 8192 && (x < width)
+
+            int alignedWidth = Align(width, 32);
+            // Top bits of coordinates
+            int macro = ((x >> 5) + (y >> 5) * (alignedWidth >> 5)) << (logBpb + 7);
+            // Lower bits of coordinates (result is 6-bit value)
+            int micro = ((x & 7) + ((y & 0xE) << 2)) << logBpb;
+            // Mix micro/macro + add few remaining x/y bits
+            int offset = macro + ((micro & ~0xF) << 1) + (micro & 0xF) + ((y & 1) << 4);
+
+            // Mix bits again
+            return (uint)((((offset & ~0x1FF) << 3) +                  // Upper bits (offset bits [*-9])
+                           ((y & 16) << 7) +                           // Next 1 bit
+                           ((offset & 0x1C0) << 2) +                   // Next 3 bits (offset bits [8-6])
+                           (((((y & 8) >> 2) + (x >> 3)) & 3) << 6) +  // Next 2 bits
+                           (offset & 0x3F)                             // Lower 6 bits (offset bits [5-0])
+                           ) >> logBpb);
+        }
+
+        private static int Align(int ptr, int alignment) => (ptr + alignment - 1) & ~(alignment - 1);
+
+        private static byte[] UntileCompressedXbox360Texture(byte[] src , int tiledWidth, int originalWidth, int tiledHeight, int originalHeight, int blockSizeX, int blockSizeY, int bytesPerBlock)
+        {
+            // Thanks to UModel: https://github.com/gildor2/UModel/blob/master/Unreal/UnTexture.cpp
+            int dstSize = ((tiledHeight * tiledWidth) * ((bytesPerBlock * 8) / (blockSizeX * blockSizeY))) / 8;
+            byte[] dst = new byte[dstSize];
+
+            int tiledBlockWidth = tiledWidth / blockSizeX;          // Width of image in blocks
+            int originalBlockWidth = originalWidth / blockSizeX;    // Width of image in blocks
+            int tiledBlockHeight = tiledHeight / blockSizeY;        // Height of image in blocks
+            int originalBlockHeight = originalHeight / blockSizeY;  // Height of image in blocks
+            int logBpp = (int)Math.Log(bytesPerBlock, 2);
+
+            int sxOffset = 0;
+            if ((tiledBlockWidth >= originalBlockWidth * 2) && (originalWidth == 16))
+                sxOffset = originalBlockWidth;
+
+            // Iterate image blocks
+            for (int dy = 0; dy < originalBlockHeight; dy++)
+            {
+                for (int dx = 0; dx < originalBlockWidth; dx++)
+                {
+                    int swzAddr = (int)GetTiledOffset(dx + sxOffset, dy, tiledBlockWidth, logBpp);  // Do once for whole block
+                    int sy = swzAddr / tiledBlockWidth;
+                    int sx = swzAddr % tiledBlockWidth;
+
+                    int dstOffset = (dy * originalBlockWidth + dx) * bytesPerBlock;
+                    int srcOffset = (sy * tiledBlockWidth + sx) * bytesPerBlock;
+                    Array.Copy(src, srcOffset, dst, dstOffset, bytesPerBlock);
+                }
+            }
+
+            return dst;
         }
     }
 }
