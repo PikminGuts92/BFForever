@@ -15,6 +15,29 @@ namespace BFForever.Texture
         private const int MAGIC_XPR2 = 1481658930;
         private const int MAGIC_TX2D = 1415066180;
 
+        private static readonly byte[] xpr2_dxt5_2048x2048 = new byte[]
+        {
+            // 0x08 = tiled size, 0x60 = height, 0x62 = width
+            0x58, 0x50, 0x52, 0x32, 0x00, 0x00, 0x08, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+            0x54, 0x58, 0x32, 0x44, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x34, 0x00, 0x00, 0x00, 0x18,
+            0x00, 0x00, 0x00, 0x00, 0x62, 0x66, 0x66, 0x6F, 0x72, 0x65, 0x76, 0x65, 0x72, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xFF, 0xFF, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x90, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x54,
+            0x00, 0xFF, 0xE7, 0xFF, 0x00, 0x00, 0x0D, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00
+        };
+
+        private static readonly byte[] xpr2_dxt1_120x120 = new byte[]
+        {
+            // 0x08 = tiled size, 0x50 = height, 0x52 = width
+            0x58, 0x50, 0x52, 0x32, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x01,
+            0x54, 0x58, 0x32, 0x44, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x34, 0x00, 0x00, 0x00, 0x18,
+            0x00, 0x00, 0x00, 0x00, 0x62, 0x66, 0x66, 0x6F, 0x72, 0x65, 0x76, 0x65, 0x72, 0x00, 0x00, 0x03,
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0xFF, 0xFF, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x81, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x52,
+            0x00, 0x0E, 0xE0, 0x77, 0x00, 0x00, 0x0D, 0x10, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x2A, 0x00
+        };
+
         private MagickImage _image;
         private string _name;
 
@@ -118,10 +141,34 @@ namespace BFForever.Texture
         private void WriteToStream(Stream stream)
         {
             MagickImage image = new MagickImage(_image);
-            image.Format = MagickFormat.Dxt1;
-            
-            byte[] data = new byte[(image.Height * image.Width) / 2];
+            image.Format = MagickFormat.Dxt5;
 
+            // Header info
+            byte[] header;
+            int hOffset, wOffset, bpp;
+            int textureDataOffset = 2060;
+
+            switch (image.Format)
+            {
+                case MagickFormat.Dxt1:
+                    header = xpr2_dxt1_120x120.ToArray();
+                    hOffset = 0x50;
+                    wOffset = 0x52;
+                    bpp = 4;
+                    break;
+                case MagickFormat.Dxt5:
+                    header = xpr2_dxt5_2048x2048.ToArray();
+                    hOffset = 0x60;
+                    wOffset = 0x62;
+                    bpp = 8;
+                    break;
+                default:
+                    // This shouldn't happen
+                    return;
+            }
+            
+            // Reads raw texture data
+            byte[] textureData = new byte[((image.Height * image.Width) * 8) / bpp];
             using (MemoryStream ms = new MemoryStream())
             {
                 // Writes DDS to stream
@@ -129,43 +176,23 @@ namespace BFForever.Texture
 
                 // Copies raw DXT data
                 ms.Seek(128, SeekOrigin.Begin); // Skips header
-                ms.Read(data, 0, data.Length);
+                ms.Read(textureData, 0, textureData.Length);
             }
 
-            data = TileCompressedXbox360Texture(data, image.Width, image.Width, image.Height, image.Height, 4, 4, 8);
-            SwapBytes(data);
+            // Writes xpr2 header
+            PatchXPR2Header(header, textureData.Length, 8, image.Height, hOffset, image.Width, wOffset);
 
-            // Writes raw tiled DXT1 bytes for now
+            // Converts to x360 format
+            textureData = TileCompressedXbox360Texture(textureData, image.Width, image.Width, image.Height, image.Height, 4, 4, (16 * bpp) / 8);
+            SwapBytes(textureData);
+
+            // Writes to XPR2 stream
             using (AwesomeWriter aw = new AwesomeWriter(stream, true))
             {
-                aw.Write(data);
+                aw.Write(header);
 
-                /*
-                aw.Write((int)MAGIC_XPR2);
-                aw.Write((int)2048);
-                aw.Write((int)tiledSize);
-                aw.Write((int)1); // Only supporting 1 texture at the moment
-                */
-                
-
-                /*
-                aw.Write(Convert.ToUInt16(Encrypted));
-                aw.Write((uint)TotalSamples);
-                aw.Write((uint)Bitrate);
-
-                aw.Write((ushort)FrameSize);
-                aw.Write((ushort)Lookahead);
-                aw.Write((ushort)SampleRate);
-                aw.Write((ushort)Unknown);
-
-                aw.Write((uint)ReckoningOffset);
-                aw.Write((uint)ReckoningSize);
-                aw.Write((uint)PacketStreamOffset);
-                aw.Write((uint)PacketStreamSize);
-
-                aw.Write(Reckoning);
-                aw.Write(PacketStream);
-                */
+                aw.Seek(textureDataOffset, SeekOrigin.Begin);
+                aw.Write(textureData);
             }
         }
 
@@ -198,6 +225,22 @@ namespace BFForever.Texture
                 byte b = data[i];
                 data[i] = data[i + 1];
                 data[i + 1] = b;
+            }
+        }
+
+        private static void PatchXPR2Header(byte[] header, int t, int tOffset, int h, int hOffset, int w, int wOffset)
+        {
+            using (AwesomeWriter aw = new AwesomeWriter(new MemoryStream(header), true))
+            {
+                // Encodes texture size, height, and width
+                aw.Seek(tOffset, SeekOrigin.Begin);
+                aw.Write((int)t);
+
+                aw.Seek(hOffset, SeekOrigin.Begin);
+                aw.Write((short)((h >> 3) - 1));
+                
+                aw.Seek(wOffset, SeekOrigin.Begin);
+                aw.Write((short)((w - 1) | 0xE000));
             }
         }
 
@@ -323,8 +366,7 @@ namespace BFForever.Texture
 
         private static byte[] TileCompressedXbox360Texture(byte[] src, int tiledWidth, int originalWidth, int tiledHeight, int originalHeight, int blockSizeX, int blockSizeY, int bytesPerBlock)
         {
-            // Thanks to UModel: https://github.com/gildor2/UModel/blob/master/Unreal/UnTexture.cpp
-            int dstSize = (int)Math.Pow(2, Math.Ceiling(Math.Log(tiledWidth, 2)))
+            int dstSize = (int)Math.Pow(2, Math.Ceiling(Math.Log(tiledWidth,  2)))
                         * (int)Math.Pow(2, Math.Ceiling(Math.Log(tiledHeight, 2)));
 
             if (bytesPerBlock == 8)
