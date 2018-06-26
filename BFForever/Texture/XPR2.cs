@@ -142,7 +142,7 @@ namespace BFForever.Texture
         {
             MagickImage image = new MagickImage(_image);
             image.Format = MagickFormat.Dxt5;
-
+            
             // Header info
             byte[] header;
             int hOffset, wOffset, bpp;
@@ -152,12 +152,16 @@ namespace BFForever.Texture
             {
                 case MagickFormat.Dxt1:
                     header = xpr2_dxt1_120x120.ToArray();
+                    image.Resize(120, 120);
+
                     hOffset = 0x50;
                     wOffset = 0x52;
                     bpp = 4;
                     break;
                 case MagickFormat.Dxt5:
                     header = xpr2_dxt5_2048x2048.ToArray();
+                    image.Resize(2048, 2048);
+
                     hOffset = 0x60;
                     wOffset = 0x62;
                     bpp = 8;
