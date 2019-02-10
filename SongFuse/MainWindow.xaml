@@ -1,0 +1,55 @@
+﻿<Window x:Class="SongFuse.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SongFuse"
+        mc:Ignorable="d"
+        Title="Song Fuse" Height="450" Width="800"
+        Style="{DynamicResource ResourceKey=StyleDefault}">
+    <Window.Resources>
+        <!--Brushes that are used-->
+        <SolidColorBrush x:Key="Brush_Background" Color="Black"/>
+        <SolidColorBrush x:Key="Brush_BackgroundLight" Color="#202020"/>
+        <SolidColorBrush x:Key="Brush_BackgroundLighter" Color="#404040"/>
+        <SolidColorBrush x:Key="Brush_Border" Color="#80E7A628" />
+        <SolidColorBrush x:Key="Brush_DefaultText" Color="White"/>
+        <SolidColorBrush x:Key="Brush_Menu" Color="#FF9F5D71"/>
+        <SolidColorBrush x:Key="Brush_Menu_Selected" Color="#FFAC8792"/>
+        <SolidColorBrush x:Key="Brush_Menu_NotSelected" Color="#FF9F5D71"/>
+
+        <Style x:Key="StyleDefault" TargetType="Control">
+            <Setter Property="Background" Value="{DynamicResource Brush_Background}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush_DefaultText}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush_Border}"/>
+        </Style>
+
+        <Style x:Key="StyleLight" TargetType="Control">
+            <Setter Property="Background" Value="{DynamicResource Brush_BackgroundLight}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush_DefaultText}" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Body -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--Toolbar with all the cool functions-->
+        <ToolBar x:Name="ToolBar" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 ToolBarTray.IsLocked="True" Margin="-3,0,0,0"
+                 Grid.Row="0" Loaded="ToolBar_Loaded"
+                 Style="{DynamicResource ResourceKey=StyleLight}">
+            <Menu Background="Transparent" Foreground="Transparent" >
+                <MenuItem Header="File" Style="{DynamicResource ResourceKey=StyleDefault}" Margin="2, 0">
+                    <MenuItem x:Name="Menu_File_New" Header="New" Style="{DynamicResource ResourceKey=StyleDefault}"/>
+                    <Separator Style="{DynamicResource ResourceKey=StyleDefault}" />
+                </MenuItem>
+                <MenuItem Header="Options" Style="{DynamicResource ResourceKey=StyleDefault}" Margin="2, 0"></MenuItem>
+                <MenuItem Header="Help" Style="{DynamicResource ResourceKey=StyleDefault}" Margin="2, 0"></MenuItem>
+            </Menu>
+        </ToolBar>
+    </Grid>
+</Window>
