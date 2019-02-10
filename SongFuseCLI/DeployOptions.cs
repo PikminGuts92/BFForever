@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace SongFuse
+namespace SongFuseCLI
 {
     [Verb("deploy", HelpText = "Deploys song package to remote RIFF archive")]
     internal class DeployOptions

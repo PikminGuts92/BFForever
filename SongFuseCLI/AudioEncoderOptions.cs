@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace SongFuse
+namespace SongFuseCLI
 {
     [Verb("audio", HelpText = "Encode/decode celt audio files")]
     internal class AudioEncoderOptions

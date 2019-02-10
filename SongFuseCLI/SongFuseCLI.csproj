@@ -7,8 +7,8 @@
     <ProjectGuid>{AC588F51-3F29-4048-AA97-D5697AC19E51}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SongFuse</RootNamespace>
-    <AssemblyName>SongFuse</AssemblyName>
+    <RootNamespace>SongFuseCLI</RootNamespace>
+    <AssemblyName>SongFuseCLI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace SongFuse
+namespace SongFuseCLI
 {
     [Verb("texture", HelpText = "Encode/decode texture files")]
     internal class TextureOptions
