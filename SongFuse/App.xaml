@@ -4,6 +4,35 @@
              xmlns:local="clr-namespace:SongFuse"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!--Brushes that are used-->
+        <SolidColorBrush x:Key="Brush_Background" Color="Black"/>
+        <SolidColorBrush x:Key="Brush_BackgroundLight" Color="#202020"/>
+        <SolidColorBrush x:Key="Brush_BackgroundLighter" Color="#404040"/>
+        <SolidColorBrush x:Key="Brush_Border" Color="#80E7A628" />
+        <SolidColorBrush x:Key="Brush_DefaultText" Color="White"/>
+        <SolidColorBrush x:Key="Brush_Menu" Color="#FF9F5D71"/>
+        <SolidColorBrush x:Key="Brush_Menu_Selected" Color="#FFAC8792"/>
+        <SolidColorBrush x:Key="Brush_Menu_NotSelected" Color="#FF9F5D71"/>
+
+        <Style TargetType="{x:Type Control}">
+            <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush_DefaultText}" />
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        </Style>
+
+        <Style TargetType="Grid">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Control}}"/>
+
+        <Style TargetType="ToolBar" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Background" Value="{StaticResource Brush_BackgroundLight}"/>
+        </Style>
+
+        <Style TargetType="Menu" BasedOn="{StaticResource {x:Type Control}}"/>
+        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type Control}}"/>
+        <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Control}}"/>
     </Application.Resources>
 </Application>
