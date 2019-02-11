@@ -43,5 +43,7 @@ namespace SongFuse
                 mainPanelBorder.Margin = new Thickness(0);
             }
         }
+
+        private void Menu_File_Exit_Click(object sender, RoutedEventArgs e) => Close();
     }
 }

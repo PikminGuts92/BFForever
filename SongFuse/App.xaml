@@ -20,7 +20,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
         </Style>
-
+        
         <Style TargetType="Grid">
             <Setter Property="Background" Value="Transparent"/>
         </Style>
@@ -30,9 +30,44 @@
         <Style TargetType="ToolBar" BasedOn="{StaticResource {x:Type Control}}">
             <Setter Property="Background" Value="{StaticResource Brush_BackgroundLight}"/>
         </Style>
-
+        
         <Style TargetType="Menu" BasedOn="{StaticResource {x:Type Control}}"/>
         <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type Control}}"/>
         <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Control}}"/>
+
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Control}}"/>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type Control}}"/>
+        
+        <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush_Border}"/>
+        </Style>
+
+        <Style TargetType="TabControl" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Background" Value="{StaticResource Brush_BackgroundLight}"/>
+        </Style>
+        <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{StaticResource Brush_Border}" CornerRadius="2,2,0,0" Margin="1,0">
+                            <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_BackgroundLighter}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>
