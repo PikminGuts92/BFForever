@@ -58,7 +58,7 @@
                         <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
                             <Setter Property="Width" Value="Auto"/>
                             <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Padding" Value="5, 0"/>
+                            <Setter Property="Padding" Value="0, 0"/>
                             <Setter Property="Margin" Value="0, 5"/>
                         </Style>
                         <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">

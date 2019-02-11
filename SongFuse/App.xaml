@@ -35,12 +35,38 @@
         <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type Control}}"/>
         <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Control}}"/>
 
-        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Control}}"/>
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        
         <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type Control}}"/>
         
         <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type Control}}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource Brush_Border}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" BorderThickness="0" BorderBrush="{StaticResource Brush_Border}" Background="{StaticResource Brush_Border}">
+                                <Label Foreground="{StaticResource Brush_DefaultText}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0" Padding="0">
+                                    <ContentPresenter Margin="4,1" ContentSource="Header" RecognizesAccessKey="True"/>
+                                </Label>
+                            </Border>
+
+                            <Border Grid.Row="1" BorderThickness="2,0,2,2" BorderBrush="{StaticResource Brush_Border}">
+                                <ContentPresenter Margin="0"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style TargetType="TabControl" BasedOn="{StaticResource {x:Type Control}}">
