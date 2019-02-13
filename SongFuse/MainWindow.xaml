@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SongFuse"
+        xmlns:controls="clr-namespace:SongFuse.Controls"
         mc:Ignorable="d"
         Title="SongFuse" Height="600" Width="800"
         Icon="Assets/rock.ico"
@@ -52,7 +53,7 @@
         </ToolBar>
 
         <TabControl Grid.Row="1">
-            <TabItem Header="Information">
+            <TabItem Header="Metadata">
                 <Grid>
                     <Grid.Resources>
                         <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
@@ -64,6 +65,9 @@
                         <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                             <Setter Property="Margin" Value="5, 5"/>
                         </Style>
+                        <Style TargetType="controls:IntensitySelector">
+                            <Setter Property="Margin" Value="5, 1"/>
+                        </Style>
                     </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -71,9 +75,10 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
+                    
+                    <!-- Song Info -->
                     <GroupBox Header="Song" Grid.Row="0" Grid.Column="0">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -90,7 +95,7 @@
                                 <ColumnDefinition Width="50"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
+                            
                             <Label Grid.Row="0" Grid.Column="0">Title:</Label>
                             <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3"></TextBox>
 
@@ -105,6 +110,37 @@
 
                             <Label Grid.Row="3" Grid.Column="0">Desc:</Label>
                             <TextBox Grid.Row="3" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="3"></TextBox>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Header="Intensities" Grid.Row="0" Grid.Column="1">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="4, 0, 0, 0">
+                                <Label>G:</Label>
+                                <controls:IntensitySelector/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Label>B:</Label>
+                                <controls:IntensitySelector/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                <Label>V:</Label>
+                                <controls:IntensitySelector/>
+                            </StackPanel>
                         </Grid>
                     </GroupBox>
                 </Grid>
