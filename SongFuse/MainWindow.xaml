@@ -70,6 +70,7 @@
                         </Style>
                     </Grid.Resources>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <!--<RowDefinition Height="Auto"/>-->
                     </Grid.RowDefinitions>
@@ -79,7 +80,7 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Song Info -->
-                    <GroupBox Header="Song" Grid.Row="0" Grid.Column="0">
+                    <GroupBox Header="Song" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
