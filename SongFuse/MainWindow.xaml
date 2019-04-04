@@ -144,6 +144,37 @@
                             </StackPanel>
                         </Grid>
                     </GroupBox>
+                    <GroupBox Header="Genres" Grid.Row="1" Grid.Column="1">
+                        <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Top">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Grid>
+                                                    <Ellipse Stroke="Gray" StrokeThickness="2">
+                                                        <Ellipse.Fill>
+                                                            <RadialGradientBrush>
+                                                                <GradientStop Offset="0" Color="White" />
+                                                                <GradientStop Offset="1" Color="LightGray" />
+                                                                <RadialGradientBrush.Transform>
+                                                                    <TransformGroup>
+                                                                        <ScaleTransform ScaleX="0.65"/>
+                                                                    </TransformGroup>
+                                                                </RadialGradientBrush.Transform>
+                                                            </RadialGradientBrush>
+                                                        </Ellipse.Fill>
+                                                    </Ellipse>
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Height="40">Rock</Button>
+                        </StackPanel>
+                    </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem Header="Audio">
