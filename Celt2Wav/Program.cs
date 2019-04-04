@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,16 +12,20 @@ namespace Celt2Wav
     {
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+            if (args.Length < 1)
             {
                 Console.WriteLine("Usage: audio.clt converted_audio.wav");
                 return;
             }
 
+            string outPath = (args.Length > 1)
+                ? args[1]
+                : Path.Combine(Path.GetDirectoryName(args[0]), $"{Path.GetFileNameWithoutExtension(args[0])}.wav");
+            
             try
             {
                 Celt celt = Celt.FromFile(args[0]);
-                celt.WriteToWavFile(args[1]);
+                celt.WriteToWavFile(outPath);
             }
             catch (Exception ex)
             {
@@ -28,7 +33,7 @@ namespace Celt2Wav
                 return;
             }
 
-            Console.WriteLine("Successfully wrote output wav file to {0}", args[1]);
+            Console.WriteLine("Successfully wrote output wav file to {0}", outPath);
         }
     }
 }
