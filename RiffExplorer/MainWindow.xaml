@@ -95,9 +95,21 @@
 
             <!--Tab control for managing files-->
             <TabControl x:Name="TabControl_Files" Background="{StaticResource Brush_Menu}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="1"
-                        Margin="5" BorderBrush="{StaticResource Brush_Menu}" BorderThickness="5" Visibility="Collapsed" ItemTemplate="{StaticResource CustomHeaderTemplate}">
-
-                
+                        Margin="5" BorderBrush="{StaticResource Brush_Menu}" BorderThickness="5" Visibility="Visible" ItemTemplate="{StaticResource CustomHeaderTemplate}">
+                <TabItem Header="Catalog">
+                    <ListView x:Name="ListView_Catalog">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="HKey" Width="400" DisplayMemberBinding="{Binding Identifier}" />
+                                <GridViewColumn Header="Title" Width="150" DisplayMemberBinding="{Binding Title}" />
+                                <GridViewColumn Header="Artist" Width="125" DisplayMemberBinding="{Binding Artist}" />
+                                <GridViewColumn Header="Album" Width="125" DisplayMemberBinding="{Binding Album}" />
+                                <GridViewColumn Header="Year" Width="40" DisplayMemberBinding="{Binding Year}" />
+                                <GridViewColumn Header="Path" Width="300" DisplayMemberBinding="{Binding SongPath}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </TabItem>
             </TabControl>
 
             <!--Drag grid control-->

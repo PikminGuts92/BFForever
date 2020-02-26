@@ -28,6 +28,7 @@ namespace RiffExplorer
     public partial class MainWindow : Window
     {
         private FEnvironment manager = new FEnvironment();
+        private ZObject selectedObject = null;
 
         public MainWindow()
         {
@@ -170,6 +171,30 @@ namespace RiffExplorer
                 TreeViewItem child = new TreeViewItem();
                 child.Header = text;
                 child.Name = key;
+
+                child.Selected += (sender, e) =>
+                {
+                    //this.selectedObject = entry;
+
+                    if (!entry.IsZObject())
+                    {
+                        selectedObject = null;
+                        ListView_Catalog.Items.Clear();
+                        return;
+                    }
+
+                    var zObject = manager[entry.FilePath];
+                    if (zObject is Catalog2 catalog2)
+                    {
+                        ListView_Catalog.ItemsSource = catalog2.Entries;
+                    }
+                    else
+                    {
+                        selectedObject = null;
+                        ListView_Catalog.ItemsSource = null;
+                    }
+                };
+
                 //temp.Path = currentPath;
                 TreeView_Archive.RegisterName(key, child);
 
@@ -180,7 +205,7 @@ namespace RiffExplorer
                 return parent.Items[returnIdx] as TreeViewItem;
             }
         }
-
+        
         private void SetNodeProperties(TreeViewItem node)
         {
             // TODO: Implement
