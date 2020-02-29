@@ -1,136 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{835AB612-BE76-4FEA-8E10-8775FD7157D6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BFForever</RootNamespace>
-    <AssemblyName>BFForever</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Concentus, Version=1.1.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Concentus.1.1.7\lib\portable-net45+win+wpa81+wp80\Concentus.dll</HintPath>
-    </Reference>
-    <Reference Include="Magick.NET-Q16-AnyCPU, Version=7.4.6.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
-      <HintPath>..\packages\Magick.NET-Q16-AnyCPU.7.4.6\lib\net40\Magick.NET-Q16-AnyCPU.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Concentus" Version="1.1.7" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.4.6" />
+    <PackageReference Include="NAudio" Version="1.10.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AudioHashMappings.cs" />
-    <Compile Include="AudioPaths.cs" />
-    <Compile Include="Audio\Celt.cs" />
-    <Compile Include="AwesomeReader.cs" />
-    <Compile Include="AwesomeWriter.cs" />
-    <Compile Include="CRC64.cs" />
-    <Compile Include="HashMapping.cs" />
-    <Compile Include="MIDI\ChartImport.cs" />
-    <Compile Include="MIDI\MIDIExport.cs" />
-    <Compile Include="MIDI\MIDIImport.cs" />
-    <Compile Include="MIDI\TempoIndex.cs" />
-    <Compile Include="Riff\FString.cs" />
-    <Compile Include="Riff\FEnvironment.cs" />
-    <Compile Include="Riff\Global.cs" />
-    <Compile Include="Riff\Helpers\AudioProcessor.cs" />
-    <Compile Include="Riff\Helpers\Pedal.cs" />
-    <Compile Include="Riff\Helpers\Pitch.cs" />
-    <Compile Include="Riff\Helpers\TabBassType.cs" />
-    <Compile Include="Riff\Helpers\TabBendType.cs" />
-    <Compile Include="Riff\Helpers\TabFinger.cs" />
-    <Compile Include="Riff\Helpers\TabNoteType.cs" />
-    <Compile Include="Riff\Helpers\VibratoType.cs" />
-    <Compile Include="Riff\Helpers\TextEvent.cs" />
-    <Compile Include="Riff\Helpers\TimeEvent.cs" />
-    <Compile Include="Riff\Helpers\InstrumentTuning.cs" />
-    <Compile Include="Riff\Helpers\VoxNoteType.cs" />
-    <Compile Include="Riff\HKey.cs" />
-    <Compile Include="Riff\Index.cs" />
-    <Compile Include="Riff\Localization.cs" />
-    <Compile Include="Riff\RiffFile.cs" />
-    <Compile Include="Riff\StringKey.cs" />
-    <Compile Include="Riff\ZObject.cs" />
-    <Compile Include="Riff\ZObjects\Audio.cs" />
-    <Compile Include="Riff\ZObjects\AudioEffect.cs" />
-    <Compile Include="Riff\ZObjects\Catalog2.cs" />
-    <Compile Include="Riff\ZObjects\Chord.cs" />
-    <Compile Include="Riff\ZObjects\Event.cs" />
-    <Compile Include="Riff\ZObjects\HKeyList.cs" />
-    <Compile Include="Riff\ZObjects\Index2.cs" />
-    <Compile Include="Riff\ZObjects\Instrument.cs" />
-    <Compile Include="Riff\ZObjects\Measure.cs" />
-    <Compile Include="Riff\ZObjects\PackageDef.cs" />
-    <Compile Include="Riff\ZObjects\Section.cs" />
-    <Compile Include="Riff\ZObjects\Song.cs" />
-    <Compile Include="Riff\ZObjects\Spread.cs" />
-    <Compile Include="Riff\ZObjects\StringTable.cs" />
-    <Compile Include="Riff\ZObjects\Tab.cs" />
-    <Compile Include="Riff\ZObjects\Tempo.cs" />
-    <Compile Include="Riff\ZObjects\Texture.cs" />
-    <Compile Include="Riff\ZObjects\TimeSignature.cs" />
-    <Compile Include="Riff\ZObjects\Tone2.cs" />
-    <Compile Include="Riff\ZObjects\Tuning.cs" />
-    <Compile Include="Riff\ZObjects\Video.cs" />
-    <Compile Include="Riff\ZObjects\Vox.cs" />
-    <Compile Include="Riff\ZObjects\VoxPushPhrase.cs" />
-    <Compile Include="FusedSong.cs" />
-    <Compile Include="Riff\ZObjects\VoxSpread.cs" />
-    <Compile Include="Riff\ZObjects\Whammy.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SongManager.cs" />
-    <Compile Include="Texture\XPR2.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
