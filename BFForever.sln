@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFForever", "BFForever\BFForever.csproj", "{835AB612-BE76-4FEA-8E10-8775FD7157D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFForever", "BFForever\BFForever.csproj", "{835AB612-BE76-4FEA-8E10-8775FD7157D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongFuse", "SongFuse\SongFuse.csproj", "{AC588F51-3F29-4048-AA97-D5697AC19E51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SongFuse", "SongFuse\SongFuse.csproj", "{AC588F51-3F29-4048-AA97-D5697AC19E51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Celt2Wav", "Celt2Wav\Celt2Wav.csproj", "{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Celt2Wav", "Celt2Wav\Celt2Wav.csproj", "{FC212E7E-52EA-4B8E-B429-32ACC180EC5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiffExplorer", "RiffExplorer\RiffExplorer.csproj", "{D6B53786-A717-468D-8102-B1E5C8319962}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RiffExplorer", "RiffExplorer\RiffExplorer.csproj", "{D6B53786-A717-468D-8102-B1E5C8319962}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFForever.Tests", "BFForever.Tests\BFForever.Tests.csproj", "{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFForever.Tests", "BFForever.Tests\BFForever.Tests.csproj", "{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuseManager", "FuseManager\FuseManager.csproj", "{4319CC3B-F63C-4F1B-B7BC-25658385A572}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E42BAA6-1BB9-48E5-B243-9A3C7DC9E750}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4319CC3B-F63C-4F1B-B7BC-25658385A572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4319CC3B-F63C-4F1B-B7BC-25658385A572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4319CC3B-F63C-4F1B-B7BC-25658385A572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4319CC3B-F63C-4F1B-B7BC-25658385A572}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
