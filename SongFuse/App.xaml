@@ -1,0 +1,99 @@
+﻿<Application x:Class="SongFuse.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SongFuse"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!--Brushes that are used-->
+        <SolidColorBrush x:Key="Brush_Background" Color="Black"/>
+        <SolidColorBrush x:Key="Brush_BackgroundLight" Color="#202020"/>
+        <SolidColorBrush x:Key="Brush_BackgroundLighter" Color="#404040"/>
+        <SolidColorBrush x:Key="Brush_Border" Color="#80E7A628" />
+        <SolidColorBrush x:Key="Brush_DefaultText" Color="White"/>
+        <SolidColorBrush x:Key="Brush_Menu" Color="#FF9F5D71"/>
+        <SolidColorBrush x:Key="Brush_Menu_Selected" Color="#FFAC8792"/>
+        <SolidColorBrush x:Key="Brush_Menu_NotSelected" Color="#FF9F5D71"/>
+
+        <Style TargetType="{x:Type Control}">
+            <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush_DefaultText}" />
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        </Style>
+        
+        <Style TargetType="Grid">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Control}}"/>
+
+        <Style TargetType="ToolBar" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Background" Value="{StaticResource Brush_BackgroundLight}"/>
+        </Style>
+        
+        <Style TargetType="Menu" BasedOn="{StaticResource {x:Type Control}}"/>
+        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type Control}}"/>
+        <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Control}}"/>
+
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type Control}}"/>
+        
+        <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush_Border}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid Margin="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" BorderThickness="0" BorderBrush="{StaticResource Brush_Border}" Background="{StaticResource Brush_Border}">
+                                <Label Foreground="{StaticResource Brush_DefaultText}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0" Padding="0">
+                                    <ContentPresenter Margin="4,1" ContentSource="Header" RecognizesAccessKey="True"/>
+                                </Label>
+                            </Border>
+
+                            <Border Grid.Row="1" BorderThickness="1,0,1,1" BorderBrush="{StaticResource Brush_Border}">
+                                <ContentPresenter Margin="0"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TabControl" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Background" Value="{StaticResource Brush_BackgroundLight}"/>
+        </Style>
+        <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type Control}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{StaticResource Brush_Border}" CornerRadius="2,2,0,0" Margin="1,0">
+                            <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_BackgroundLighter}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

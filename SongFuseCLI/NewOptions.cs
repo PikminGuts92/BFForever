@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace SongFuse
+namespace SongFuseCLI
 {
     [Verb("new", HelpText = "Create new song directory")]
     internal class NewOptions

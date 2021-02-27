@@ -10,7 +10,7 @@ using BFForever.Audio;
 using BFForever.Riff;
 using BFForever.Texture;
 
-namespace SongFuse
+namespace SongFuseCLI
 {
     class Program
     {

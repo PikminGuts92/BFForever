@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace SongFuse
+namespace SongFuseCLI
 {
     [Verb("build", HelpText = "Build source files into RIFF archive")]
     internal class BuildOptions { }

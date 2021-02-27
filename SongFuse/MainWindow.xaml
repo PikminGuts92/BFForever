@@ -1,0 +1,189 @@
+﻿<Window x:Class="SongFuse.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SongFuse"
+        xmlns:controls="clr-namespace:SongFuse.Controls"
+        mc:Ignorable="d"
+        Title="SongFuse" Height="600" Width="800"
+        Icon="Assets/rock.ico"
+        ResizeMode="CanMinimize">
+    <Grid Background="{StaticResource Brush_Background}">
+        <Grid.RowDefinitions>
+            <!-- Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Body -->
+            <RowDefinition Height="*"/>
+            <!-- Footer -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--Toolbar with all the cool functions-->
+        <ToolBar x:Name="ToolBar" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 ToolBarTray.IsLocked="True" Margin="-3,0,0,0"
+                 Grid.Row="0" Loaded="ToolBar_Loaded">
+            <ToolBar.Resources>
+                <Style x:Key="{x:Static ToolBar.MenuStyleKey}" TargetType="Menu">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+
+                <!--<Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                    <Setter Property="Foreground" Value="{StaticResource Brush_DefaultText}" />
+                </Style>-->
+            </ToolBar.Resources>
+            <Menu>
+                <Menu.Resources>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="BorderThickness" Value="0"></Setter>
+                    </Style>
+                    <Style TargetType="Separator" BasedOn="{StaticResource {x:Type Separator}}"/>
+                    <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}"/>
+                </Menu.Resources>
+                <MenuItem Header="File">
+                    <MenuItem x:Name="Menu_File_New" Header="New"/>
+                    <MenuItem x:Name="Menu_File_Open" Header="Open"/>
+                    <MenuItem x:Name="Menu_File_Save" Header="Save"/>
+                    <Separator/>
+                    <MenuItem x:Name="Menu_File_Exit" Header="Exit" Click="Menu_File_Exit_Click"/>
+                </MenuItem>
+                <MenuItem Header="Options"></MenuItem>
+                <MenuItem Header="Help"></MenuItem>
+            </Menu>
+        </ToolBar>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="Metadata">
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                            <Setter Property="Width" Value="Auto"/>
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="Padding" Value="0, 0"/>
+                            <Setter Property="Margin" Value="0, 5"/>
+                        </Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="Margin" Value="5, 5"/>
+                        </Style>
+                        <Style TargetType="controls:IntensitySelector">
+                            <Setter Property="Margin" Value="5, 1"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <!--<RowDefinition Height="Auto"/>-->
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Song Info -->
+                    <GroupBox Header="Song" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Label Grid.Row="0" Grid.Column="0">Title:</Label>
+                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3"></TextBox>
+
+                            <Label Grid.Row="1" Grid.Column="0">Artist:</Label>
+                            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"></TextBox>
+
+                            <Label Grid.Row="2" Grid.Column="0">Album:</Label>
+                            <TextBox Grid.Row="2" Grid.Column="1"></TextBox>
+
+                            <Label Grid.Row="2" Grid.Column="2">Year:</Label>
+                            <TextBox Grid.Row="2" Grid.Column="3"></TextBox>
+
+                            <Label Grid.Row="3" Grid.Column="0">Desc:</Label>
+                            <TextBox Grid.Row="3" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="3"></TextBox>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Header="Intensities" Grid.Row="0" Grid.Column="1">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="4, 0, 0, 0">
+                                <Label>G:</Label>
+                                <controls:IntensitySelector/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Label>B:</Label>
+                                <controls:IntensitySelector/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                <Label>V:</Label>
+                                <controls:IntensitySelector/>
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Genres" Grid.Row="1" Grid.Column="1">
+                        <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Top">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Grid>
+                                                    <Ellipse Stroke="Gray" StrokeThickness="2">
+                                                        <Ellipse.Fill>
+                                                            <RadialGradientBrush>
+                                                                <GradientStop Offset="0" Color="White" />
+                                                                <GradientStop Offset="1" Color="LightGray" />
+                                                                <RadialGradientBrush.Transform>
+                                                                    <TransformGroup>
+                                                                        <ScaleTransform ScaleX="0.65"/>
+                                                                    </TransformGroup>
+                                                                </RadialGradientBrush.Transform>
+                                                            </RadialGradientBrush>
+                                                        </Ellipse.Fill>
+                                                    </Ellipse>
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Height="40">Rock</Button>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Audio">
+
+            </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="2">
+            <Label HorizontalAlignment="Right" Margin="5, 0" BorderThickness="0">Powered by BFForever</Label>
+        </Grid>
+    </Grid>
+</Window>
