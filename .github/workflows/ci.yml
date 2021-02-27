@@ -1,0 +1,30 @@
+on: [push, pull_request]
+
+name: CI
+
+jobs:
+  build:
+    runs-on: windows-latest
+    name: .NET 5 Application
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.101'
+      - name: Publish applications
+        shell: bash
+        run: |
+          dotnet publish ./Celt2Wav/Celt2Wav.csproj -c=Release --self-contained=false -r=win-x64 -p:Version="${APPVEYOR_BUILD_VERSION}" -o="./published-win-x64"
+          dotnet publish ./RiffExplorer/RiffExplorer.csproj -c=Release --self-contained=false -r=win-x64 -p:Version="${APPVEYOR_BUILD_VERSION}" -o="./published-win-x64"
+          dotnet publish ./SongFuse/SongFuse.csproj -c=Release --self-contained=false -r=win-x64 -p:Version="${APPVEYOR_BUILD_VERSION}" -o="./published-win-x64"
+          dotnet publish ./SongFuseCLI/SongFuseCLI.csproj -c=Release --self-contained=false -r=win-x64 -p:Version="${APPVEYOR_BUILD_VERSION}" -o="./published-win-x64"
+      - name: Archive projects
+        shell: bash
+        run: |
+          7z a ./BFForever-win-x64.zip $(find ./published-win-x64/*) ./LICENSE ./README.md ./THIRDPARTY
+      - uses: actions/upload-artifact@v2
+        with:
+          name: BFForever-win-x64.zip
+          path: ./BFForever-win-x64.zip
+          
