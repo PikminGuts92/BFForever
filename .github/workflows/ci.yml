@@ -5,13 +5,13 @@ name: CI
 jobs:
   build:
     runs-on: windows-latest
-    name: .NET 5 Application
+    name: .NET Application
     steps:
       - uses: actions/checkout@v2
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.101'
+          dotnet-version: '6.0.x'
       - name: Publish applications
         shell: bash
         run: |
