@@ -4,7 +4,7 @@ BFForever is an open-source library for managing and creating game files for the
 The latest build can be found on [AppVeyor](https://ci.appveyor.com/project/PikminGuts92/bfforever/branch/master/artifacts).
 
 # System Requirements
-You will need at least [.NET 5](https://dotnet.microsoft.com/download/dotnet-core) runtime installed and be using an x64 operating system.
+You will need at least [.NET 6](https://dotnet.microsoft.com/download/dotnet-core) runtime installed and be using an x64 operating system.
 
 # Planned Features
 * Full support for creating/managing RIFF files
