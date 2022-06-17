@@ -16,6 +16,7 @@ jobs:
         shell: bash
         run: |
           dotnet publish ./Celt2Wav/Celt2Wav.csproj -c=Release --self-contained=false -r=win-x64 -o="./published-win-x64"
+          dotnet publish ./Rif2Mid/Rif2Mid.csproj -c=Release --self-contained=false -r=win-x64 -o="./published-win-x64"
           dotnet publish ./RiffExplorer/RiffExplorer.csproj -c=Release --self-contained=false -r=win-x64 -o="./published-win-x64"
           dotnet publish ./SongFuse/SongFuse.csproj -c=Release --self-contained=false -r=win-x64 -o="./published-win-x64"
           dotnet publish ./SongFuseCLI/SongFuseCLI.csproj -c=Release --self-contained=false -r=win-x64 -o="./published-win-x64"
