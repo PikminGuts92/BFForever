@@ -1,7 +1,7 @@
-# BFForever [![Build status](https://ci.appveyor.com/api/projects/status/yt8eu333kn91fv2y?svg=true)](https://ci.appveyor.com/project/PikminGuts92/bfforever)
+# BFForever [![CI](https://github.com/PikminGuts92/BFForever/workflows/CI/badge.svg)](https://github.com/PikminGuts92/BFForever/actions?query=workflow%3ACI)
 BFForever is an open-source library for managing and creating game files for the short-lived BandFuse video game which released for PS3 and Xbox 360 consoles in November 2013. [Preview](https://www.youtube.com/watch?v=NHvFKonTGR0)
 
-The latest build can be found on [AppVeyor](https://ci.appveyor.com/project/PikminGuts92/bfforever/branch/master/artifacts).
+The latest build can be found [here](https://github.com/PikminGuts92/BFForever/actions/workflows/ci.yml).
 
 # System Requirements
 You will need at least [.NET 6](https://dotnet.microsoft.com/download/dotnet-core) runtime installed and be using an x64 operating system.
