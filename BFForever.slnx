@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="BFForever.Tests/BFForever.Tests.csproj" />
+  <Project Path="BFForever/BFForever.csproj" />
+  <Project Path="Celt2Wav/Celt2Wav.csproj" />
+  <Project Path="Rif2Mid/Rif2Mid.csproj" />
+  <Project Path="RiffExplorer/RiffExplorer.csproj" />
+  <Project Path="SongFuse/SongFuse.csproj" />
+  <Project Path="SongFuseCLI/SongFuseCLI.csproj" />
+</Solution>
