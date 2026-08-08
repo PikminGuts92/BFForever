@@ -3,10 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>false</PublishTrimmed>
-    <SelfContained>false</SelfContained>
+    <PublishAot>true</PublishAot>
+    <AssemblyName>rif2mid</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
