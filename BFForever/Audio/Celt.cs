@@ -264,13 +264,27 @@ namespace BFForever.Audio
             }
         }
 
+        private static WaveStream OpenAudioFile(string path)
+        {
+            var ext = Path.GetExtension(path);
+
+            return ext.ToLower() switch
+            {
+                ".wav" => new WaveFileReader(path),
+                ".aiff" or ".aif" => new AiffFileReader(path),
+                _ => throw new NotSupportedException($"Audio file with extension \"{ext}\" not support"),
+            };
+        }
+
         public static Celt FromAudio(string path)
         {
             // TODO: Clean all of this up and implement tracking packet offsets
-            AudioFileReader afr = new AudioFileReader(path);
+            // TODO: Use NAudio.SoundFile after v3 releases
+            using var ws = OpenAudioFile(path);
+            var sp = ws.ToSampleProvider();
             Celt celt = new Celt()
             {
-                SampleRate = (ushort)afr.WaveFormat.SampleRate
+                SampleRate = (ushort)sp.WaveFormat.SampleRate
             };
 
             OpusEncoder encoder = OpusEncoder.Create(celt.SampleRate, NUM_CHANNELS, OpusApplication.OPUS_APPLICATION_AUDIO);
@@ -285,12 +299,21 @@ namespace BFForever.Audio
             bool skipMode = true;
             List<int> recks = new List<int>() { 0 };
 
-            MemoryStream ms = new MemoryStream();
+            using var ms = new MemoryStream();
 
             // Encoding loop
-            while (afr.Position < afr.Length)
+            int samplesRead;
+            while ((samplesRead = sp.Read(buffer, 0, buffer.Length)) > 0)
             {
-                int bufferLength = afr.Read(buffer, 0, buffer.Length);
+                // Zero out rest of data if samples don't fill buffer
+                if (samplesRead < buffer.Length)
+                {
+                    for (int i = samplesRead; i < buffer.Length; i++)
+                    {
+                        buffer[i] = 0.0f;
+                    }
+                }
+
                 int packetLength = encoder.Encode(buffer, 0, celt.FrameSize, packet, 0, packet.Length);
 
                 // Tracks reckoning counts
