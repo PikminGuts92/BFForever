@@ -222,7 +222,8 @@ namespace BFForever.Audio
 
             bool skipMode = true;
             int audioOffset = 0, reckonOffset = 0;
-            OpusDecoder decoder = OpusDecoder.Create(SampleRate, NUM_CHANNELS);
+
+            var decoder = OpusCodecFactory.CreateDecoder(SampleRate, NUM_CHANNELS);
 
             using (WaveFileWriter writer = new WaveFileWriter(outputPath, new WaveFormat(SampleRate, 16, NUM_CHANNELS))) // 16-bit PCM
             {
@@ -250,7 +251,7 @@ namespace BFForever.Audio
                             int packetSize = ((PacketStream[audioOffset++] & 0x0F) << 8) | PacketStream[audioOffset++]; // 12-bit encoding
 
                             // Decodes OPUS packet
-                            decoder.Decode(PacketStream, audioOffset, packetSize, outputShorts, 0, FrameSize);
+                            decoder.Decode(PacketStream.AsSpan(audioOffset, packetSize), outputShorts, FrameSize);
 
                             // Writes frame
                             writer.WriteSamples(outputShorts, 0, outputShorts.Length);
@@ -287,7 +288,7 @@ namespace BFForever.Audio
                 SampleRate = (ushort)sp.WaveFormat.SampleRate
             };
 
-            OpusEncoder encoder = OpusEncoder.Create(celt.SampleRate, NUM_CHANNELS, OpusApplication.OPUS_APPLICATION_AUDIO);
+            var encoder = OpusCodecFactory.CreateEncoder(celt.SampleRate, NUM_CHANNELS, OpusApplication.OPUS_APPLICATION_AUDIO);
             encoder.Bitrate = (int)celt.Bitrate;
             encoder.ForceMode = OpusMode.MODE_CELT_ONLY;
             encoder.SignalType = OpusSignal.OPUS_SIGNAL_MUSIC;
@@ -314,7 +315,7 @@ namespace BFForever.Audio
                     }
                 }
 
-                int packetLength = encoder.Encode(buffer, 0, celt.FrameSize, packet, 0, packet.Length);
+                int packetLength = encoder.Encode(buffer, celt.FrameSize, packet, packet.Length);
 
                 // Tracks reckoning counts
                 if (packetLength <= 3) // Checks if packet is empty
