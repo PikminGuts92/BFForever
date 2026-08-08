@@ -184,10 +184,10 @@ namespace BFForever.Texture
             }
 
             // Writes xpr2 header
-            PatchXPR2Header(header, textureData.Length, 8, image.Height, hOffset, image.Width, wOffset);
+            PatchXPR2Header(header, textureData.Length, 8, (int)image.Height, hOffset, (int)image.Width, wOffset);
 
             // Converts to x360 format
-            textureData = TileCompressedXbox360Texture(textureData, image.Width, image.Width, image.Height, image.Height, 4, 4, (16 * bpp) / 8);
+            textureData = TileCompressedXbox360Texture(textureData, (int)image.Width, (int)image.Width, (int)image.Height, (int)image.Height, 4, 4, (16 * bpp) / 8);
             SwapBytes(textureData);
 
             // Writes to XPR2 stream
