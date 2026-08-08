@@ -7,11 +7,11 @@ jobs:
     runs-on: windows-latest
     name: .NET Application
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
       - name: Publish applications
         shell: bash
         run: |
@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           7z a ./BFForever-win-x64.zip $(find ./published-win-x64/*) ./LICENSE ./README.md ./THIRDPARTY
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: BFForever-win-x64.zip
           path: ./BFForever-win-x64.zip
