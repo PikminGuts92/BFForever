@@ -27,7 +27,7 @@ namespace BFForever
             _packageManager = env;
         }
 
-        private string GetFilePath(string path) => (Path.IsPathRooted(path)) ? path : Path.Combine(_jsonDirectory + path);
+        private string GetFilePath(params ReadOnlySpan<string> paths) => Path.Combine([_jsonDirectory, ..paths]);
 
         private InstrumentTuning UpdateTuning(InstrumentTuning tuning, bool guitar)
         {
@@ -64,7 +64,7 @@ namespace BFForever
 
         public void ImportSong(string jsonPath)
         {
-            _jsonDirectory = Path.GetDirectoryName(jsonPath) + "\\";
+            _jsonDirectory = Path.GetDirectoryName(jsonPath);
             FusedSong fusedSong = FusedSong.Import(jsonPath);
 
             // Updates tuning info
@@ -87,7 +87,7 @@ namespace BFForever
                 songObjects.Add(audio);
 
                 // Adds celt to index
-                AddFileToIndex(audio.AudioPath, "clt", audio.FilePath.Value.Replace(".", "/") + ".clt");
+                AddFileToIndex(audio.AudioPath, "clt", audio.FilePath.Value.Replace('.', Path.DirectorySeparatorChar) + ".clt");
             }
 
             CreateAudioPath(song.PreviewPath);
@@ -103,7 +103,7 @@ namespace BFForever
             video.VideoPath = video.FilePath + ".bik";
             songObjects.Add(video);
 
-            AddFileToIndex(video.VideoPath, "bik", video.FilePath.Value.Replace(".", "/") + ".bik");
+            AddFileToIndex(video.VideoPath, "bik", Path.Combine(video.FilePath.Value.Replace('.', Path.DirectorySeparatorChar), ".bik"));
 
             // Create texture path
             // TODO: Add texture conversion
@@ -112,14 +112,14 @@ namespace BFForever
             texture.TexturePath = texture.DirectoryPath + ".album.xpr";
             //songObjects.Add(texture); // Don't write to index
 
-            AddFileToIndex(texture.FilePath, "texture", texture.DirectoryPath.Value.Replace(".", "/") + "/album.xpr");
+            AddFileToIndex(texture.FilePath, "texture", Path.Combine(texture.DirectoryPath.Value.Replace('.', Path.DirectorySeparatorChar), "album.xpr"));
             */
 
             // Adds song to catalog
             AddToCatalog(song, fusedSong.LeadGuitarTuning, fusedSong.RhythmGuitarTuning, fusedSong.BassTuning);
 
-            string realPath = song.DirectoryPath.Value.Replace(".", "/");
-            AddObjectsToIndex(songObjects, realPath + "/fused.rif");
+            string realPath = song.DirectoryPath.Value.Replace('.', Path.DirectorySeparatorChar);
+            AddObjectsToIndex(songObjects, Path.Combine(realPath, "fused.rif"));
 
             _packageManager.AddZObjectsAsPending(songObjects);
             _packageManager.SavePendingChanges();
@@ -129,7 +129,7 @@ namespace BFForever
             {
                 if (input == null || !File.Exists(input)) return;
 
-                string outPath = Path.Combine(_packageManager.CurrentPackageDirectory + "\\songs\\", fusedSong.Identifier.Replace(".", "\\") + "\\" + output);
+                string outPath = Path.Combine(_packageManager.CurrentPackageDirectory, "songs", fusedSong.Identifier.Replace('.', Path.DirectorySeparatorChar), output);
 
                 // Creates directory
                 if (!Directory.Exists(Path.GetDirectoryName(outPath)))
@@ -139,7 +139,7 @@ namespace BFForever
             }
 
             //CopyFile(GetFilePath(fusedSong.TexturePath), "album.xpr");
-            CopyFile(GetFilePath(fusedSong.VideoPath), "musicvideo\\video.bik");
+            CopyFile(GetFilePath(fusedSong.VideoPath), Path.Combine("musicvideo", "video.bik"));
             
             if (fusedSong.AudioPaths == null) return;
 
@@ -154,9 +154,10 @@ namespace BFForever
             AudioHashMappings audioMap = File.Exists(mapPath)
                 ? AudioHashMappings.Import(mapPath)
                 : new AudioHashMappings();
-            
+
+            // TODO: Figure out better way to path in relative path...
             string GetPackageFilePath(string relativePath) =>
-                Path.Combine(_packageManager.CurrentPackageDirectory + "\\songs\\", song.Identifier.Replace(".", "\\") + "\\" + relativePath);
+                Path.Combine(_packageManager.CurrentPackageDirectory, "songs", song.Identifier.Replace('.', Path.DirectorySeparatorChar), relativePath.Replace('\\', Path.DirectorySeparatorChar));
 
             bool IsCeltFile(string path)
             {

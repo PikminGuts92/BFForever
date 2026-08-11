@@ -83,13 +83,24 @@ namespace SongFuseCLI
 
         static void BuildSong(BuildOptions options)
         {
-            string currentDir = Directory.GetCurrentDirectory();
-            string packagePath = Path.Combine(currentDir, "package");
-            string songPath = Path.Combine(currentDir, "song.json");
+            string projectDir;
+
+            if (!string.IsNullOrEmpty(options.ProjectPath))
+            {
+                projectDir = options.ProjectPath;
+            }
+            else
+            {
+                Console.WriteLine("Project path not given, using current directory...");
+                projectDir = Directory.GetCurrentDirectory();
+            }
+
+            string packagePath = Path.Combine(projectDir, "package");
+            string songPath = Path.Combine(projectDir, "song.json");
 
             if (!File.Exists(songPath))
             {
-                Console.WriteLine($"Can't find \"song.json\" file in {currentDir}");
+                Console.WriteLine($"Can't find \"song.json\" file in {projectDir}");
                 return;
             }
 

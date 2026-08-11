@@ -8,5 +8,9 @@ using CommandLine;
 namespace SongFuseCLI
 {
     [Verb("build", HelpText = "Build source files into RIFF archive")]
-    internal class BuildOptions { }
+    internal class BuildOptions
+    {
+        [Value(0, Required = false, MetaName = "Project Path", MetaValue = "STRING", HelpText = "Directory path to song project")]
+        public string ProjectPath { get; set; }
+    }
 }
