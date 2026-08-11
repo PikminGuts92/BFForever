@@ -30,15 +30,15 @@ jobs:
       - name: Publish applications
         shell: bash
         run: |
-          dotnet publish ./Celt2Wav/Celt2Wav.csproj -c=Release -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
-          dotnet publish ./Rif2Mid/Rif2Mid.csproj -c=Release -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
-          dotnet publish ./SongFuseCLI/SongFuseCLI.csproj -c=Release -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
+          dotnet publish ./Src/Celt2Wav/Celt2Wav.csproj -c=Release -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
+          dotnet publish ./Src/Rif2Mid/Rif2Mid.csproj -c=Release -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
+          dotnet publish ./Src/SongFuseCLI/SongFuseCLI.csproj -c=Release -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
       - name: Publish applications (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         shell: bash
         run: |
-          dotnet publish ./RiffExplorer/RiffExplorer.csproj -c=Release --self-contained=false -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
-          dotnet publish ./SongFuse/SongFuse.csproj -c=Release --self-contained=false -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
+          dotnet publish ./Src/RiffExplorer/RiffExplorer.csproj -c=Release --self-contained=false -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
+          dotnet publish ./Src/SongFuse/SongFuse.csproj -c=Release --self-contained=false -r=${{ matrix.osname }} -o=${{ env.OUTPUT_PATH }}
       - name: Cleanup debug files
         shell: bash
         run: |

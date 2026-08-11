@@ -1,9 +1,9 @@
 <Solution>
-  <Project Path="BFForever.Tests/BFForever.Tests.csproj" />
-  <Project Path="BFForever/BFForever.csproj" />
-  <Project Path="Celt2Wav/Celt2Wav.csproj" />
-  <Project Path="Rif2Mid/Rif2Mid.csproj" />
-  <Project Path="RiffExplorer/RiffExplorer.csproj" />
-  <Project Path="SongFuse/SongFuse.csproj" />
-  <Project Path="SongFuseCLI/SongFuseCLI.csproj" />
+  <Project Path="Src/BFForever/BFForever.csproj" />
+  <Project Path="Src/Celt2Wav/Celt2Wav.csproj" />
+  <Project Path="Src/Rif2Mid/Rif2Mid.csproj" />
+  <Project Path="Src/RiffExplorer/RiffExplorer.csproj" />
+  <Project Path="Src/SongFuse/SongFuse.csproj" />
+  <Project Path="Src/SongFuseCLI/SongFuseCLI.csproj" />
+  <Project Path="Test/BFForever.Tests/BFForever.Tests.csproj" />
 </Solution>
